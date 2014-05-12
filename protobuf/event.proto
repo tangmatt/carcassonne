@@ -1,0 +1,8 @@
+package edu.carleton.comp4905.carcassonne.common;
+
+option java_outer_classname = "EventMessage";
+
+message Event {
+	required int32 eventType = 1;
+	required string playerName = 2;
+}

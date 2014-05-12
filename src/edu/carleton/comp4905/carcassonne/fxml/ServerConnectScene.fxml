@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane prefHeight="281.0" prefWidth="298.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="edu.carleton.comp4905.carcassonne.client.JoinGameController">
+  <bottom>
+    <GridPane id="grid" hgap="5.0" prefHeight="250.0" prefWidth="287.0" style="" vgap="5.0">
+      <children>
+        <Label id="" alignment="CENTER" text="Carcassonne" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.hgrow="NEVER" GridPane.rowIndex="0" GridPane.rowSpan="1" GridPane.valignment="CENTER" GridPane.vgrow="NEVER">
+          <font>
+            <Font size="25.0" />
+          </font>
+        </Label>
+        <Label fx:id="sceneDesc" text="Fill in the form below to connect to a server." GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.rowSpan="1" GridPane.valignment="CENTER" GridPane.vgrow="NEVER" />
+        <Label fx:id="usernameLabel" text="Username:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <Label fx:id="servAddrLabel" text="Server Address:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+        <Label fx:id="servPortLabel" text="Server Port:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+        <TextField id="userName" fx:id="usernameField" prefWidth="200.0" text="Anonymous" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+        <TextField id="servAddress" fx:id="servAddrField" prefWidth="200.0" text="127.0.0.1" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+        <TextField id="servPort" fx:id="servPortField" prefWidth="200.0" text="5000" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+        <VBox alignment="CENTER_RIGHT" fillWidth="true" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
+          <children>
+            <Button id="connectButton" fx:id="submitButton" defaultButton="true" onAction="#handleSubmit" text="Connect" />
+          </children>
+        </VBox>
+        <Label fx:id="messagePrompt" opacity="1.0" text="" textFill="#ff3333" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="5" GridPane.rowSpan="1" />
+      </children>
+      <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="112.0" minWidth="10.0" prefWidth="87.0" />
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="147.0" minWidth="10.0" prefWidth="138.0" />
+      </columnConstraints>
+      <padding>
+        <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+      </padding>
+      <rowConstraints>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      </rowConstraints>
+    </GridPane>
+  </bottom>
+  <top>
+    <ToolBar>
+      <items>
+        <Button id="joinButton" cancelButton="false" defaultButton="false" disable="true" mnemonicParsing="false" text="Join Game" />
+        <Button fx:id="hostButton" defaultButton="false" focusTraversable="false" mnemonicParsing="false" onAction="#handleHostGame" text="Host Game" visible="true" />
+      </items>
+    </ToolBar>
+  </top>
+</BorderPane>
