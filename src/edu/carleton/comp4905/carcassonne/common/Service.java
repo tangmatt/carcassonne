@@ -6,12 +6,12 @@ import java.util.concurrent.Executors;
 public abstract class Service {
 	protected Reactor reactor;
 	protected PropertyLoader propertyLoader;
-	protected ExecutorService executors;
+	protected ExecutorService pool;
 	
 	public Service() {
 		propertyLoader = new PropertyLoader();
 		reactor = new Reactor();
-		executors = Executors.newCachedThreadPool();
+		pool = Executors.newCachedThreadPool();
 	}
 	
 	public Reactor getReactor() {
@@ -22,11 +22,11 @@ public abstract class Service {
 		return propertyLoader;
 	}
 	
-	public ExecutorService getExecutor() {
-		return executors;
+	public ExecutorService getPool() {
+		return pool;
 	}
 	
 	public void shutdown() {
-		executors.shutdown();
+		pool.shutdownNow();
 	}
 }

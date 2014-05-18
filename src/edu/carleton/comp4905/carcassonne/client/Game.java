@@ -27,7 +27,7 @@ public class Game extends Service implements Runnable {
 	public void run() {
 		try {
 			connection = connector.connect(address.getHostname(), address.getPort());
-			executors.execute(connection);
+			pool.execute(connection);
 			connection.sendEvent(new Event(EventType.JOIN_REQUEST, playerName));
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
@@ -36,21 +36,21 @@ public class Game extends Service implements Runnable {
 		}
 	}
 	
-	public String getPlayerName() {
+	public synchronized String getPlayerName() {
 		return playerName;
 	}
 	
-	public Address getAddress() {
+	public synchronized Address getAddress() {
 		return address;
 	}
 	
-	public Connection getConnection() {
+	public synchronized Connection getConnection() {
 		return connection;
 	}
 	
 	@Override
-	public void shutdown() {
-		//connection.close();
+	public synchronized void shutdown() {
+		connection.close();
 		super.shutdown();
 	}
 }

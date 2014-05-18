@@ -65,23 +65,23 @@ public class Server extends Service implements Runnable {
 		
 	}
 	
-	public ConcurrentMap<Address, Connection> getConnections() {
+	public synchronized ConcurrentMap<Address, Connection> getConnections() {
 		return connections;
 	}
 	
-	public ServerSocket getServerSocket() {
+	public synchronized ServerSocket getServerSocket() {
 		return listener;
 	}
 	
-	public Logger getLogger() {
+	public synchronized Logger getLogger() {
 		return logger;
 	}
 	
-	public ServerController getController() {
+	public synchronized ServerController getController() {
 		return controller;
 	}
 	
-	public void setController(ServerController controller) {
+	public synchronized void setController(ServerController controller) {
 		this.controller = controller;
 	}
 	
@@ -93,7 +93,7 @@ public class Server extends Service implements Runnable {
 			try {
 				//controller.addMessageEntry(MessageType.INFO, "Waiting for active connections...");
 				Connection connection = acceptor.accept();
-				executors.execute(connection);
+				pool.execute(connection);
 			} catch (IOException e) {
 				running = false;
 			}
@@ -101,12 +101,12 @@ public class Server extends Service implements Runnable {
 	}
 	
 	@Override
-	public void shutdown() {
+	public synchronized void shutdown() {
 		super.shutdown();
 		running = false;
 		
-		//for(Connection connection : connections.values())
-		//	connection.close();
+		for(Connection connection : connections.values())
+			connection.close();
 		
 		try {
 			listener.close();
@@ -126,7 +126,7 @@ public class Server extends Service implements Runnable {
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public EventHandler getEventHandler(Properties properties, final String handlerName) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+	protected EventHandler getEventHandler(Properties properties, final String handlerName) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		// Instantiate the handler
 		@SuppressWarnings("unchecked")
 		Class<EventHandler> clazz = (Class<EventHandler>)Class.forName(handlerName);

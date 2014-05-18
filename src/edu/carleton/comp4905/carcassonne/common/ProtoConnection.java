@@ -4,18 +4,16 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class ProtoConnection extends Connection {
 	private static final long serialVersionUID = 1L;
 	protected Socket peer;
-	protected BlockingQueue<Event> buffer;
+	private boolean running;
 
 	public ProtoConnection(Service service, Socket peer) throws IOException {
 		super(service);
 		this.peer = peer;
-		this.buffer = new LinkedBlockingQueue<Event>();
+		this.running = false;
 	}
 	
 	public Socket getPeer() {
@@ -25,6 +23,8 @@ public class ProtoConnection extends Connection {
 	@Override
 	public void close() {
 		try {
+			running = false;
+			service.getPool().shutdown();
 			peer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -33,8 +33,9 @@ public class ProtoConnection extends Connection {
 	
 	@Override
 	public void run() {
-		new Thread(new Producer()).start();
-		new Thread(new Consumer(this)).start();
+		running = true;
+		service.getPool().execute(new Producer());
+		service.getPool().execute(new Consumer(this));
 	}
 
 	@Override
@@ -54,7 +55,7 @@ public class ProtoConnection extends Connection {
 	private class Producer implements Runnable {
 		@Override
 		public void run() {
-			while(true) {
+			while(running || !Thread.currentThread().isInterrupted()) {
 				try {
 					Event event = getEvent();
 					/*EventMessage.Event eventMessage = EventMessage.Event.newBuilder()
@@ -64,9 +65,9 @@ public class ProtoConnection extends Connection {
 					eventMessage.writeTo(peer.getOutputStream());*/
 					new ObjectOutputStream(peer.getOutputStream()).writeObject(event);
 				} catch (IOException e) {
-					e.printStackTrace();
+					Thread.currentThread().interrupt();
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					Thread.currentThread().interrupt();
 				}
 			}
 		}
@@ -82,7 +83,7 @@ public class ProtoConnection extends Connection {
 		@Override
 		public void run() {
 			try {
-				while(true) {
+				while(running || !Thread.currentThread().isInterrupted()) {
 					/*if(service.getClass() == Server.class) {
 						((Server)service).getController().addMessageEntry(MessageType.INFO, "Received Event Message");
 					}
@@ -98,9 +99,9 @@ public class ProtoConnection extends Connection {
 						service.getReactor().dispatch(event);
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				Thread.currentThread().interrupt();
 			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+				Thread.currentThread().interrupt();
 			}
 		}
 	}
