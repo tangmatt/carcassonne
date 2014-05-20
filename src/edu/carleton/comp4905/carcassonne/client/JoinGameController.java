@@ -11,7 +11,6 @@ import javafx.scene.control.Button;
 
 public class JoinGameController extends InputController implements Initializable, ControlledScreen {
 	@FXML private Button hostButton;
-		
 	private ScreensController screensController;
 	
 	@Override
@@ -20,15 +19,16 @@ public class JoinGameController extends InputController implements Initializable
 	}
 	
 	@FXML
-	private void handleSubmit(ActionEvent event) {
+	/**
+	 * Handles the submit button when the user chooses to join a game.
+	 * @param event an ActionEvent
+	 */
+	private void handleSubmit(final ActionEvent event) {
 		if(isNameFieldEmpty() || isAddrFieldEmpty() || !isPortFieldValid())
 			return;
 		try {
-			//Socket socket = new Socket(servAddrField.getText(), Integer.parseInt(servPortField.getText()));
-			//socket.close();
 			Address address = new Address(servAddrField.getText(), Integer.parseInt(servPortField.getText()));
 			new GameClient(usernameField.getText(), address).start(new javafx.stage.Stage());
-			//new Thread(new Game(usernameField.getText(), socket)).start();
 		} catch (Exception e) {
 			e.printStackTrace();
 			showMessage("Could not connect to server.");
@@ -40,12 +40,12 @@ public class JoinGameController extends InputController implements Initializable
 	 * Handles event when Host Game button is pressed from the tool bar.
 	 * @param event the event
 	 */
-	private void handleHostGame(ActionEvent event) {
+	private void handleHostGame(final ActionEvent event) {
 		screensController.setScreen(Carcassonne.HOST_SCREEN);
 	}
 
 	@Override
-	public void setScreenParent(ScreensController screen) {
+	public void setScreenParent(final ScreensController screen) {
 		screensController = screen;
 	}
 }

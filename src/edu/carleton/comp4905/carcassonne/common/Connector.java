@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 
 public abstract class Connector {
-	protected Service service;
+	protected final Service service;
 	
-	public Connector(Service service) {
+	public Connector(final Service service) {
 		this.service = service;
 	}
 	

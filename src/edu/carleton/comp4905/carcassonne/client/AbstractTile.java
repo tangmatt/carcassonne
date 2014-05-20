@@ -7,15 +7,16 @@ import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 
-public abstract class TileBase extends StackPane {
-	private GameTile tile;
-	private EventHandler<MouseEvent> handler;
+public abstract class AbstractTile extends StackPane {
+	protected GameTile tile;
+	protected EventHandler<MouseEvent> handler;
+	protected boolean state;
 	public static final String selectedStyle = "-fx-border-color: #2F8BFA;"
             + "-fx-border-width: 2;"
 			+ "-fx-border-insets: -1;"
             + "-fx-border-style: solid;";
 	
-	public TileBase(GameTile tile) {
+	public AbstractTile(final GameTile tile) {
 		addTile(tile);
 		setSelected(false);
 	}
@@ -24,10 +25,10 @@ public abstract class TileBase extends StackPane {
 	 * Adds a new GameTile above the existing GameTile(s).
 	 * @param tile a GameTile
 	 */
-	public void addTile(GameTile tile) {
+	public void addTile(final GameTile tile) {
 		this.tile = tile;
-		getChildren().add(tile);
-		setSelected(false);
+		getChildren().add(this.tile);
+		setSelected(state);
 	}
 	
 	/**
@@ -59,46 +60,83 @@ public abstract class TileBase extends StackPane {
 		return tile.getSegments();
 	}
 	
-	public void addMouseListener(GameController controller, EventHandler<MouseEvent> handler) {
+	public void addMouseListener(final GameController controller, final EventHandler<MouseEvent> handler) {
+		removeMouseListener();
 		this.handler = handler;
-		addEventHandler(MouseEvent.MOUSE_PRESSED, handler);
-		//setCursor(Cursor.HAND);
+		addEventHandler(MouseEvent.MOUSE_PRESSED, this.handler);
 	}
 	
-	public void removePreviewSelectListener() {
+	public void removeMouseListener() {
+		if(handler == null)
+			return;
 		removeEventHandler(MouseEvent.MOUSE_PRESSED, handler);
-		//setCursor(Cursor.DEFAULT);
 	}
 	
+	/**
+	 * Returns the top segment of the tile.
+	 * @return a Segment
+	 */
 	public Segment getTopSegment() {
 		return tile.getTopSegment();
 	}
 	
+	/**
+	 * Returns the right segment of the tile.
+	 * @return a Segment
+	 */
 	public Segment getRightSegment() {
 		return tile.getRightSegment();
 	}
 	
+	/**
+	 * Returns the bottom segment of the tile.
+	 * @return a Segment
+	 */
 	public Segment getBottomSegment() {
 		return tile.getBottomSegment();
 	}
 	
+	/**
+	 * Returns the left segment of the tile.
+	 * @return a Segment
+	 */
 	public Segment getLeftSegment() {
 		return tile.getLeftSegment();
 	}
 	
-	public boolean matchesTopSegment(Segment segment) {
+	/**
+	 * Returns true if specified segment matches this tile's top segment.
+	 * @param segment a segment
+	 * @return a boolean
+	 */
+	public boolean matchesTopSegment(final Segment segment) {
 		return tile.getTopSegment() == segment;
 	}
 	
-	public boolean matchesRightSegment(Segment segment) {
+	/**
+	 * Returns true if specified segment matches this tile's right segment.
+	 * @param segment a segment
+	 * @return a boolean
+	 */
+	public boolean matchesRightSegment(final Segment segment) {
 		return tile.getRightSegment() == segment;
 	}
 	
-	public boolean matchesBottomSegment(Segment segment) {
+	/**
+	 * Returns true if specified segment matches this tile's bottom segment.
+	 * @param segment a segment
+	 * @return a boolean
+	 */
+	public boolean matchesBottomSegment(final Segment segment) {
 		return tile.getBottomSegment() == segment;
 	}
 	
-	public boolean matchesLeftSegment(Segment segment) {
+	/**
+	 * Returns true if specified segment matches this tile's left segment.
+	 * @param segment a segment
+	 * @return a boolean
+	 */
+	public boolean matchesLeftSegment(final Segment segment) {
 		return tile.getLeftSegment() == segment;
 	}
 	

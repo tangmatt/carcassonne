@@ -11,7 +11,11 @@ public abstract class InputController {
 	@FXML protected Label messagePrompt;
 	@FXML protected TextField usernameField, servAddrField, servPortField;
 	
-	protected void showMessage(String message) {
+	/**
+	 * Displays a message onto the Scene.
+	 * @param message a message (String)
+	 */
+	protected void showMessage(final String message) {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
@@ -24,44 +28,46 @@ public abstract class InputController {
 		});
 	}
 	
+	/**
+	 * Checks whether the user name text field is empty.
+	 * @return a boolean
+	 */
 	protected boolean isNameFieldEmpty() {
 		// Check if the username field has any input
 		if(usernameField.getText().isEmpty()) {
 			// Show the missing field message
-			Platform.runLater(new Runnable() {
-				@Override
-				public void run() {
-					messagePrompt.setText("Enter your username.");
-					FadeTransition fadeTransition = new FadeTransition(Duration.millis(2500), messagePrompt);
-					fadeTransition.setFromValue(1.0);
-					fadeTransition.setToValue(0.0);
-					fadeTransition.play();
-				}
-			});
+			messagePrompt.setText("Enter your username.");
+			FadeTransition fadeTransition = new FadeTransition(Duration.millis(2500), messagePrompt);
+			fadeTransition.setFromValue(1.0);
+			fadeTransition.setToValue(0.0);
+			fadeTransition.play();
 			return true;
 		}
 		return false;
 	}
 	
+	/**
+	 * Checks whether the server address text field is empty.
+	 * @return a boolean
+	 */
 	protected boolean isAddrFieldEmpty() {
 		// Check if the server address field has any input
 		if(servAddrField.getText().isEmpty()) {
 			// Show the missing field message
-			Platform.runLater(new Runnable() {
-				@Override
-				public void run() {
-					messagePrompt.setText("Enter the server address.");
-					FadeTransition fadeTransition = new FadeTransition(Duration.millis(2500), messagePrompt);
-					fadeTransition.setFromValue(1.0);
-					fadeTransition.setToValue(0.0);
-					fadeTransition.play();
-				}
-			});
+			messagePrompt.setText("Enter the server address.");
+			FadeTransition fadeTransition = new FadeTransition(Duration.millis(2500), messagePrompt);
+			fadeTransition.setFromValue(1.0);
+			fadeTransition.setToValue(0.0);
+			fadeTransition.play();
 			return true;
 		}
 		return false;
 	}
 	
+	/**
+	 * Checks whether the server port field is empty and its correctness.
+	 * @return a boolean
+	 */
 	protected boolean isPortFieldValid() {
 		// Check if the server port field has any input
 		if(servPortField.getText().isEmpty()) {

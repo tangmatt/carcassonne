@@ -5,13 +5,12 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class ProtoConnector extends Connector {
-
-	public ProtoConnector(Service service) {
+	public ProtoConnector(final Service service) {
 		super(service);
 	}
 
 	@Override
-	public Connection connect(String host, int port) throws UnknownHostException, IOException {
+	public Connection connect(final String host, final int port) throws UnknownHostException, IOException {
 		Socket socket = new Socket(host, port);
 		return new ProtoConnection(service, socket);
 	}

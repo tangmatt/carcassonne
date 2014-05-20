@@ -1,10 +1,11 @@
 package edu.carleton.comp4905.carcassonne.client;
 
+import edu.carleton.comp4905.carcassonne.common.ResourceManager;
+import edu.carleton.comp4905.carcassonne.common.StringConstants;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -18,24 +19,23 @@ public class Carcassonne extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		primaryStage.setTitle("Manager - Carcassonne");
-		primaryStage.getIcons().add(new Image("edu/carleton/comp4905/carcassonne/resources/icon.png"));
+		primaryStage.setTitle(StringConstants.MANAGER_TITLE + StringConstants.SEPARATOR + StringConstants.GAME_TITLE);
+		primaryStage.getIcons().add(ResourceManager.getImageFromResources("icon.png"));
 		primaryStage.setResizable(false);
 		
-		ScreensController mainContainer = new ScreensController();
+		// set up multiple screens on one Stage
+		ScreensController mainContainer = new ScreensController(this);
 		mainContainer.loadScreen(Carcassonne.JOIN_SCREEN, Carcassonne.JOIN_SCREEN_FXML);
 		mainContainer.loadScreen(Carcassonne.HOST_SCREEN, Carcassonne.HOST_SCREEN_FXML);
-		//mainContainer.loadScreen(Carcassonne.SERVER_LOG_SCREEN, Carcassonne.SERVER_LOG_SCREEN_FXML);
-		
 		mainContainer.setScreen(Carcassonne.JOIN_SCREEN);
 		
 		Group root = new Group();
 		root.getChildren().addAll(mainContainer);
 		Scene scene = new Scene(root, 298-10, 281-10);
-		//scene.getStylesheets().addAll(getClass().getResource("/styles/bg.css").toExternalForm());
-		primaryStage.setScene(scene); // subtracted by 10 because setResizable adds 10 pixels..
+		primaryStage.setScene(scene); // subtracted by 10 because setResizable adds 10 pixels apparently..
 		primaryStage.show();
 		
+		// event handler for closing the window
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent event) {

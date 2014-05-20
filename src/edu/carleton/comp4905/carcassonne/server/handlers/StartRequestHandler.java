@@ -11,7 +11,7 @@ import edu.carleton.comp4905.carcassonne.common.MessageType;
 import edu.carleton.comp4905.carcassonne.server.Server;
 import edu.carleton.comp4905.carcassonne.server.ServerController;
 
-public class JoinRequestHandler implements EventHandler {
+public class StartRequestHandler implements EventHandler {
 	@Override
 	public void handleEvent(final Event event) {
 		Connection connection = (Connection)event.getProperty("connection");
@@ -22,13 +22,11 @@ public class JoinRequestHandler implements EventHandler {
 		ServerController controller = server.getController();
 		ConcurrentMap<Address, Connection> connections = server.getConnections();
 		
-		connections.put(new Address(address, port), connection);
-		controller.addPlayerEntry(event.getPlayerName(), address, portAsString);
-		controller.addMessageEntry(MessageType.INFO, "Player '" + event.getPlayerName() + "' has joined the lobby");
+		controller.addMessageEntry(MessageType.INFO, "Player '" + event.getPlayerName() + "' has started the game (with " + connections.size() + " players)");
 		
 		// send reply back to connected clients
-		Event reply = new Event(EventType.JOIN_REPLY, event.getPlayerName());
-		reply.addProperty("numOfPlayers", connections.size());
+		Event reply = new Event(EventType.START_REPLY, event.getPlayerName());
+		// TODO send players information
 		connection.sendEvent(reply);
 	}
 }

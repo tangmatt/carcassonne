@@ -8,19 +8,47 @@ import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Connector;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventType;
+import edu.carleton.comp4905.carcassonne.common.PlatformManager;
 import edu.carleton.comp4905.carcassonne.common.ProtoConnector;
 import edu.carleton.comp4905.carcassonne.common.Service;
+import edu.carleton.comp4905.carcassonne.common.StringConstants;
 
 public class Game extends Service implements Runnable {
-	private String playerName;
-	private Address address;
-	private Connector connector;
+	private final String playerName;
+	private final Address address;
+	private final Connector connector;
 	private Connection connection;
+	private final GameController controller;
 	
-	public Game(final String playerName, final Address address) {
+	public Game(final String playerName, final Address address, final GameController gameController) {
+		super();
 		this.address = address;
 		this.playerName = playerName;
 		this.connector = new ProtoConnector(this);
+		this.controller = gameController;
+		initialize();
+	}
+	
+	/**
+	 * Initializes the reactor with event handlers and instantiates them.
+	 */
+	private void initialize() {
+		propertyLoader.loadProperty("client.properties");
+		for(Object eventType : propertyLoader.getProperties().keySet()) {
+			String handlerName = propertyLoader.getProperty((String)eventType);
+			if(handlerName != null) {
+				try {
+					reactor.addHandler(EventType.valueOf((String)eventType), getEventHandler(propertyLoader.getProperties(), handlerName));
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				} catch (InstantiationException e) {
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
 	}
 	
 	@Override
@@ -32,25 +60,56 @@ public class Game extends Service implements Runnable {
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
+			PlatformManager.run(new Runnable() {
+				@Override
+				public void run() {
+					controller.blurGame(true);
+					new MessageDialog(controller.getGridPane().getScene().getWindow(),
+							controller.getGameClient(),
+							StringConstants.ERR_TITLE,
+							e.getMessage())
+					.show();
+				}
+			});
 		}
 	}
 	
-	public synchronized String getPlayerName() {
+	/**
+	 * Returns the client's player name.
+	 * @return a String
+	 */
+	public String getPlayerName() {
 		return playerName;
 	}
 	
-	public synchronized Address getAddress() {
+	/**
+	 * Returns the client's address information.
+	 * @return an Address
+	 */
+	public Address getAddress() {
 		return address;
 	}
 	
-	public synchronized Connection getConnection() {
+	/**
+	 * Returns the established Connection object.
+	 * @return a Connection
+	 */
+	public Connection getConnection() {
 		return connection;
 	}
 	
+	/**
+	 * Returns the GameController object.
+	 * @return a GameController
+	 */
+	public GameController getGameController() {
+		return controller;
+	}
+	
 	@Override
-	public synchronized void shutdown() {
-		connection.close();
+	public void shutdown() {
+		if(connection != null)
+			connection.close();
 		super.shutdown();
 	}
 }

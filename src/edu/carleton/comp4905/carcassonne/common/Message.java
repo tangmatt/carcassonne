@@ -20,18 +20,34 @@ public class Message {
 		this.message = message;
 	}
 	
+	/**
+	 * Returns the date when the message was logged.
+	 * @return a String
+	 */
 	public String getDate() {
 		return date;
 	}
 	
+	/**
+	 * Returns the time when the message was logged.
+	 * @return a String
+	 */
 	public String getTime() {
 		return time;
 	}
 	
+	/**
+	 * Returns the message type.
+	 * @return a MessageType
+	 */
 	public MessageType getType() {
 		return type;
 	}
 	
+	/**
+	 * Returns the body of the message.
+	 * @return a String
+	 */
 	public String getMessage() {
 		return message;
 	}

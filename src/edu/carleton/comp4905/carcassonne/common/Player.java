@@ -1,11 +1,11 @@
 package edu.carleton.comp4905.carcassonne.common;
 
 public class Player {
-	private String name;
-	private String address;
-	private String port;
+	private final String name;
+	private final String address;
+	private final String port;
 	
-	public Player(PlayerBuilder builder) {
+	public Player(final PlayerBuilder builder) {
 		this.name = builder.name;
 		this.address = builder.address;
 		this.port = builder.port;
@@ -23,7 +23,7 @@ public class Player {
 		return port;
 	}
 	
-	public boolean equals(Player p) {
+	public boolean equals(final Player p) {
 		return name.equals(p.getName())
 				&& address.equals(p.getAddress())
 				&& port.equals(p.getPort());
@@ -34,7 +34,7 @@ public class Player {
 		private final String address;
 		private final String port;
 		
-		public PlayerBuilder(String name, String address, String port) {
+		public PlayerBuilder(final String name, final String address, final String port) {
 			this.name = name;
 			this.address = address;
 			this.port = port;

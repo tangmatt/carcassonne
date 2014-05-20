@@ -1,10 +1,12 @@
 package edu.carleton.comp4905.carcassonne.server;
 
+import edu.carleton.comp4905.carcassonne.common.FXMLManager;
+import edu.carleton.comp4905.carcassonne.common.ResourceManager;
+import edu.carleton.comp4905.carcassonne.common.StringConstants;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -12,7 +14,8 @@ import javafx.stage.WindowEvent;
 public class ServerClient extends Application {
 	private FXMLLoader fxmlLoader;
 	private ServerController controller;
-	private Server server;
+	private final Server server;
+	private Stage primaryStage;
 	
 	public ServerClient() {
 		this.server = new Server();
@@ -24,16 +27,19 @@ public class ServerClient extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		primaryStage.setTitle("Server - Carcassonne");
-		primaryStage.getIcons().add(new Image("/edu/carleton/comp4905/carcassonne/resources/icon.png"));
+		this.primaryStage = primaryStage;
+		primaryStage.setTitle(StringConstants.SERVER_TITLE + StringConstants.SEPARATOR + StringConstants.GAME_TITLE);
+		primaryStage.getIcons().add(ResourceManager.getImageFromResources("icon.png"));
 		
-		fxmlLoader = new FXMLLoader(getClass().getResource("/edu/carleton/comp4905/carcassonne/fxml/ServerLogScene.fxml"));
+		fxmlLoader = FXMLManager.getFXML(getClass(), "ServerLogScene.fxml");
 		AnchorPane anchorPane = fxmlLoader.load();
 		controller = fxmlLoader.getController();
+		controller.initData(this);
 		
 		primaryStage.setScene(new Scene(anchorPane));
 		primaryStage.show();
 		
+		// handles the event for closing the window
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent event) {
@@ -42,12 +48,25 @@ public class ServerClient extends Application {
 			}
 		});
 		
+		// initializes and executes the server
 		server.setController(controller);
 		server.getPool().execute(server);
 	}
 	
+	/**
+	 * Returns the ServerController object.
+	 * @return a ServerController
+	 */
 	public ServerController getController() {
 		return controller;
+	}
+	
+	/**
+	 * Returns the primary stage.
+	 * @return a Stage
+	 */
+	public Stage getStage() {
+		return primaryStage;
 	}
 	
 	public static void main(String args[]) {

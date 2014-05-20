@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.*?>
 
-<BorderPane prefHeight="-1.0" prefWidth="-1.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="edu.carleton.comp4905.carcassonne.client.GameController">
+<BorderPane fx:id="rootPane" prefHeight="-1.0" prefWidth="-1.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="edu.carleton.comp4905.carcassonne.client.GameController">
   <center>
     <GridPane fx:id="gridPane" hgap="5.0" maxHeight="634.0" maxWidth="634.0" minHeight="-1.0" minWidth="-1.0" prefHeight="634.0" prefWidth="634.0" style="" vgap="5.0">
       <columnConstraints>

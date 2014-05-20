@@ -3,7 +3,7 @@ package edu.carleton.comp4905.carcassonne.client;
 import java.util.EnumSet;
 import java.util.Set;
 
-import edu.carleton.comp4905.carcassonne.common.StringConstants;
+import edu.carleton.comp4905.carcassonne.common.ResourceManager;
 import javafx.scene.image.ImageView;
 
 public class GameTile extends ImageView implements Cloneable {
@@ -14,7 +14,7 @@ public class GameTile extends ImageView implements Cloneable {
 		super();
 	}
 	
-	public GameTile(GameTile tile) {
+	public GameTile(final GameTile tile) {
 		setSegments(tile.top, tile.right, tile.bottom, tile.left);
 		setImage(tile.getImage());
 	}
@@ -27,10 +27,10 @@ public class GameTile extends ImageView implements Cloneable {
 	 * @param bottom a Segment
 	 * @param left a Segment
 	 */
-	public void setTile(String name, Segment top, Segment right, Segment bottom, Segment left) {
+	public void setTile(final String name, final Segment top, final Segment right, final Segment bottom, final Segment left) {
 		this.name = name;
 		setSegments(top, right, bottom, left);
-		setImage(ResourceManager.getImage(StringConstants.TILES_DIR, name));
+		setImage(ResourceManager.getImageFromTiles(name));
 	}
 	
 	/**
@@ -40,7 +40,7 @@ public class GameTile extends ImageView implements Cloneable {
 	 * @param bottom a Segment
 	 * @param left a Segment
 	 */
-	private void setSegments(Segment top, Segment right, Segment bottom, Segment left) {
+	private void setSegments(final Segment top, final Segment right, final Segment bottom, final Segment left) {
 		this.top = top;
 		this.right = right;
 		this.bottom = bottom;
@@ -49,7 +49,7 @@ public class GameTile extends ImageView implements Cloneable {
 	
 	/**
 	 * Returns the name of the latest image file.
-	 * @return
+	 * @return a String
 	 */
 	public String getName() {
 		return name;
@@ -63,24 +63,45 @@ public class GameTile extends ImageView implements Cloneable {
 		return EnumSet.of(top, right, bottom, left);
 	}
 	
+	/**
+	 * Returns the top segment of the tile.
+	 * @return a Segment
+	 */
 	public Segment getTopSegment() {
 		return top;
 	}
 	
+	/**
+	 * Returns the right segment of the tile.
+	 * @return a Segment
+	 */
 	public Segment getRightSegment() {
 		return right;
 	}
 	
+	/**
+	 * Returns the bottom segment of the tile.
+	 * @return a Segment
+	 */
 	public Segment getBottomSegment() {
 		return bottom;
 	}
 	
+	/**
+	 * Returns the left segment of the tile.
+	 * @return a Segment
+	 */
 	public Segment getLeftSegment() {
 		return left;
 	}
 	
 	@Override
-	public Object clone() throws CloneNotSupportedException {
-		return super.clone();
+	public Object clone() {
+		try {
+			return super.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

@@ -1,55 +1,53 @@
 package edu.carleton.comp4905.carcassonne.client;
 
 import java.net.URL;
+import java.util.Random;
 import java.util.ResourceBundle;
 
-import javafx.application.Platform;
+import org.controlsfx.control.PopOver;
+import org.controlsfx.control.PopOver.ArrowLocation;
+
+import edu.carleton.comp4905.carcassonne.client.handlers.TileContainerHandler;
+import edu.carleton.comp4905.carcassonne.client.handlers.TilePreviewHandler;
+import edu.carleton.comp4905.carcassonne.common.PlatformManager;
+import edu.carleton.comp4905.carcassonne.common.StringConstants;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 
 public class GameController implements Initializable {
+	@FXML private BorderPane rootPane;
 	@FXML private GridPane gridPane;
 	@FXML private HBox previewPane;
 	@FXML private Button endTurnButton;
 	private TileManager tileManager;
 	private Board board;
-	private static MouseEvent mouseEvent;
+	private PopOver popOver;
+	private MouseEvent mouseEvent;
+	private LobbyDialog lobbyDialog;
+	private GameClient client;
+	private Random random;
 	
-	public GameController() {
+	@Override
+	public void initialize(URL url, ResourceBundle resourceBundle) {
 		tileManager = TileManager.getInstance();
 		board = new Board();
 		mouseEvent = new MouseEvent(MouseEvent.MOUSE_PRESSED, 0, 0, 0, 0, 
 				MouseButton.PRIMARY, 1, true, true, true, true, true, true, true, true, true, true, null);
-	}
-
-	@Override
-	public void initialize(URL url, ResourceBundle resourceBundle) {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					for(int c=0; c<Board.COLS; ++c) {
-						for(int r=0; r<Board.ROWS; ++r) {
-							TileContainer container;
-							if(r == Board.CENTER_ROW && c == Board.CENTER_COL)
-								container = new TileContainer(tileManager.getStarterTile());
-							else
-								container = new TileContainer(tileManager.getEmptyTile());
-							addTile(r, c, container);
-						}
-					}
-					setPreviewTiles(tileManager.getTile("tile2.png"));
-				} catch (CloneNotSupportedException e) {
-					e.printStackTrace();
-				}
-			}
-		});
+		random = new Random();
+		
+		setPreviewTiles(tileManager.getEmptyTile()); // initializes the preview tiles to be empty
+		
+		createGameBoard();
+		createPopOver();
+		createLobby();
 	}
 	
 	/**
@@ -58,50 +56,56 @@ public class GameController implements Initializable {
 	 * @param c a column (integer)
 	 * @param container a TileContainer
 	 */
-	public void addTile(int r, int c, TileContainer container) {
-		board.setTile(r, c, container);
-		gridPane.add(container, c, r);
+	public void addTile(final int r, final int c, final TileContainer container) {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				board.setTile(r, c, container);
+				gridPane.add(container, c, r);
+			}
+		});
 	}
 	
 	/**
 	 * Places tiles onto the tile preview displays.
 	 * @param tile a GameTile
 	 */
-	public void setPreviewTiles(GameTile tile) {
-		try {
-			board.setRotatedPreviews(tile);
-			preview0.addMouseListener(this, new TilePreviewHandler(preview0, this));
-			preview90.addMouseListener(this, new TilePreviewHandler(preview90, this));
-			preview180.addMouseListener(this, new TilePreviewHandler(preview180, this));
-			preview270.addMouseListener(this, new TilePreviewHandler(preview270, this));
-			
-			Event.fireEvent(preview0, mouseEvent);
-
-			previewPane.getChildren().addAll(preview0, preview90, preview180, preview270);
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
-		
-		//handleHints(container);
+	public void setPreviewTiles(final GameTile tile) {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				setRotatedPreviews(tile);
+				if(previewPane.getChildren().isEmpty())
+					previewPane.getChildren().addAll(board.getPreviews());
+					Event.fireEvent(board.getPreviews()[0], mouseEvent);
+			}
+		});
 	}
 	
 	/**
 	 * Determines whether the chosen tile can be placed adjacent to existing tiles.
-	 * @param container a TileBase
+	 * @param preview a TilePreview
 	 */
-	public void handleHints(TileBase container) {
-		for(int c=0; c<Board.COLS; ++c) {
-			for(int r=0; r<Board.ROWS; ++r) {
-				TileContainer currTile;
-				currTile = board.getTile(r, c);
-				if(currTile != null) {
-					showHint(Side.TOP, r, c, container, currTile.getTopSegment());
-					showHint(Side.RIGHT, r, c, container, currTile.getRightSegment());
-					showHint(Side.BOTTOM, r, c, container, currTile.getBottomSegment());
-					showHint(Side.LEFT, r, c, container, currTile.getLeftSegment());
+	public void handleHints(final TilePreview preview) {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				refresh();
+				for(int c=0; c<Board.COLS; ++c) {
+					for(int r=0; r<Board.ROWS; ++r) {
+						TileContainer currTile;
+						currTile = board.getTile(r, c);
+						if(currTile != null) {
+							// compare existing tile with new tile and indicating if matching
+							showHint(Side.TOP, r, c, preview, currTile.getTopSegment());
+							showHint(Side.RIGHT, r, c, preview, currTile.getRightSegment());
+							showHint(Side.BOTTOM, r, c, preview, currTile.getBottomSegment());
+							showHint(Side.LEFT, r, c, preview, currTile.getLeftSegment());
+						}
+					}
 				}
 			}
-		}
+		});
 	}
 	
 	/**
@@ -109,13 +113,13 @@ public class GameController implements Initializable {
 	 * @param side a Side
 	 * @param r a row (integer)
 	 * @param c a column (integer)
-	 * @param container a TileBase
+	 * @param container an AbstractTile
 	 * @param segment a Segment
 	 * @return boolean
 	 */
-	private boolean showHint(Side side, int r, int c, TileBase container, Segment segment) {
+	private boolean showHint(final Side side, final int r, final int c, final AbstractTile container, final Segment segment) {
 		try {
-			TileBase selected = null;
+			AbstractTile selected = null;
 			if(side == Side.TOP && board.getTile(r-1, c).isEmpty() && container.matchesBottomSegment(segment)) {
 				selected = board.getTile(r-1, c);
 				selected.setSelected(true);
@@ -143,19 +147,232 @@ public class GameController implements Initializable {
 		return true;
 	}
 	
-	public void removeMouseHandlers() {
-		
+	/**
+	 * Initializes the start of a game.
+	 */
+	public void startGame() {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				startTurn(); // TODO temporary; for testing
+			}
+		});
 	}
 	
+	/**
+	 * Handles the start of the turn for the current client.
+	 */
+	public void startTurn() {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				// TODO randomize a preview tile based on Carcassonne rules
+				int index = random.nextInt(TileManager.NUM_OF_TILES) + 1;
+				setPreviewTiles(tileManager.getTile("tile" + index + ".png"));
+			}
+		});
+	}
+	
+	/**
+	 * Handles the end of the turn for current client.
+	 */
+	public void endTurn() {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				for(TilePreview preview : board.getPreviews())
+					preview.setSelected(false);
+				for(int c=0; c<Board.COLS; ++c) {
+					for(int r=0; r<Board.ROWS; ++r) {
+						board.getTile(r, c).setSelected(false);
+						board.getTile(r, c).removeMouseListener();
+					}
+				}
+				// TODO send event to server
+			}
+		});
+	}
+	
+	/**
+	 * Sets previews to be given tile and its rotated views and adds mouse listener to it.
+	 * @param tile a GameTile
+	 */
+	private void setRotatedPreviews(final GameTile tile) {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				TilePreview[] previews = board.getPreviews();
+				for(int i=0, degrees=0; i<previews.length; ++i, degrees+=90) {
+					boolean original = (degrees == 0);
+					if(previews[i] == null)
+						previews[i] = new TilePreview(tileManager.getTile(original ? tile.getName() : tile.getName()+degrees));
+					else
+						previews[i].addTile(tileManager.getTile(original ? tile.getName() : tile.getName()+degrees));
+					if(!previews[i].getTile().getName().equals(StringConstants.EMPTY_TILE))
+						previews[i].addMouseListener(GameController.this, new TilePreviewHandler(previews[i], GameController.this));
+				}
+			}
+		});
+	}
+	
+	/**
+	 * Refreshes the preview and game tiles.
+	 */
+	public void refresh() {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				for(TilePreview preview : board.getPreviews())
+					preview.setSelected(false);
+				for(int c=0; c<Board.COLS; ++c) {
+					for(int r=0; r<Board.ROWS; ++r) {
+						board.getTile(r, c).setSelected(false);
+						board.getTile(r, c).removeMouseListener();
+					}
+				}
+			}
+		});
+	}
+	
+	/**
+	 * Handles the triggering of the PopOver.
+	 * @param tile a TilePreview
+	 * @param x a x-coordinate (Double)
+	 * @param y a y-coordinate (Double)
+	 */
+	public void handlePopOver(final TilePreview tile, final double x, final double y) {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				if(!popOver.isDetached())
+					popOver.hide();
+				popOver.show(tile, x, y);
+			}
+		});
+	}
+	
+	/**
+	 * Creates a PopOver component.
+	 */
+	private void createPopOver() {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				popOver = new PopOver();
+				popOver.setArrowSize(10f);
+				popOver.setArrowIndent(15f);
+				popOver.setCornerRadius(0f);
+				popOver.setArrowLocation(ArrowLocation.TOP_CENTER);
+				popOver.setDetachable(false);
+				popOver.setAutoHide(true);
+			}
+		});
+	}
+	
+	/**
+	 * Creates a dialog for displaying the player queue and pre-game interaction.
+	 */
+	private void createLobby() {
+		PlatformManager.runLater(new Runnable() { // Note: must use runLater otherwise LoadException
+			@Override
+			public void run() {
+				lobbyDialog = new LobbyDialog(gridPane.getScene().getWindow(), client);
+			}
+		});
+	}
+	
+	/**
+	 * Shows the lobby dialog.
+	 */
+	public void showLobbyDialog() {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				client.getController().blurGame(true);
+				lobbyDialog.show();
+			}		
+		});
+	}
+	
+	/**
+	 * Initializes the game board with empty tiles and the starting tile at the center.
+	 */
+	private void createGameBoard() {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				for(int c=0; c<Board.COLS; ++c) {
+					for(int r=0; r<Board.ROWS; ++r) {
+						TileContainer container;
+						if(r == Board.CENTER_ROW && c == Board.CENTER_COL)
+							container = new TileContainer(tileManager.getStarterTile());
+						else
+							container = new TileContainer(tileManager.getEmptyTile());
+						addTile(r, c, container);
+					}
+				}
+			}
+		});
+	}
+	
+	/**
+	 * Adds/removes blur from the interface.
+	 * @param state
+	 */
+	public void blurGame(final boolean state) {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				rootPane.setEffect(state ? new GaussianBlur() : null);
+			}
+		});
+	}
+	
+	/**
+	 * Returns the pane containing the preview tiles. 
+	 * @return a HBox
+	 */
 	public HBox getPreviewPane() {
 		return previewPane;
 	}
 	
+	/**
+	 * Returns the pane containing the game tiles.
+	 * @return a GridPane
+	 */
 	public GridPane getGridPane() {
 		return gridPane;
 	}
 	
+	/**
+	 * Returns the Board object.
+	 * @return a Board
+	 */
 	public Board getBoard() {
 		return board;
+	}
+	
+	/**
+	 * Returns the LobbyController object.
+	 * @return a LobbyController
+	 */
+	public LobbyController getLobbyController() {
+		return lobbyDialog.getController();
+	}
+	
+	/**
+	 * Returns the GameClient object.
+	 * @return a GameClient;
+	 */
+	public GameClient getGameClient() {
+		return client;
+	}
+	
+	/**
+	 * Initializes data for this controller.
+	 * @param client a GameClient
+	 */
+	public void initData(final GameClient client) {
+		this.client = client;
 	}
 }

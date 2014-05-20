@@ -7,10 +7,10 @@ import java.net.Socket;
 
 public class ProtoConnection extends Connection {
 	private static final long serialVersionUID = 1L;
-	protected Socket peer;
+	protected final Socket peer;
 	private boolean running;
 
-	public ProtoConnection(Service service, Socket peer) throws IOException {
+	public ProtoConnection(final Service service, final Socket peer) throws IOException {
 		super(service);
 		this.peer = peer;
 		this.running = false;
@@ -44,7 +44,7 @@ public class ProtoConnection extends Connection {
 	}
 
 	@Override
-	public void sendEvent(Event event) {
+	public void sendEvent(final Event event) {
 		try {
 			buffer.put(event);
 		} catch (InterruptedException e) {
@@ -74,9 +74,9 @@ public class ProtoConnection extends Connection {
 	}
 	
 	private class Consumer implements Runnable {
-		private ProtoConnection connection;
+		private final ProtoConnection connection;
 		
-		public Consumer(ProtoConnection connection) {
+		public Consumer(final ProtoConnection connection) {
 			this.connection = connection;
 		}
 		

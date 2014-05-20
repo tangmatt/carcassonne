@@ -5,9 +5,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ProtoAcceptor extends Acceptor {
-	private ServerSocket listener;
+	private final ServerSocket listener;
 	
-	public ProtoAcceptor(Service service, ServerSocket listener) {
+	public ProtoAcceptor(final Service service, final ServerSocket listener) {
 		super(service);
 		this.listener = listener;
 	}

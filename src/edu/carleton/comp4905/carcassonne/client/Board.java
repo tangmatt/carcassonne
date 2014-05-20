@@ -6,15 +6,13 @@ public class Board {
 	public static final int CENTER_ROW = Math.floorDiv(ROWS, 2);
 	public static final int CENTER_COL = Math.floorDiv(COLS, 2);
 	
-	private TileContainer[][] tiles;
-	private TilePreview[] previews;
+	private final TileContainer[][] tiles;
+	private final TilePreview[] previews;
 	private GameTile selected;
-	private TileManager tileManager;
 	
 	public Board() {
 		tiles = new TileContainer[COLS][ROWS];
 		previews = new TilePreview[Side.values().length];
-		tileManager = TileManager.getInstance();
 	}
 	
 	/**
@@ -23,7 +21,7 @@ public class Board {
 	 * @param c a column (integer)
 	 * @param tile a TileContainer
 	 */
-	public void setTile(int r, int c, TileContainer tile) {
+	public void setTile(final int r, final int c, final TileContainer tile) {
 		tiles[c][r] = tile;
 	}
 	
@@ -33,27 +31,31 @@ public class Board {
 	 * @param c a column (integer)
 	 * @return TileContainer
 	 */
-	public TileContainer getTile(int r, int c) {
+	public TileContainer getTile(final int r, final int c) {
 		return tiles[c][r];
 	}
 	
-	public void setSelectedPreviewTile(GameTile selected) {
+	/**
+	 * Set selected preview tile.
+	 * @param selected
+	 */
+	public void setSelectedPreviewTile(final GameTile selected) {
 		this.selected = selected;
 	}
 	
+	/**
+	 * Returns the selected preview tile.
+	 * @return GameTile
+	 */
 	public GameTile getSelectedPreviewTile() {
 		return selected;
 	}
 	
-	public void setRotatedPreviews(GameTile tile) {
-		for(int i=0, degrees=0; i<previews.length; ++i, degrees+=90) {
-			try {
-				previews[i] = new TilePreview(tileManager.getTile(tile.getName()+degrees));
-			} catch (CloneNotSupportedException e) {
-				e.printStackTrace();
-			}
-		}
+	/**
+	 * Returns the array of previews.
+	 * @return an array of TilePreview
+	 */
+	public TilePreview[] getPreviews() {
+		return previews;
 	}
-	
-	public TilePreview get
 }

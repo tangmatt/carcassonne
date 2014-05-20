@@ -4,28 +4,43 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.carleton.comp4905.carcassonne.common.FXMLManager;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.layout.StackPane;
 
 public class ScreensController extends StackPane {
-	private Map<String, Node> screens;
-	private final String fxmlDir = "edu/carleton/comp4905/carcassonne/fxml";
+	private final Map<String, Node> screens;
+	private final Carcassonne client;
 	
-	public ScreensController() {
+	public ScreensController(final Carcassonne client) {
+		this.client = client;
 		screens = new HashMap<String, Node>();
 	}
 	
-	public void addScreen(String name, Node screen) {
+	/**
+	 * Adds a new screen.
+	 * @param name a name of the screen
+	 * @param screen a screen (Node)
+	 */
+	public void addScreen(final String name, final Node screen) {
 		screens.put(name, screen);
 	}
 	
-	public boolean loadScreen(String name, String resource) {
+	/**
+	 * Loads the screen.
+	 * @param name a name of the screen
+	 * @param resource a resource
+	 * @return a boolean
+	 */
+	public boolean loadScreen(final String name, final String resource) {
 		try {
-			String path = "/" + fxmlDir + "/" + resource;
-			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(path));
+			FXMLLoader fxmlLoader = FXMLManager.getFXML(getClass(), resource);
 			Parent loadScreen = (Parent)fxmlLoader.load();
+			Object obj = fxmlLoader.getController();
+			if(obj instanceof HostGameController)
+				((HostGameController)obj).initData(client);
 			ControlledScreen screenContainer = ((ControlledScreen)fxmlLoader.getController());
 			screenContainer.setScreenParent(this);
 			addScreen(name, loadScreen);
@@ -36,6 +51,11 @@ public class ScreensController extends StackPane {
 		return true;
 	}
 	
+	/**
+	 * Sets the screen.
+	 * @param name a name of the screen
+	 * @return a boolean
+	 */
 	public boolean setScreen(final String name) {
 		if(screens.get(name) == null)
 			return false;

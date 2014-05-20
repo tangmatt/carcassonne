@@ -2,24 +2,22 @@ package edu.carleton.comp4905.carcassonne.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import edu.carleton.comp4905.carcassonne.common.Acceptor;
 import edu.carleton.comp4905.carcassonne.common.Address;
 import edu.carleton.comp4905.carcassonne.common.Connection;
-import edu.carleton.comp4905.carcassonne.common.EventHandler;
 import edu.carleton.comp4905.carcassonne.common.EventType;
 import edu.carleton.comp4905.carcassonne.common.MessageType;
 import edu.carleton.comp4905.carcassonne.common.ProtoAcceptor;
 import edu.carleton.comp4905.carcassonne.common.Service;
+import edu.carleton.comp4905.carcassonne.common.StringConstants;
 
 public class Server extends Service implements Runnable {
-	private ConcurrentMap<Address, Connection> connections;
+	private final ConcurrentMap<Address, Connection> connections;
 	private ServerSocket listener;
 	private Acceptor acceptor;
-	private Logger logger;
 	private ServerController controller;
 	private boolean running;
 	
@@ -36,16 +34,22 @@ public class Server extends Service implements Runnable {
 		try {
 			listener = new ServerSocket(PORT);
 			listener.setReuseAddress(true);
+			acceptor = new ProtoAcceptor(this, listener);
+			running = false;
+			initialize();
 		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(0);
+			// TODO controller is null, need to fix
+			/*new MessageDialog(controller.getAnchorPane().getScene().getWindow(),
+					controller.getServerClient(),
+					StringConstants.ERR_TITLE,
+					e.getMessage())
+			.show();*/
 		}
-		acceptor = new ProtoAcceptor(this, listener);
-		logger = new Logger();
-		running = false;
-		initialize();
 	}
 	
+	/**
+	 * Initializes the reactor with event handlers and instantiates them.
+	 */
 	private void initialize() {
 		propertyLoader.loadProperty("server.properties");
 		for(Object eventType : propertyLoader.getProperties().keySet()) {
@@ -61,27 +65,38 @@ public class Server extends Service implements Runnable {
 					e.printStackTrace();
 				}
 			}
-		}
-		
+		}	
 	}
 	
-	public synchronized ConcurrentMap<Address, Connection> getConnections() {
+	/**
+	 * Returns the map of Connections.
+	 * @return a Map
+	 */
+	public ConcurrentMap<Address, Connection> getConnections() {
 		return connections;
 	}
 	
-	public synchronized ServerSocket getServerSocket() {
+	/**
+	 * Returns the server socket.
+	 * @return a ServerSocket
+	 */
+	public ServerSocket getServerSocket() {
 		return listener;
 	}
 	
-	public synchronized Logger getLogger() {
-		return logger;
-	}
-	
-	public synchronized ServerController getController() {
+	/**
+	 * Returns the ServerController object
+	 * @return a ServerController
+	 */
+	public ServerController getController() {
 		return controller;
 	}
 	
-	public synchronized void setController(ServerController controller) {
+	/**
+	 * Sets the ServerController object.
+	 * @param controller a ServerController
+	 */
+	public void setController(final ServerController controller) {
 		this.controller = controller;
 	}
 	
@@ -91,7 +106,6 @@ public class Server extends Service implements Runnable {
 		running = true;
 		while(running) {
 			try {
-				//controller.addMessageEntry(MessageType.INFO, "Waiting for active connections...");
 				Connection connection = acceptor.accept();
 				pool.execute(connection);
 			} catch (IOException e) {
@@ -101,7 +115,7 @@ public class Server extends Service implements Runnable {
 	}
 	
 	@Override
-	public synchronized void shutdown() {
+	public void shutdown() {
 		super.shutdown();
 		running = false;
 		
@@ -115,21 +129,5 @@ public class Server extends Service implements Runnable {
 		}
 		
 		controller.addMessageEntry(MessageType.INFO, "Server is now offline");
-	}
-	
-	/**
-	 * Creates an instance of an EventHandler
-	 * @param properties the properties
-	 * @param handlerName the handler name
-	 * @return
-	 * @throws ClassNotFoundException
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
-	 */
-	protected EventHandler getEventHandler(Properties properties, final String handlerName) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-		// Instantiate the handler
-		@SuppressWarnings("unchecked")
-		Class<EventHandler> clazz = (Class<EventHandler>)Class.forName(handlerName);
-		return clazz.newInstance();
 	}
 }
