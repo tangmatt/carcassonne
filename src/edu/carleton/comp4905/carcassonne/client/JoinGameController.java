@@ -8,10 +8,12 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.stage.Stage;
 
 public class JoinGameController extends InputController implements Initializable, ControlledScreen {
 	@FXML private Button hostButton;
 	private ScreensController screensController;
+	private Stage stage;
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -29,6 +31,7 @@ public class JoinGameController extends InputController implements Initializable
 		try {
 			Address address = new Address(servAddrField.getText(), Integer.parseInt(servPortField.getText()));
 			new GameClient(usernameField.getText(), address).start(new javafx.stage.Stage());
+			stage.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			showMessage("Could not connect to server.");
@@ -42,6 +45,14 @@ public class JoinGameController extends InputController implements Initializable
 	 */
 	private void handleHostGame(final ActionEvent event) {
 		screensController.setScreen(Carcassonne.HOST_SCREEN);
+	}
+	
+	/**
+	 * Initializes data for this controller.
+	 * @param stage a Stage
+	 */
+	public void initData(final Stage stage) {
+		this.stage = stage;
 	}
 
 	@Override

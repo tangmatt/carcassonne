@@ -7,6 +7,7 @@ import java.util.ResourceBundle;
 import edu.carleton.comp4905.carcassonne.common.Message;
 import edu.carleton.comp4905.carcassonne.common.MessageType;
 import edu.carleton.comp4905.carcassonne.common.Player;
+import edu.carleton.comp4905.carcassonne.common.Player.Status;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,6 +25,7 @@ public class ServerController implements Initializable {
 	@FXML private TableView<Player> playerView;
 	@FXML private TableView<Message> logView;
 	@FXML private TableColumn<Player, String> playerColumn, addrColumn, portColumn;
+	@FXML private TableColumn<Player, Status> statusColumn;
 	@FXML private TableColumn<Message, String> dateColumn, timeColumn, messageColumn;
 	@FXML private TableColumn<Message, MessageType> typeColumn;
 	@FXML private TextArea messageDesc;
@@ -47,6 +49,7 @@ public class ServerController implements Initializable {
 				playerColumn.setCellValueFactory(new PropertyValueFactory<Player, String>("name"));
 				addrColumn.setCellValueFactory(new PropertyValueFactory<Player, String>("address"));
 				portColumn.setCellValueFactory(new PropertyValueFactory<Player, String>("port"));
+				statusColumn.setCellValueFactory(new PropertyValueFactory<Player, Status>("status"));
 				dateColumn.setCellValueFactory(new PropertyValueFactory<Message, String>("date"));
 				timeColumn.setCellValueFactory(new PropertyValueFactory<Message, String>("time"));
 				typeColumn.setCellValueFactory(new PropertyValueFactory<Message, MessageType>("type"));
@@ -59,36 +62,40 @@ public class ServerController implements Initializable {
 						messageDesc.setText(selectedMessage.getMessage());
 				});
 				
-				playerView.setPlaceholder(new Text("There are no players connected."));
+				playerView.setPlaceholder(new Text("There are no players in the game."));
 				logView.setPlaceholder(new Text("There are no log messages."));
 			}
 		});
 	}
 	
 	/**
-	 * Adds a player to the player list.
+	 * Changes the status of the specified player to indicate connection.
 	 * @param name a name (String)
 	 * @param address an address (String)
 	 * @param port a port (String)
 	 */
-	public void addPlayerEntry(final String name, final String address, final String port) {
-		playerData.add(new Player.PlayerBuilder(name, address, port).build());
+	public void connectPlayer(final String name, final String address, final String port) {
+		playerData.add(new Player.PlayerBuilder(name, address, port, Status.CONNECTED).build());
 	}
 	
 	/**
-	 * Removes a specified player from the player list.
+	 * Changes the status of the specified player to indicate connectivity.
 	 * @param name a name (String)
 	 * @param address an address (String)
 	 * @param port a port (String)
+	 * @param status a Status
 	 */
-	public void removePlayerEntry(final String name, final String address, final String port) {
-		Player temp = new Player.PlayerBuilder(name, address, port).build();
+	public void updatePlayer(final String name, final String address, final String port, final Status status) {
+		Player temp = new Player.PlayerBuilder(name, address, port, status).build();
+		int index = 0;
 		Iterator<Player> it = playerData.iterator();
-		while(it.hasNext()) {
+		while(it.hasNext()) { // replace matching player with updated status
 			Player p = it.next();
 			if(temp.equals(p))
-				it.remove();
+				break;
+			index++;
 		}
+		playerData.set(index, temp);
 	}
 	
 	/**
@@ -114,6 +121,14 @@ public class ServerController implements Initializable {
 	 */
 	public ServerClient getServerClient() {
 		return client;
+	}
+	
+	/**
+	 * Returns a list of players.
+	 * @return an ObservableList
+	 */
+	public ObservableList<Player> getPlayers() {
+		return playerData;
 	}
 	
 	/**

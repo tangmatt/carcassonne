@@ -4,6 +4,7 @@
 <?import java.util.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.*?>
 
@@ -37,11 +38,18 @@
   <top>
     <VBox prefHeight="-1.0" prefWidth="-1.0">
       <children>
-        <ToolBar orientation="HORIZONTAL" style="-fx-background-color: linear-gradient(#4E78C2, #325DA7);&#10;-fx-border-color: transparent transparent #1E3C6B transparent;">
-          <items>
-            <Button fx:id="endTurnButton" alignment="CENTER_RIGHT" cancelButton="false" defaultButton="false" focusTraversable="false" mnemonicParsing="false" prefHeight="26.000091552734375" text="End Turn" visible="false" />
-          </items>
-        </ToolBar>
+        <HBox prefHeight="-1.0" prefWidth="-1.0" spacing="3.0" style="-fx-background-color: linear-gradient(#4E78C2, #325DA7);&#10;-fx-border-color: transparent transparent #1E3C6B transparent;">
+          <children>
+            <ImageView fx:id="player1" fitHeight="29.0" fitWidth="23.0" opacity="0.6" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="player2" fitHeight="29.0" fitWidth="23.0" opacity="0.6" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="player3" fitHeight="29.0" fitWidth="23.0" opacity="0.6" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="player4" fitHeight="29.0" fitWidth="23.0" opacity="0.6" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="player5" fitHeight="29.0" fitWidth="23.0" opacity="0.6" pickOnBounds="true" preserveRatio="true" />
+          </children>
+          <padding>
+            <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+          </padding>
+        </HBox>
         <HBox id="tilePreview" fx:id="previewPane" alignment="CENTER" fillHeight="false" prefHeight="80.0" prefWidth="200.0" spacing="5.0" style="-fx-background-color: #5D5D5D;&#10;-fx-border-color: transparent transparent #3B3B3B transparent;">
           <padding>
             <Insets bottom="5.0" />

@@ -24,7 +24,7 @@ public class Carcassonne extends Application {
 		primaryStage.setResizable(false);
 		
 		// set up multiple screens on one Stage
-		ScreensController mainContainer = new ScreensController(this);
+		ScreensController mainContainer = new ScreensController(primaryStage);
 		mainContainer.loadScreen(Carcassonne.JOIN_SCREEN, Carcassonne.JOIN_SCREEN_FXML);
 		mainContainer.loadScreen(Carcassonne.HOST_SCREEN, Carcassonne.HOST_SCREEN_FXML);
 		mainContainer.setScreen(Carcassonne.JOIN_SCREEN);

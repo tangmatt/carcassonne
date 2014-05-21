@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.concurrent.ConcurrentMap;
 
 public class ProtoConnection extends Connection {
 	private static final long serialVersionUID = 1L;
@@ -49,6 +50,14 @@ public class ProtoConnection extends Connection {
 			buffer.put(event);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public void broadcastEvent(final Event event, final ConcurrentMap<Address, Connection> connections) {
+		for(Address address : connections.keySet()) {
+			Connection connection = connections.get(address);
+			connection.sendEvent(event);
 		}
 	}
 	

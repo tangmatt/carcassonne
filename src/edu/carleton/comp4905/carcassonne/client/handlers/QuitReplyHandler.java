@@ -8,7 +8,7 @@ import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventHandler;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
 
-public class StartReplyHandler implements EventHandler {
+public class QuitReplyHandler implements EventHandler {
 	@Override
 	public void handleEvent(final Event event) {
 		PlatformManager.run(new Runnable() {
@@ -20,9 +20,7 @@ public class StartReplyHandler implements EventHandler {
 				LobbyController lobbyController = gameController.getLobbyController();
 				boolean[] statuses = (boolean[])event.getProperty("statuses");
 				
-				lobbyController.close();
 				gameController.updatePlayerPanel(statuses);
-				gameController.startGame();
 			}
 		});
 	}

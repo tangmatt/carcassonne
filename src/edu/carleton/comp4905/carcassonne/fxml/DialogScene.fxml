@@ -8,7 +8,7 @@
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane id="AnchorPane" fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" opacity="0.88" prefHeight="157.0" prefWidth="270.0" style="-fx-background-color: #06060A;&#10;-fx-border-color: #3B3B3B;&#10;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="edu.carleton.comp4905.carcassonne.common.DialogController">
+<AnchorPane id="AnchorPane" fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" opacity="0.75" prefHeight="157.0" prefWidth="270.0" style="-fx-background-color: #06060A;&#10;-fx-border-color: #3B3B3B;&#10;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="edu.carleton.comp4905.carcassonne.common.DialogController">
   <children>
     <Label fx:id="titleLabel" alignment="CENTER" contentDisplay="LEFT" layoutX="15.0" layoutY="0.0" prefHeight="45.0" prefWidth="242.0" style="-fx-border-color: transparent transparent gray transparent;" text="" textFill="WHITE">
       <font>

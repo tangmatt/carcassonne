@@ -8,16 +8,16 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.*?>
 
-<AnchorPane id="AnchorPane" fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" opacity="0.88" prefHeight="156.9609375" prefWidth="270.0" style="-fx-background-color: #06060A;&#10;-fx-border-color: #3B3B3B;&#10;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="edu.carleton.comp4905.carcassonne.client.LobbyController">
+<AnchorPane id="AnchorPane" fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" opacity="0.75" prefHeight="156.9609375" prefWidth="270.0" style="-fx-background-color: #06060A;&#10;-fx-border-color: #3B3B3B;&#10;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="edu.carleton.comp4905.carcassonne.client.LobbyController">
   <children>
     <Label alignment="CENTER" contentDisplay="LEFT" layoutX="14.0" layoutY="0.0" prefHeight="45.0" prefWidth="242.0" style="-fx-border-color: transparent transparent gray transparent;" text="Waiting for other players..." textFill="WHITE" />
     <HBox layoutX="67.0" layoutY="68.0" prefHeight="-1.0" prefWidth="-1.0" spacing="5.0">
       <children>
-        <ImageView fx:id="player1" fitHeight="39.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true" />
-        <ImageView fx:id="player2" fitHeight="39.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true" />
-        <ImageView fx:id="player3" fitHeight="39.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true" />
-        <ImageView fx:id="player4" fitHeight="39.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true" />
-        <ImageView fx:id="player5" fitHeight="39.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true" />
+        <ImageView fx:id="player1" fitHeight="29.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true" />
+        <ImageView fx:id="player2" fitHeight="29.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true" />
+        <ImageView fx:id="player3" fitHeight="29.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true" />
+        <ImageView fx:id="player4" fitHeight="29.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true" />
+        <ImageView fx:id="player5" fitHeight="29.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true" />
       </children>
     </HBox>
     <ImageView fx:id="closeButton" fitHeight="11.0" fitWidth="11.0" layoutX="251.0" layoutY="9.0" onMouseEntered="#handleCloseButtonEntered" onMouseExited="#handleCloseButtonExited" onMousePressed="#handleCloseButtonPressed" opacity="0.6" pickOnBounds="true" preserveRatio="true" smooth="true">

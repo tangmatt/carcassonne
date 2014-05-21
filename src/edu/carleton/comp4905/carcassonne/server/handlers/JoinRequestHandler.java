@@ -23,12 +23,12 @@ public class JoinRequestHandler implements EventHandler {
 		ConcurrentMap<Address, Connection> connections = server.getConnections();
 		
 		connections.put(new Address(address, port), connection);
-		controller.addPlayerEntry(event.getPlayerName(), address, portAsString);
+		controller.connectPlayer(event.getPlayerName(), address, portAsString);
 		controller.addMessageEntry(MessageType.INFO, "Player '" + event.getPlayerName() + "' has joined the lobby");
 		
 		// send reply back to connected clients
 		Event reply = new Event(EventType.JOIN_REPLY, event.getPlayerName());
 		reply.addProperty("numOfPlayers", connections.size());
-		connection.sendEvent(reply);
+		connection.broadcastEvent(reply, connections);
 	}
 }

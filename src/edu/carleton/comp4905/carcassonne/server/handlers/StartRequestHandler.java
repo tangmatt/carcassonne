@@ -23,10 +23,14 @@ public class StartRequestHandler implements EventHandler {
 		ConcurrentMap<Address, Connection> connections = server.getConnections();
 		
 		controller.addMessageEntry(MessageType.INFO, "Player '" + event.getPlayerName() + "' has started the game (with " + connections.size() + " players)");
+		boolean[] statuses = new boolean[connections.size()];
+		for(int i=0; i<statuses.length; ++i) {
+			statuses[i] = controller.getPlayers().get(i).isConnected();
+		}
 		
 		// send reply back to connected clients
 		Event reply = new Event(EventType.START_REPLY, event.getPlayerName());
-		// TODO send players information
-		connection.sendEvent(reply);
+		reply.addProperty("statuses", statuses);
+		connection.broadcastEvent(reply, connections);
 	}
 }

@@ -5,7 +5,6 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ResourceBundle;
 
-import edu.carleton.comp4905.carcassonne.common.StringConstants;
 import edu.carleton.comp4905.carcassonne.server.ServerClient;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

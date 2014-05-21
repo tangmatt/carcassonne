@@ -10,12 +10,16 @@ import org.controlsfx.control.PopOver.ArrowLocation;
 import edu.carleton.comp4905.carcassonne.client.handlers.TileContainerHandler;
 import edu.carleton.comp4905.carcassonne.client.handlers.TilePreviewHandler;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
+import edu.carleton.comp4905.carcassonne.common.ResourceManager;
 import edu.carleton.comp4905.carcassonne.common.StringConstants;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
 import javafx.scene.effect.GaussianBlur;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -27,21 +31,41 @@ public class GameController implements Initializable {
 	@FXML private GridPane gridPane;
 	@FXML private HBox previewPane;
 	@FXML private Button endTurnButton;
+	@FXML private ImageView player1, player2, player3, player4, player5;
 	private TileManager tileManager;
 	private Board board;
 	private PopOver popOver;
 	private MouseEvent mouseEvent;
 	private LobbyDialog lobbyDialog;
 	private GameClient client;
+	private ImageView[] players;
 	private Random random;
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
-		tileManager = TileManager.getInstance();
-		board = new Board();
 		mouseEvent = new MouseEvent(MouseEvent.MOUSE_PRESSED, 0, 0, 0, 0, 
 				MouseButton.PRIMARY, 1, true, true, true, true, true, true, true, true, true, true, null);
+		tileManager = TileManager.getInstance();
+		board = new Board();
+		players = new ImageView[5];
 		random = new Random();
+		
+		// initialize player tiles and preview tiles
+		players[0] = player1;
+		players[1] = player2;
+		players[2] = player3;
+		players[3] = player4;
+		players[4] = player5;
+		
+		player1.addEventHandler(MouseEvent.MOUSE_ENTERED, new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				double x = player1.getX()+player1.getFitWidth()/2;
+				double y = player1.getY()+player1.getFitHeight();
+				Point2D p = player1.localToScreen(x, y);
+				handlePopOver(player1, p.getX(), p.getY());
+			}
+		});
 		
 		setPreviewTiles(tileManager.getEmptyTile()); // initializes the preview tiles to be empty
 		
@@ -91,19 +115,23 @@ public class GameController implements Initializable {
 			@Override
 			public void run() {
 				refresh();
+				int numOfHints = 0;
 				for(int c=0; c<Board.COLS; ++c) {
 					for(int r=0; r<Board.ROWS; ++r) {
 						TileContainer currTile;
 						currTile = board.getTile(r, c);
 						if(currTile != null) {
 							// compare existing tile with new tile and indicating if matching
-							showHint(Side.TOP, r, c, preview, currTile.getTopSegment());
-							showHint(Side.RIGHT, r, c, preview, currTile.getRightSegment());
-							showHint(Side.BOTTOM, r, c, preview, currTile.getBottomSegment());
-							showHint(Side.LEFT, r, c, preview, currTile.getLeftSegment());
+							numOfHints += showHint(Side.TOP, r, c, preview, currTile.getTopSegment());
+							numOfHints += showHint(Side.RIGHT, r, c, preview, currTile.getRightSegment());
+							numOfHints += showHint(Side.BOTTOM, r, c, preview, currTile.getBottomSegment());
+							numOfHints += showHint(Side.LEFT, r, c, preview, currTile.getLeftSegment());
 						}
 					}
 				}
+				// if there are no place-able cards, discard current tile and re-draw
+				if(numOfHints == 0)
+					drawTileFromDeck();
 			}
 		});
 	}
@@ -115,9 +143,9 @@ public class GameController implements Initializable {
 	 * @param c a column (integer)
 	 * @param container an AbstractTile
 	 * @param segment a Segment
-	 * @return boolean
+	 * @return Integer
 	 */
-	private boolean showHint(final Side side, final int r, final int c, final AbstractTile container, final Segment segment) {
+	private int showHint(final Side side, final int r, final int c, final AbstractTile container, final Segment segment) {
 		try {
 			AbstractTile selected = null;
 			if(side == Side.TOP && board.getTile(r-1, c).isEmpty() && container.matchesBottomSegment(segment)) {
@@ -141,10 +169,10 @@ public class GameController implements Initializable {
 				selected.addMouseListener(this, new TileContainerHandler(selected, this));
 			}
 		} catch(ArrayIndexOutOfBoundsException e) {
-			return false;
+			return 0;
 		}
 		
-		return true;
+		return 1;
 	}
 	
 	/**
@@ -154,7 +182,7 @@ public class GameController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				startTurn(); // TODO temporary; for testing
+				drawTileFromDeck(); // TODO temporary; for testing
 			}
 		});
 	}
@@ -162,7 +190,7 @@ public class GameController implements Initializable {
 	/**
 	 * Handles the start of the turn for the current client.
 	 */
-	public void startTurn() {
+	public void drawTileFromDeck() {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -236,17 +264,17 @@ public class GameController implements Initializable {
 	
 	/**
 	 * Handles the triggering of the PopOver.
-	 * @param tile a TilePreview
+	 * @param symbol an ImageView
 	 * @param x a x-coordinate (Double)
 	 * @param y a y-coordinate (Double)
 	 */
-	public void handlePopOver(final TilePreview tile, final double x, final double y) {
+	public void handlePopOver(final ImageView symbol, final double x, final double y) {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
 				if(!popOver.isDetached())
 					popOver.hide();
-				popOver.show(tile, x, y);
+				popOver.show(symbol, x, y);
 			}
 		});
 	}
@@ -310,6 +338,21 @@ public class GameController implements Initializable {
 							container = new TileContainer(tileManager.getEmptyTile());
 						addTile(r, c, container);
 					}
+				}
+			}
+		});
+	}
+	
+	/**
+	 * Shows the panel with players information.
+	 * @param statuses an array of booleans
+	 */
+	public void updatePlayerPanel(final boolean[] statuses) {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				for(int i=0; i<statuses.length; ++i) {
+					players[i].setImage(ResourceManager.getImageFromResources(statuses[i] ? "joined.png" : "disconnected.png"));
 				}
 			}
 		});

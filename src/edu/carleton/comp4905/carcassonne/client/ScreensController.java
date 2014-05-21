@@ -9,13 +9,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 
 public class ScreensController extends StackPane {
 	private final Map<String, Node> screens;
-	private final Carcassonne client;
+	private final Stage stage;
 	
-	public ScreensController(final Carcassonne client) {
-		this.client = client;
+	public ScreensController(final Stage stage) {
+		this.stage = stage;
 		screens = new HashMap<String, Node>();
 	}
 	
@@ -38,9 +39,9 @@ public class ScreensController extends StackPane {
 		try {
 			FXMLLoader fxmlLoader = FXMLManager.getFXML(getClass(), resource);
 			Parent loadScreen = (Parent)fxmlLoader.load();
-			Object obj = fxmlLoader.getController();
-			if(obj instanceof HostGameController)
-				((HostGameController)obj).initData(client);
+			Object controller = fxmlLoader.getController();
+			if(controller instanceof JoinGameController)
+				((JoinGameController)controller).initData(stage);
 			ControlledScreen screenContainer = ((ControlledScreen)fxmlLoader.getController());
 			screenContainer.setScreenParent(this);
 			addScreen(name, loadScreen);

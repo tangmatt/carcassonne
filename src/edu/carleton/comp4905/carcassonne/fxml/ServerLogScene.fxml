@@ -10,13 +10,14 @@
   <children>
     <SplitPane dividerPositions="0.7528735632183908" focusTraversable="true" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <items>
-        <SplitPane dividerPositions="0.3609467455621302" focusTraversable="false" prefHeight="350.0" prefWidth="680.0">
+        <SplitPane dividerPositions="0.44822485207100593" focusTraversable="false" prefHeight="350.0" prefWidth="680.0">
           <items>
             <TableView id="playerTable" fx:id="playerView" focusTraversable="false" maxWidth="300.0" minWidth="90.0" prefHeight="200.0" prefWidth="200.0">
               <columns>
                 <TableColumn editable="false" prefWidth="75.0" text="Player" fx:id="playerColumn" />
                 <TableColumn editable="false" prefWidth="75.0" text="Address" fx:id="addrColumn" />
                 <TableColumn editable="false" prefWidth="75.0" resizable="true" text="Port" fx:id="portColumn" />
+                <TableColumn editable="false" prefWidth="75.0" resizable="true" text="Status" fx:id="statusColumn" />
               </columns>
             </TableView>
             <TableView fx:id="logView" focusTraversable="false" prefHeight="200.0" prefWidth="200.0">

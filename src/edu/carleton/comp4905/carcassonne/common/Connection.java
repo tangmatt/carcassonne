@@ -1,6 +1,7 @@
 package edu.carleton.comp4905.carcassonne.common;
 
 import java.io.Serializable;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class Connection implements Runnable, Serializable {
@@ -65,4 +66,10 @@ public abstract class Connection implements Runnable, Serializable {
 	 * @param event an Event
 	 */
 	public abstract void sendEvent(Event event);
+	
+	/**
+	 * Broadcasts an event to all connected services.
+	 * @param event an Event
+	 */
+	public abstract void broadcastEvent(Event event, ConcurrentMap<Address, Connection> connections);
 }

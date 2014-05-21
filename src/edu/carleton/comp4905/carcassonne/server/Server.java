@@ -12,7 +12,6 @@ import edu.carleton.comp4905.carcassonne.common.EventType;
 import edu.carleton.comp4905.carcassonne.common.MessageType;
 import edu.carleton.comp4905.carcassonne.common.ProtoAcceptor;
 import edu.carleton.comp4905.carcassonne.common.Service;
-import edu.carleton.comp4905.carcassonne.common.StringConstants;
 
 public class Server extends Service implements Runnable {
 	private final ConcurrentMap<Address, Connection> connections;
