@@ -15,6 +15,14 @@ public class GameTile extends ImageView implements Cloneable {
 	}
 	
 	public GameTile(final GameTile tile) {
+		setTile(tile);
+	}
+	
+	/**
+	 * Sets the tile image and respective segments.
+	 * @param tile a GameTile
+	 */
+	public void setTile(GameTile tile) {
 		setSegments(tile.top, tile.right, tile.bottom, tile.left);
 		setImage(tile.getImage());
 	}

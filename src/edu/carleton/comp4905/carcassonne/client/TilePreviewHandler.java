@@ -1,7 +1,5 @@
-package edu.carleton.comp4905.carcassonne.client.handlers;
+package edu.carleton.comp4905.carcassonne.client;
 
-import edu.carleton.comp4905.carcassonne.client.GameController;
-import edu.carleton.comp4905.carcassonne.client.TilePreview;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 
@@ -19,7 +17,7 @@ public class TilePreviewHandler implements EventHandler<MouseEvent> {
 		if(!event.isPrimaryButtonDown())
 			return;
 		
-		controller.getBoard().setSelectedPreviewTile(preview.getTile());
+		controller.getModel().setSelectedPreviewTile(preview.getTile());
 		//controller.handlePopOver(preview, event.getScreenX(), event.getScreenY());
 		controller.handleHints(preview);
 		preview.setSelected(true);

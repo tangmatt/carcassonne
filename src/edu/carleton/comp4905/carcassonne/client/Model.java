@@ -1,6 +1,13 @@
 package edu.carleton.comp4905.carcassonne.client;
 
-public class Board {
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.controlsfx.control.PopOver;
+
+import javafx.scene.image.ImageView;
+
+public class Model {
 	public static final int ROWS = 9;
 	public static final int COLS = 9;
 	public static final int CENTER_ROW = Math.floorDiv(ROWS, 2);
@@ -9,10 +16,12 @@ public class Board {
 	private final TileContainer[][] tiles;
 	private final TilePreview[] previews;
 	private GameTile selected;
+	private Map<ImageView, PopOver> players;
 	
-	public Board() {
+	public Model() {
 		tiles = new TileContainer[COLS][ROWS];
 		previews = new TilePreview[Side.values().length];
+		players = new LinkedHashMap<ImageView, PopOver>();
 	}
 	
 	/**
@@ -44,6 +53,16 @@ public class Board {
 	}
 	
 	/**
+	 * Adds the player view and pop over to the map.
+	 * @param imageView an array of ImageViews
+	 * @param popOver a PopOver
+	 */
+	public void addPlayerViews(final ImageView[] imageView, final PopOver popOver) {
+		for(int i=0; i<imageView.length; ++i)
+			players.put(imageView[i], popOver);
+	}
+	
+	/**
 	 * Returns the selected preview tile.
 	 * @return GameTile
 	 */
@@ -57,5 +76,13 @@ public class Board {
 	 */
 	public TilePreview[] getPreviews() {
 		return previews;
+	}
+	
+	/**
+	 * Returns the images representing the players that are mapped to pop overs.
+	 * @return a Map<ImageView, PopOver>
+	 */
+	public Map<ImageView, PopOver> getPlayerViews() {
+		return players;
 	}
 }

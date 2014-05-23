@@ -2,8 +2,11 @@ package edu.carleton.comp4905.carcassonne.server;
 
 import java.net.URL;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.ResourceBundle;
 
+import edu.carleton.comp4905.carcassonne.common.Address;
+import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Message;
 import edu.carleton.comp4905.carcassonne.common.MessageType;
 import edu.carleton.comp4905.carcassonne.common.Player;
@@ -96,6 +99,51 @@ public class ServerController implements Initializable {
 			index++;
 		}
 		playerData.set(index, temp);
+	}
+	
+	/**
+	 * Removes the connection mapped to the address and port.
+	 * @param connections a Map<Address, Connection>
+	 * @param address a String
+	 * @param port an Integer
+	 */
+	public void removeConnection(final Map<Address, Connection> connections, final String address, final int port) {
+		Iterator<Map.Entry<Address, Connection>> it = connections.entrySet().iterator();
+		while(it.hasNext()) {
+			Map.Entry<Address, Connection> pairs = (Map.Entry<Address, Connection>)it.next();
+			Address temp = (Address)pairs.getKey();
+			if(temp.equals(new Address(address, port)))
+				it.remove();
+		}
+	}
+	
+	/**
+	 * Returns the players' status.
+	 * @return an array of booleans
+	 */
+	public boolean[] getStatuses(final Map<Address, Connection> connections) {
+		boolean[] statuses = new boolean[playerData.size()];
+		for(int i=0; i<statuses.length; ++i)
+			statuses[i] = playerData.get(i).isConnected();
+		return statuses;
+	}
+	
+	/**
+	 * Returns all players' names.
+	 * @return an array of Strings
+	 */
+	public String[] getPlayerNames() {
+		String[] names = new String[playerData.size()];
+		for(int i=0; i<names.length; ++i)
+			names[i] = playerData.get(i).getName();
+		return names;
+	}
+	
+	/**
+	 * Handles when the game is over.
+	 */
+	public void handleGameFinish() {
+		playerData.clear();
 	}
 	
 	/**

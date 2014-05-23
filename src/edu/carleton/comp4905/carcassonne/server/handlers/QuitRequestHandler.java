@@ -1,7 +1,5 @@
 package edu.carleton.comp4905.carcassonne.server.handlers;
 
-import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
 import edu.carleton.comp4905.carcassonne.common.Address;
@@ -25,25 +23,20 @@ public class QuitRequestHandler implements EventHandler {
 		ServerController controller = server.getController();
 		ConcurrentMap<Address, Connection> connections = server.getConnections();
 		
-		// remove related connection
-		Iterator<Map.Entry<Address, Connection>> it = connections.entrySet().iterator();
-		while(it.hasNext()) {
-			Map.Entry<Address, Connection> pairs = (Map.Entry<Address, Connection>)it.next();
-			Address temp = (Address)pairs.getKey();
-			if(temp.equals(new Address(address, port)))
-				it.remove();
-		}
-		
+		controller.removeConnection(connections, address, port);
 		controller.updatePlayer(event.getPlayerName(), address, portAsString, Status.DISCONNECTED);
 		controller.addMessageEntry(MessageType.INFO, "Player (" + event.getPlayerName() + ") has quit");
 		
-		boolean[] statuses = new boolean[controller.getPlayers().size()];
-		for(int i=0; i<statuses.length; ++i)
-			statuses[i] = controller.getPlayers().get(i).isConnected();
+		if(connections.isEmpty())
+			controller.handleGameFinish();
+		
+		boolean[] statuses = controller.getStatuses(connections);
+		String[] names = controller.getPlayerNames();
 		
 		// send reply back to connected clients
 		Event reply = new Event(EventType.QUIT_REPLY, event.getPlayerName());
 		reply.addProperty("statuses", statuses);
+		reply.addProperty("playerNames", names);
 		connection.broadcastEvent(reply, connections);
 	}
 }
