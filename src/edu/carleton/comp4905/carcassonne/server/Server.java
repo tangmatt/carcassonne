@@ -10,8 +10,10 @@ import edu.carleton.comp4905.carcassonne.common.Address;
 import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.EventType;
 import edu.carleton.comp4905.carcassonne.common.MessageType;
+import edu.carleton.comp4905.carcassonne.common.PlatformManager;
 import edu.carleton.comp4905.carcassonne.common.ProtoAcceptor;
 import edu.carleton.comp4905.carcassonne.common.Service;
+import edu.carleton.comp4905.carcassonne.common.StringConstants;
 
 public class Server extends Service implements Runnable {
 	private final ConcurrentMap<Address, Connection> connections;
@@ -19,6 +21,7 @@ public class Server extends Service implements Runnable {
 	private Acceptor acceptor;
 	private ServerController controller;
 	private boolean running;
+	private boolean gameInProgress;
 	
 	public static int PORT = 5000;
 	
@@ -30,20 +33,9 @@ public class Server extends Service implements Runnable {
 		super();
 		PORT = port;
 		connections = new ConcurrentHashMap<Address, Connection>();
-		try {
-			listener = new ServerSocket(PORT);
-			listener.setReuseAddress(true);
-			acceptor = new ProtoAcceptor(this, listener);
-			running = false;
-			initialize();
-		} catch (IOException e) {
-			// TODO controller is null, need to fix
-			/*new MessageDialog(controller.getAnchorPane().getScene().getWindow(),
-					controller.getServerClient(),
-					StringConstants.ERR_TITLE,
-					e.getMessage())
-			.show();*/
-		}
+		running = false;
+		gameInProgress = false;
+		initialize();
 	}
 	
 	/**
@@ -101,16 +93,46 @@ public class Server extends Service implements Runnable {
 	
 	@Override
 	public void run() {
-		controller.addMessageEntry(MessageType.INFO, "Server listening on port " + PORT);
-		running = true;
-		while(running) {
-			try {
-				Connection connection = acceptor.accept();
-				pool.execute(connection);
-			} catch (IOException e) {
-				running = false;
+		try {
+			listener = new ServerSocket(PORT);
+			acceptor = new ProtoAcceptor(this, listener);
+			controller.addMessageEntry(MessageType.INFO, "Server listening on port " + PORT);
+			running = true;
+			while(running) {
+				try {
+					Connection connection = acceptor.accept();
+					pool.execute(connection);
+				} catch (IOException e) {
+					running = false;
+				}
 			}
+		} catch (IOException e) {
+			PlatformManager.run(new Runnable() {
+				@Override
+				public void run() {
+					new MessageDialog(controller.getAnchorPane().getScene().getWindow(),
+							controller.getServerClient(),
+							StringConstants.ERR_TITLE,
+							e.getMessage())
+					.show();
+				}
+			});
 		}
+	}
+	
+	/**
+	 * Sets the flag that holds whether the game is in progress.
+	 * @param state a boolean
+	 */
+	public void gameInProgress(boolean state) {
+		gameInProgress = state;
+	}
+	
+	/**
+	 * Returns true if the game is in progress.
+	 */
+	public boolean isGameInProgress() {
+		return gameInProgress;
 	}
 	
 	@Override
@@ -122,7 +144,8 @@ public class Server extends Service implements Runnable {
 			connection.close();
 		
 		try {
-			listener.close();
+			if(listener != null)
+				listener.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

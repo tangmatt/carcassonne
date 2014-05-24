@@ -19,6 +19,7 @@ public class StartRequestHandler implements EventHandler {
 		ServerController controller = server.getController();
 		ConcurrentMap<Address, Connection> connections = server.getConnections();
 		
+		server.gameInProgress(true);
 		controller.addMessageEntry(MessageType.INFO, "Player '" + event.getPlayerName() + "' has started the game (with " + connections.size() + " players)");
 		boolean[] statuses = controller.getStatuses(connections);
 		String[] names = controller.getPlayerNames();

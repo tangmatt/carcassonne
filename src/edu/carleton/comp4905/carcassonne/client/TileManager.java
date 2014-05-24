@@ -48,7 +48,8 @@ public class TileManager {
 				Segment left = Segment.valueOf(section.get(Side.LEFT.toString()));
 				GameTile gameTile = new GameTile();
 				gameTile.setTile(key, top, right, bottom, left);
-				addTileCombinations(key, gameTile, top, right, bottom, left);
+				tiles.put(key, gameTile);
+				addTileCombinations(key, top, right, bottom, left);
 				if(!(key.equals(StringConstants.EMPTY_TILE) || key.equals(StringConstants.STARTER_TILE)))
 					NUM_OF_TILES++;
 			}
@@ -70,8 +71,7 @@ public class TileManager {
 	 * @param bottom a Segment
 	 * @param left a Segment
 	 */
-	protected void addTileCombinations(final String key, final GameTile gameTile, final Segment top, final Segment right, final Segment bottom, final Segment left) {
-		tiles.put(key, gameTile);
+	protected void addTileCombinations(final String key, final Segment top, final Segment right, final Segment bottom, final Segment left) {
 		for(int i=1, degrees=90; i<Side.values().length; ++i, degrees+=90) {
 			GameTile rotatedTile = new GameTile();
 			if(degrees == 90)

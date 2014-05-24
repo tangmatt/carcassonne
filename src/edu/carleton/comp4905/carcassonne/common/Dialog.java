@@ -2,7 +2,9 @@ package edu.carleton.comp4905.carcassonne.common;
 
 import java.io.IOException;
 
+import edu.carleton.comp4905.carcassonne.client.GameClient;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
@@ -32,15 +34,6 @@ public class Dialog extends Stage {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		/*setOnCloseRequest(new EventHandler<WindowEvent>() {
-			@Override
-			public void handle(WindowEvent event) {
-				client.getController().blurGame(false);
-				client.getStage().getOnCloseRequest().handle(null);
-				close();
-			}
-		});*/
 	}
 	
 	/**

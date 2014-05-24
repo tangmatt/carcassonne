@@ -8,12 +8,10 @@ import java.util.concurrent.ConcurrentMap;
 
 public class ProtoConnection extends Connection {
 	private static final long serialVersionUID = 1L;
-	protected final Socket peer;
 	private boolean running;
 
 	public ProtoConnection(final Service service, final Socket peer) throws IOException {
-		super(service);
-		this.peer = peer;
+		super(service, peer);
 		this.running = false;
 	}
 	

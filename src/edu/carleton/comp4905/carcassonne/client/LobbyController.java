@@ -32,12 +32,15 @@ public class LobbyController implements Initializable {
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
+		closeButton.setImage(ResourceManager.getImageFromResources("close.png"));
+		
 		playerIcons = new ArrayList<>();
 		playerIcons.add(player1);
 		playerIcons.add(player2);
 		playerIcons.add(player3);
 		playerIcons.add(player4);
 		playerIcons.add(player5);
+		
 		for(ImageView playerIcon : playerIcons)
 			playerIcon.setImage(ResourceManager.getImageFromResources("free.png"));
 		
@@ -85,13 +88,13 @@ public class LobbyController implements Initializable {
 	 * @param numbOfPlayers
 	 */
 	public void handleStartAvailability(final int numOfPlayers) {
-		/*if(numOfPlayers < 2) {
+		if(numOfPlayers < 2) {
 			startButton.setOpacity(0.6f);
 			startButton.setDisable(true);
-		} else {*/
+		} else {
 			startButton.setOpacity(1);
 			startButton.setDisable(false);
-		//}
+		}
 	}
 	
 	/**

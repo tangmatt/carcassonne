@@ -87,18 +87,38 @@ public class ServerController implements Initializable {
 	 * @param address an address (String)
 	 * @param port a port (String)
 	 * @param status a Status
+	 * @return boolean
 	 */
-	public void updatePlayer(final String name, final String address, final String port, final Status status) {
+	public boolean updatePlayer(final String name, final String address, final String port, final Status status) {
 		Player temp = new Player.PlayerBuilder(name, address, port, status).build();
 		int index = 0;
 		Iterator<Player> it = playerData.iterator();
 		while(it.hasNext()) { // replace matching player with updated status
 			Player p = it.next();
-			if(temp.equals(p))
-				break;
+			if(temp.equals(p)) {
+				playerData.set(index, temp);
+				return true;
+			}
 			index++;
 		}
-		playerData.set(index, temp);
+		return false;
+	}
+	
+	/**
+	 * Removes the specified player from data list.
+	 * @param name a name (String)
+	 * @param address an address (String)
+	 * @param port a port (String)
+	 * @return boolean
+	 */
+	public void removePlayer(final String name, final String address, final String port, final Status status) {
+		Player temp = new Player.PlayerBuilder(name, address, port, status).build();
+		Iterator<Player> it = playerData.iterator();
+		while(it.hasNext()) {
+			Player p = it.next();
+			if(temp.equals(p))
+				it.remove();
+		}
 	}
 	
 	/**
@@ -137,6 +157,19 @@ public class ServerController implements Initializable {
 		for(int i=0; i<names.length; ++i)
 			names[i] = playerData.get(i).getName();
 		return names;
+	}
+	
+	/**
+	 * Returns the remaining player (assumes only one player is connected)
+	 * @return Player
+	 */
+	public Player getRemainingPlayer() {
+		for(Player player : playerData) {
+			if(player.isConnected()) {
+				return player;
+			}
+		}
+		return null;
 	}
 	
 	/**

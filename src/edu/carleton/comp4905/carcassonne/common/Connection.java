@@ -1,17 +1,20 @@
 package edu.carleton.comp4905.carcassonne.common;
 
 import java.io.Serializable;
+import java.net.Socket;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class Connection implements Runnable, Serializable {
 	private static final long serialVersionUID = 1L;
 	protected final Service service;
+	protected final Socket peer;
 	protected final boolean running;
 	protected final LinkedBlockingQueue<Event> buffer;
 	
-	public Connection(final Service service) {
+	public Connection(final Service service, final Socket peer) {
 		this.service = service;
+		this.peer = peer;
 		this.running = false;
 		this.buffer = new LinkedBlockingQueue<Event>();
 	}
@@ -39,6 +42,14 @@ public abstract class Connection implements Runnable, Serializable {
 	 */
 	public Service getService() {
 		return service;
+	}
+	
+	/**
+	 * Returns the Socket object.
+	 * @return a Socket
+	 */
+	public Socket getPeer() {
+		return peer;
 	}
 	
 	/**

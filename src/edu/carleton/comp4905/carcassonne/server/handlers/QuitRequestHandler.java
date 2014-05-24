@@ -8,6 +8,7 @@ import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventHandler;
 import edu.carleton.comp4905.carcassonne.common.EventType;
 import edu.carleton.comp4905.carcassonne.common.MessageType;
+import edu.carleton.comp4905.carcassonne.common.Player;
 import edu.carleton.comp4905.carcassonne.common.Player.Status;
 import edu.carleton.comp4905.carcassonne.server.Server;
 import edu.carleton.comp4905.carcassonne.server.ServerController;
@@ -24,19 +25,34 @@ public class QuitRequestHandler implements EventHandler {
 		ConcurrentMap<Address, Connection> connections = server.getConnections();
 		
 		controller.removeConnection(connections, address, port);
-		controller.updatePlayer(event.getPlayerName(), address, portAsString, Status.DISCONNECTED);
+		if(!controller.updatePlayer(event.getPlayerName(), address, portAsString, Status.DISCONNECTED))
+			return;
 		controller.addMessageEntry(MessageType.INFO, "Player (" + event.getPlayerName() + ") has quit");
 		
 		if(connections.isEmpty())
 			controller.handleGameFinish();
 		
-		boolean[] statuses = controller.getStatuses(connections);
 		String[] names = controller.getPlayerNames();
+		String message = null;
+		boolean[] statuses = controller.getStatuses(connections);
+		boolean gameOver = (connections.size() == 1 && server.isGameInProgress());
+		
+		if(gameOver) {
+			Player player = controller.getRemainingPlayer();
+			message = player.getName() + " (" + player.getAddress() + ":" + player.getPort() + ") is the winner!";
+			controller.addMessageEntry(MessageType.INFO, message);
+		} else if(!server.isGameInProgress()) {
+			controller.removePlayer(event.getPlayerName(), address, portAsString, Status.DISCONNECTED);
+		}
 		
 		// send reply back to connected clients
 		Event reply = new Event(EventType.QUIT_REPLY, event.getPlayerName());
+		reply.addProperty("numOfPlayers", connections.size());
 		reply.addProperty("statuses", statuses);
 		reply.addProperty("playerNames", names);
+		reply.addProperty("finished", gameOver);
+		reply.addProperty("message", message);
+		reply.addProperty("gameInProgress", server.isGameInProgress());
 		connection.broadcastEvent(reply, connections);
 	}
 }

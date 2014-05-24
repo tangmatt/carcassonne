@@ -22,6 +22,16 @@ public class JoinRequestHandler implements EventHandler {
 		ServerController controller = server.getController();
 		ConcurrentMap<Address, Connection> connections = server.getConnections();
 		
+		// send reply back to client if game is already in progress (no joining during the game)
+		if(server.isGameInProgress()) {
+			Event reply = new Event(EventType.JOIN_REPLY, event.getPlayerName());
+			reply.addProperty("numOfPlayers", connections.size());
+			reply.addProperty("success", false);
+			reply.addProperty("message", "Game has already started.");
+			connection.sendEvent(reply);
+			return;
+		}
+		
 		connections.put(new Address(address, port), connection);
 		controller.connectPlayer(event.getPlayerName(), address, portAsString);
 		controller.addMessageEntry(MessageType.INFO, "Player '" + event.getPlayerName() + "' has joined the lobby");
@@ -29,6 +39,7 @@ public class JoinRequestHandler implements EventHandler {
 		// send reply back to connected clients
 		Event reply = new Event(EventType.JOIN_REPLY, event.getPlayerName());
 		reply.addProperty("numOfPlayers", connections.size());
+		reply.addProperty("success", true);
 		connection.broadcastEvent(reply, connections);
 	}
 }

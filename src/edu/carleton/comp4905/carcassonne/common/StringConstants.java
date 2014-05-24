@@ -11,5 +11,7 @@ public class StringConstants {
 	public static final String TILE_PREFIX = "tile";
 	public static final String TILE_TYPE = ".png";
 	
+	public static final String INFO_TITLE = "Game over!";
 	public static final String ERR_TITLE = "An error has occurred.";
+	public static final String REFUSED_TITLE = "Connection request refused.";
 }

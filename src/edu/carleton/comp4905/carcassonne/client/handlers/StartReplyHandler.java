@@ -14,8 +14,8 @@ public class StartReplyHandler implements EventHandler {
 		Game game = (Game)connection.getService();
 		GameController gameController = game.getGameController();
 		LobbyController lobbyController = gameController.getLobbyController();
-		boolean[] statuses = (boolean[])event.getProperty("statuses");
 		String[] names = (String[])event.getProperty("names");
+		boolean[] statuses = (boolean[])event.getProperty("statuses");
 		
 		lobbyController.close();
 		gameController.updatePlayerPanel(names, statuses);

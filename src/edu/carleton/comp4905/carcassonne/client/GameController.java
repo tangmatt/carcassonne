@@ -113,7 +113,7 @@ public class GameController implements Initializable {
 				}
 				// if there are no place-able cards, discard current tile and re-draw
 				if(numOfHints == 0)
-					drawTileFromDeck();
+					startTurn();
 			}
 		});
 	}
@@ -164,7 +164,7 @@ public class GameController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				drawTileFromDeck(); // TODO temporary; for testing
+				startTurn(); // TODO temporary; for testing
 			}
 		});
 	}
@@ -172,7 +172,7 @@ public class GameController implements Initializable {
 	/**
 	 * Handles the start of the turn for the current client.
 	 */
-	public void drawTileFromDeck() {
+	public void startTurn() {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -300,7 +300,7 @@ public class GameController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				client.getController().blurGame(true);
+				blurGame(true);
 				lobbyDialog.show();
 			}		
 		});
