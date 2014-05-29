@@ -7,12 +7,39 @@ import java.util.concurrent.Executors;
 public abstract class Service {
 	protected Reactor reactor;
 	protected PropertyLoader propertyLoader;
+	protected Protocol protocol;
 	protected ExecutorService pool;
 	
 	public Service() {
 		propertyLoader = new PropertyLoader();
 		reactor = new Reactor();
 		pool = Executors.newCachedThreadPool();
+	}
+	
+	/**
+	 * Initializes the reactor with event handlers and instantiates them.
+	 * Also reads in other information such as protocol.
+	 */
+	protected void initialize(String filename) {
+		propertyLoader.loadProperty(filename);
+		for(Object propertyType : propertyLoader.getProperties().keySet()) {
+			String handlerName = propertyLoader.getProperty((String)propertyType);
+			if(handlerName != null) {
+				if(((String)propertyType).equalsIgnoreCase("PROTOCOL")) {
+					protocol = Protocol.valueOf(handlerName);
+				} else {
+					try {
+						reactor.addHandler(EventType.valueOf((String)propertyType), getEventHandler(propertyLoader.getProperties(), handlerName));
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					} catch (InstantiationException e) {
+						e.printStackTrace();
+					} catch (IllegalAccessException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
 	}
 	
 	/**

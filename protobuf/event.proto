@@ -5,4 +5,18 @@ option java_outer_classname = "EventMessage";
 message Event {
 	required int32 eventType = 1;
 	required string playerName = 2;
+	optional bytes connection = 3;
+	optional string address = 4;
+	optional int32 port = 5;
+	optional int32 numOfPlayers = 6;
+	optional bool success = 7;
+	optional string message = 8;
+	repeated bool statuses = 9;
+	repeated string names = 10;
+	optional bool finished = 11;
+	optional bool gameInProgress = 12;
+	optional string tile = 13;
+	optional int32 row = 14;
+	optional int32 column = 15;
+	optional int32 rotation = 16;
 }

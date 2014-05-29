@@ -19,23 +19,6 @@ public abstract class Connection implements Runnable, Serializable {
 		this.buffer = new LinkedBlockingQueue<Event>();
 	}
 	
-	@Override
-	public void run() {
-		while(running) {
-			try {
-				Event event = getEvent();
-				service.getPool().execute(new Runnable() {
-					@Override
-					public void run() {
-						service.getReactor().dispatch(event);
-					}
-				});
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	
 	/**
 	 * Returns the Service object.
 	 * @return a Service
@@ -64,13 +47,6 @@ public abstract class Connection implements Runnable, Serializable {
 	 * Closes the socket and other relations.
 	 */
 	public abstract void close();
-	
-	/**
-	 * Returns an Event object.
-	 * @return an Event
-	 * @throws InterruptedException
-	 */
-	public abstract Event getEvent() throws InterruptedException;
 	
 	/**
 	 * Sends an event.

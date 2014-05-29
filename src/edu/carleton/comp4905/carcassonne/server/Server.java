@@ -8,10 +8,11 @@ import java.util.concurrent.ConcurrentMap;
 import edu.carleton.comp4905.carcassonne.common.Acceptor;
 import edu.carleton.comp4905.carcassonne.common.Address;
 import edu.carleton.comp4905.carcassonne.common.Connection;
-import edu.carleton.comp4905.carcassonne.common.EventType;
+import edu.carleton.comp4905.carcassonne.common.DefaultAcceptor;
 import edu.carleton.comp4905.carcassonne.common.MessageType;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
 import edu.carleton.comp4905.carcassonne.common.ProtoAcceptor;
+import edu.carleton.comp4905.carcassonne.common.Protocol;
 import edu.carleton.comp4905.carcassonne.common.Service;
 import edu.carleton.comp4905.carcassonne.common.StringConstants;
 
@@ -31,32 +32,11 @@ public class Server extends Service implements Runnable {
 	
 	public Server(final int port) {
 		super();
+		initialize("server.properties");
 		PORT = port;
 		connections = new ConcurrentHashMap<Address, Connection>();
 		running = false;
 		gameInProgress = false;
-		initialize();
-	}
-	
-	/**
-	 * Initializes the reactor with event handlers and instantiates them.
-	 */
-	private void initialize() {
-		propertyLoader.loadProperty("server.properties");
-		for(Object eventType : propertyLoader.getProperties().keySet()) {
-			String handlerName = propertyLoader.getProperty((String)eventType);
-			if(handlerName != null) {
-				try {
-					reactor.addHandler(EventType.valueOf((String)eventType), getEventHandler(propertyLoader.getProperties(), handlerName));
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				} catch (InstantiationException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				}
-			}
-		}	
 	}
 	
 	/**
@@ -95,7 +75,10 @@ public class Server extends Service implements Runnable {
 	public void run() {
 		try {
 			listener = new ServerSocket(PORT);
-			acceptor = new ProtoAcceptor(this, listener);
+			if(protocol == Protocol.JAVA_SERIALIZE)
+				acceptor = new DefaultAcceptor(this, listener);
+			else if(protocol == Protocol.GOOGLE_PROTOBUF)
+				acceptor = new ProtoAcceptor(this, listener);
 			controller.addMessageEntry(MessageType.INFO, "Server listening on port " + PORT);
 			running = true;
 			while(running) {

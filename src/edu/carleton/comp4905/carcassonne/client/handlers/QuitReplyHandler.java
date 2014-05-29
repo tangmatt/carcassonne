@@ -21,16 +21,21 @@ public class QuitReplyHandler implements EventHandler {
 				GameController gameController = game.getGameController();
 				LobbyController lobbyController = gameController.getLobbyController();
 				int numOfPlayers = (int)event.getProperty("numOfPlayers");
-				boolean[] statuses = (boolean[])event.getProperty("statuses");
-				String[] names = (String[])event.getProperty("playerNames");
+				Boolean[] statusesObj = (Boolean[])event.getProperty("statuses");
+				boolean[] statuses = new boolean[statusesObj.length];
+				for(int i=0; i<statusesObj.length; ++i)
+					statuses[i] = statusesObj[i].booleanValue();
+				String[] names = (String[])event.getProperty("names");
 				boolean finished = (boolean)event.getProperty("finished");
 				String message = (String)event.getProperty("message");
 				boolean gameInProgress = (boolean)event.getProperty("gameInProgress");
 				
 				if(gameInProgress)
 					gameController.updatePlayerPanel(names, statuses);
-				else
+				else {
 					lobbyController.updatePlayerIcons(numOfPlayers);
+					lobbyController.handleStartAvailability(numOfPlayers);
+				}
 				
 				if(finished && message != null) {
 					gameController.blurGame(true);

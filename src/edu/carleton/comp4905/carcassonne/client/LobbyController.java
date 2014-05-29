@@ -89,7 +89,7 @@ public class LobbyController implements Initializable {
 	 */
 	public void handleStartAvailability(final int numOfPlayers) {
 		if(numOfPlayers < 2) {
-			startButton.setOpacity(0.6f);
+			startButton.setOpacity(0.4f);
 			startButton.setDisable(true);
 		} else {
 			startButton.setOpacity(1);

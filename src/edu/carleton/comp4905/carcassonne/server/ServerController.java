@@ -60,7 +60,7 @@ public class ServerController implements Initializable {
 				
 				// Row selection listener; displays log message in text area
 				logView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-					Message selectedMessage = (Message)newValue;
+					Message selectedMessage = newValue;
 					if(selectedMessage != null)
 						messageDesc.setText(selectedMessage.getMessage());
 				});
@@ -130,8 +130,8 @@ public class ServerController implements Initializable {
 	public void removeConnection(final Map<Address, Connection> connections, final String address, final int port) {
 		Iterator<Map.Entry<Address, Connection>> it = connections.entrySet().iterator();
 		while(it.hasNext()) {
-			Map.Entry<Address, Connection> pairs = (Map.Entry<Address, Connection>)it.next();
-			Address temp = (Address)pairs.getKey();
+			Map.Entry<Address, Connection> pairs = it.next();
+			Address temp = pairs.getKey();
 			if(temp.equals(new Address(address, port)))
 				it.remove();
 		}
@@ -170,6 +170,33 @@ public class ServerController implements Initializable {
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * Returns true if there is already a player with the same name.
+	 * @param playerName a String
+	 * @return a boolean
+	 */
+	public boolean playerExists(final String playerName) {
+		for(Player player : playerData) {
+			if(player.getName().equalsIgnoreCase(playerName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Returns the players' positions in the list.
+	 * @return an array of String
+	 */
+	public String[] getPlayerPositions() {
+		String[] list = new String[playerData.size()];
+		int index = 0;
+		for(Player player : playerData) {
+			list[index++] = player.getName();
+		}
+		return list;
 	}
 	
 	/**

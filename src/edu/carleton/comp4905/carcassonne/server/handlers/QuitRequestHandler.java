@@ -49,7 +49,7 @@ public class QuitRequestHandler implements EventHandler {
 		Event reply = new Event(EventType.QUIT_REPLY, event.getPlayerName());
 		reply.addProperty("numOfPlayers", connections.size());
 		reply.addProperty("statuses", statuses);
-		reply.addProperty("playerNames", names);
+		reply.addProperty("names", names);
 		reply.addProperty("finished", gameOver);
 		reply.addProperty("message", message);
 		reply.addProperty("gameInProgress", server.isGameInProgress());

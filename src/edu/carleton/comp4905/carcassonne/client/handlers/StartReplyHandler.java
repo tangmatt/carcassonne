@@ -3,6 +3,7 @@ package edu.carleton.comp4905.carcassonne.client.handlers;
 import edu.carleton.comp4905.carcassonne.client.Game;
 import edu.carleton.comp4905.carcassonne.client.GameController;
 import edu.carleton.comp4905.carcassonne.client.LobbyController;
+import edu.carleton.comp4905.carcassonne.client.Model;
 import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventHandler;
@@ -15,10 +16,20 @@ public class StartReplyHandler implements EventHandler {
 		GameController gameController = game.getGameController();
 		LobbyController lobbyController = gameController.getLobbyController();
 		String[] names = (String[])event.getProperty("names");
-		boolean[] statuses = (boolean[])event.getProperty("statuses");
+		Boolean[] statusesObj = (Boolean[])event.getProperty("statuses");
+		boolean[] statuses = new boolean[statusesObj.length];
+		for(int i=0; i<statusesObj.length; ++i)
+			statuses[i] = statusesObj[i].booleanValue();
+		
+		int index;
+		for(index = 0; index<names.length; ++index) {
+			if(names[index].equalsIgnoreCase(game.getPlayerName()))
+				break;
+		}
 		
 		lobbyController.close();
 		gameController.updatePlayerPanel(names, statuses);
+		gameController.updateFollowerPanel(index+1, Model.NUM_OF_FOLLOWERS);
 		gameController.startGame();
 	}
 }

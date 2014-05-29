@@ -91,7 +91,7 @@ public class TileManager {
 	 * @return a GameTile
 	 */
 	public GameTile getTile(final String key) {
-		return (GameTile)((GameTile)tiles.get(key)).clone();
+		return (GameTile)tiles.get(key).clone();
 	}
 	
 	/**

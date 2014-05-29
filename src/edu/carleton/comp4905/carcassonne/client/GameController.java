@@ -33,6 +33,7 @@ public class GameController implements Initializable {
 	@FXML private HBox previewPane;
 	@FXML private Button endTurnButton;
 	@FXML private ImageView player1, player2, player3, player4, player5;
+	@FXML private ImageView meeple1, meeple2, meeple3, meeple4, meeple5, meeple6, meeple7; // meeple = follower
 	private TileManager tileManager;
 	private Model model;
 	private MouseEvent mouseEvent;
@@ -48,8 +49,10 @@ public class GameController implements Initializable {
 		model = new Model();
 		random = new Random();
 		
-		ImageView[] imageViews = new ImageView[] { player1, player2, player3, player4, player5 };
-		model.addPlayerViews(imageViews, createPopOver());
+		ImageView[] playerViews = new ImageView[] { player1, player2, player3, player4, player5 };
+		ImageView[] followerViews = new ImageView[] { meeple1, meeple2, meeple3, meeple4, meeple5, meeple6, meeple7 };
+		model.addPlayerViews(playerViews, createPopOver());
+		model.addFollowerViews(followerViews);
 		setPreviewTiles(tileManager.getEmptyTile()); // initializes the preview tiles to be empty
 		
 		createGameBoard();
@@ -155,6 +158,32 @@ public class GameController implements Initializable {
 		}
 		
 		return 1;
+	}
+	
+	/**
+	 * Checks to see if the tile to be placed matches the surrounding tiles.
+	 * @param side a Side
+	 * @param r a row (integer)
+	 * @param c a column (integer)
+	 * @param container an AbstractTile
+	 * @param segment a Segment
+	 * @return Integer
+	 */
+	private boolean matchesSurroundingTiles(final Side side, final int r, final int c, final AbstractTile container, final Segment segment) {
+		try {
+			if(side == Side.TOP && (model.getTile(r-1, c).isEmpty() || container.matchesBottomSegment(segment)))
+				return true;
+			else if(side == Side.RIGHT && (model.getTile(r, c+1).isEmpty() || container.matchesLeftSegment(segment)))
+				return true;
+			else if(side == Side.BOTTOM && (model.getTile(r+1, c).isEmpty() || container.matchesTopSegment(segment)))
+				return true;
+			else if(side == Side.LEFT && (model.getTile(r, c-1).isEmpty() || container.matchesRightSegment(segment)))
+				return true;
+		} catch(ArrayIndexOutOfBoundsException e) {
+			// do nothing
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -353,6 +382,26 @@ public class GameController implements Initializable {
 					imageView.setImage(image);
 					imageView.addEventHandler(MouseEvent.MOUSE_ENTERED, new PlayerViewHandler(imageView, popOver, label));
 					i++;
+				}
+			}
+		});
+	}
+	
+	/**
+	 * Shows the amount of followers for the player.
+	 * @param id player id (Integer)
+	 * @param numOfFollowers an Integer
+	 */
+	public void updateFollowerPanel(int id, int numOfFollowers) {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				ImageView[] followers = model.getFollowerViews();
+				for(int i=followers.length-1; i>=0; --i) {
+					if(i < (followers.length - numOfFollowers))
+						followers[i].setOpacity(0.2f);
+					Image image = ResourceManager.getImageFromResources("meeple" + id + ".png");
+					followers[i].setImage(image);
 				}
 			}
 		});

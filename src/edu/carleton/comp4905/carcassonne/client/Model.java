@@ -12,16 +12,19 @@ public class Model {
 	public static final int COLS = 9;
 	public static final int CENTER_ROW = Math.floorDiv(ROWS, 2);
 	public static final int CENTER_COL = Math.floorDiv(COLS, 2);
+	public static final int NUM_OF_FOLLOWERS = 7;
 	
 	private final TileContainer[][] tiles;
 	private final TilePreview[] previews;
 	private GameTile selected;
 	private Map<ImageView, PopOver> players;
+	private ImageView[] followers;
 	
 	public Model() {
 		tiles = new TileContainer[COLS][ROWS];
 		previews = new TilePreview[Side.values().length];
 		players = new LinkedHashMap<ImageView, PopOver>();
+		followers = new ImageView[NUM_OF_FOLLOWERS];
 	}
 	
 	/**
@@ -63,6 +66,15 @@ public class Model {
 	}
 	
 	/**
+	 * Adds the follower view.
+	 * @param imageView an array of ImageViews
+	 */
+	public void addFollowerViews(final ImageView[] imageView) {
+		for(int i=0; i<imageView.length; ++i)
+			followers[i] = imageView[i];
+	}
+	
+	/**
 	 * Returns the selected preview tile.
 	 * @return GameTile
 	 */
@@ -84,5 +96,13 @@ public class Model {
 	 */
 	public Map<ImageView, PopOver> getPlayerViews() {
 		return players;
+	}
+	
+	/**
+	 * Returns the images representing the followers.
+	 * @return a Map<ImageView, PopOver>
+	 */
+	public ImageView[] getFollowerViews() {
+		return followers;
 	}
 }

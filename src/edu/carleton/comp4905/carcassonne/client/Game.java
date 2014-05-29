@@ -6,51 +6,34 @@ import java.net.UnknownHostException;
 import edu.carleton.comp4905.carcassonne.common.Address;
 import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Connector;
+import edu.carleton.comp4905.carcassonne.common.DefaultConnector;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventType;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
 import edu.carleton.comp4905.carcassonne.common.ProtoConnector;
+import edu.carleton.comp4905.carcassonne.common.Protocol;
 import edu.carleton.comp4905.carcassonne.common.Service;
 import edu.carleton.comp4905.carcassonne.common.StringConstants;
 
 public class Game extends Service implements Runnable {
 	private final String playerName;
 	private final Address address;
-	private final Connector connector;
+	private Connector connector;
 	private Connection connection;
 	private final GameController controller;
 	
 	public Game(final String playerName, final Address address, final GameController gameController) {
 		super();
+		initialize("client.properties");
 		this.address = address;
 		this.playerName = playerName;
-		this.connector = new ProtoConnector(this);
+		if(protocol == Protocol.JAVA_SERIALIZE)
+			this.connector = new DefaultConnector(this);
+		else if(protocol == Protocol.GOOGLE_PROTOBUF)
+			this.connector = new ProtoConnector(this);
 		this.controller = gameController;
-		initialize();
 	}
-	
-	/**
-	 * Initializes the reactor with event handlers and instantiates them.
-	 */
-	private void initialize() {
-		propertyLoader.loadProperty("client.properties");
-		for(Object eventType : propertyLoader.getProperties().keySet()) {
-			String handlerName = propertyLoader.getProperty((String)eventType);
-			if(handlerName != null) {
-				try {
-					reactor.addHandler(EventType.valueOf((String)eventType), getEventHandler(propertyLoader.getProperties(), handlerName));
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				} catch (InstantiationException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		
-	}
-	
+
 	@Override
 	public void run() {
 		try {

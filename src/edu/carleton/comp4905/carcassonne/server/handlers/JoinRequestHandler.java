@@ -22,12 +22,19 @@ public class JoinRequestHandler implements EventHandler {
 		ServerController controller = server.getController();
 		ConcurrentMap<Address, Connection> connections = server.getConnections();
 		
-		// send reply back to client if game is already in progress (no joining during the game)
+		// send reply back to sending client if game is in progress or player name already taken
 		if(server.isGameInProgress()) {
 			Event reply = new Event(EventType.JOIN_REPLY, event.getPlayerName());
 			reply.addProperty("numOfPlayers", connections.size());
 			reply.addProperty("success", false);
 			reply.addProperty("message", "Game has already started.");
+			connection.sendEvent(reply);
+			return;
+		} else if(controller.playerExists(event.getPlayerName())) {
+			Event reply = new Event(EventType.JOIN_REPLY, event.getPlayerName());
+			reply.addProperty("numOfPlayers", connections.size());
+			reply.addProperty("success", false);
+			reply.addProperty("message", "Player name already exists.");
 			connection.sendEvent(reply);
 			return;
 		}
