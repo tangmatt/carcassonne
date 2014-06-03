@@ -4,5 +4,6 @@ public enum Segment {
 	CITY,
 	FIELD,
 	ROAD,
+	CLOISTER,
 	EMPTY
 }

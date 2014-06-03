@@ -9,6 +9,7 @@ import edu.carleton.comp4905.carcassonne.common.Address;
 import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Message;
 import edu.carleton.comp4905.carcassonne.common.MessageType;
+import edu.carleton.comp4905.carcassonne.common.PlatformManager;
 import edu.carleton.comp4905.carcassonne.common.Player;
 import edu.carleton.comp4905.carcassonne.common.Player.Status;
 import javafx.application.Platform;
@@ -78,7 +79,12 @@ public class ServerController implements Initializable {
 	 * @param port a port (String)
 	 */
 	public void connectPlayer(final String name, final String address, final String port) {
-		playerData.add(new Player.PlayerBuilder(name, address, port, Status.CONNECTED).build());
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				playerData.add(new Player.PlayerBuilder(name, address, port, Status.CONNECTED).build());
+			}
+		});
 	}
 	
 	/**
@@ -112,13 +118,18 @@ public class ServerController implements Initializable {
 	 * @return boolean
 	 */
 	public void removePlayer(final String name, final String address, final String port, final Status status) {
-		Player temp = new Player.PlayerBuilder(name, address, port, status).build();
-		Iterator<Player> it = playerData.iterator();
-		while(it.hasNext()) {
-			Player p = it.next();
-			if(temp.equals(p))
-				it.remove();
-		}
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				Player temp = new Player.PlayerBuilder(name, address, port, status).build();
+				Iterator<Player> it = playerData.iterator();
+				while(it.hasNext()) {
+					Player p = it.next();
+					if(temp.equals(p))
+						it.remove();
+				}
+			}
+		});
 	}
 	
 	/**
@@ -128,21 +139,26 @@ public class ServerController implements Initializable {
 	 * @param port an Integer
 	 */
 	public void removeConnection(final Map<Address, Connection> connections, final String address, final int port) {
-		Iterator<Map.Entry<Address, Connection>> it = connections.entrySet().iterator();
-		while(it.hasNext()) {
-			Map.Entry<Address, Connection> pairs = it.next();
-			Address temp = pairs.getKey();
-			if(temp.equals(new Address(address, port)))
-				it.remove();
-		}
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				Iterator<Map.Entry<Address, Connection>> it = connections.entrySet().iterator();
+				while(it.hasNext()) {
+					Map.Entry<Address, Connection> pairs = it.next();
+					Address temp = pairs.getKey();
+					if(temp.equals(new Address(address, port)))
+						it.remove();
+				}
+			}
+		});
 	}
 	
 	/**
 	 * Returns the players' status.
 	 * @return an array of booleans
 	 */
-	public boolean[] getStatuses(final Map<Address, Connection> connections) {
-		boolean[] statuses = new boolean[playerData.size()];
+	public Boolean[] getStatuses(final Map<Address, Connection> connections) {
+		Boolean[] statuses = new Boolean[playerData.size()];
 		for(int i=0; i<statuses.length; ++i)
 			statuses[i] = playerData.get(i).isConnected();
 		return statuses;
@@ -187,10 +203,10 @@ public class ServerController implements Initializable {
 	}
 	
 	/**
-	 * Returns the players' positions in the list.
+	 * Returns the players' index in the list.
 	 * @return an array of String
 	 */
-	public String[] getPlayerPositions() {
+	public String[] getPlayerIndices() {
 		String[] list = new String[playerData.size()];
 		int index = 0;
 		for(Player player : playerData) {
@@ -203,7 +219,12 @@ public class ServerController implements Initializable {
 	 * Handles when the game is over.
 	 */
 	public void handleGameFinish() {
-		playerData.clear();
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				playerData.clear();
+			}
+		});
 	}
 	
 	/**
@@ -212,7 +233,12 @@ public class ServerController implements Initializable {
 	 * @param message a message (String)
 	 */
 	public void addMessageEntry(final MessageType type, final String message) {
-		messageData.add(new Message(type, message));
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				messageData.add(new Message(type, message));
+			}
+		});
 	}
 	
 	/**

@@ -34,7 +34,7 @@ public class ProtoConnection extends Connection {
 	public void run() {
 		running = true;
 		service.getPool().execute(new Producer());
-		service.getPool().execute(new Consumer());
+		service.getPool().execute(new Consumer(this));
 	}
 
 	@Override
@@ -44,6 +44,7 @@ public class ProtoConnection extends Connection {
 			eventMessage.writeDelimitedTo(peer.getOutputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
+			running = false;
 		}
 	}
 	
@@ -53,48 +54,6 @@ public class ProtoConnection extends Connection {
 			Connection connection = connections.get(address);
 			connection.sendEvent(event);
 		}
-	}
-	
-	/**
-	 * Returns an Event Message.
-	 * @param event an Event
-	 * @return EventMessage.Event
-	 */
-	protected EventMessage.Event getEventMessage(final Event event) {
-		EventMessage.Event.Builder builder = EventMessage.Event.newBuilder()
-				.setEventType(event.getEventType().ordinal())
-				.setPlayerName(event.getPlayerName());
-		
-		if(event.getProperty("numOfPlayers") != null)
-			builder.setNumOfPlayers((int)event.getProperty("numOfPlayers"));
-		if(event.getProperty("success") != null)
-			builder.setSuccess((boolean)event.getProperty("success"));
-		if(event.getProperty("message") != null)
-			builder.setMessage((String)event.getProperty("message"));
-		if(event.getProperty("statuses") != null) {
-			boolean[] statuses = (boolean[])event.getProperty("statuses");
-			for(int i=0; i<statuses.length; ++i)
-				builder.addStatuses(statuses[i]);	
-		}
-		if(event.getProperty("names") != null) {
-			String[] names = (String[])event.getProperty("names");
-			for(int i=0; i<names.length; ++i)
-				builder.addNames(names[i]);	
-		}
-		if(event.getProperty("finished") != null)
-			builder.setFinished((boolean)event.getProperty("finished"));
-		if(event.getProperty("gameInProgress") != null)
-			builder.setGameInProgress((boolean)event.getProperty("gameInProgress"));
-		if(event.getProperty("tile") != null)
-			builder.setTile((String)event.getProperty("tile"));
-		if(event.getProperty("row") != null)
-			builder.setRow((int)event.getProperty("row"));
-		if(event.getProperty("column") != null)
-			builder.setColumn((int)event.getProperty("column"));
-		if(event.getProperty("rotation") != null)
-			builder.setRotation((int)event.getProperty("rotation"));
-		
-		return builder.build();
 	}
 	
 	/**
@@ -135,14 +94,64 @@ public class ProtoConnection extends Connection {
 			event.addProperty("column", eventMessage.getColumn());
 		if(eventMessage.hasRotation())
 			event.addProperty("rotation", eventMessage.getRotation());
+		if(eventMessage.hasMeeple())
+			event.addProperty("meeple", eventMessage.getMeeple());
+		if(eventMessage.hasPosition())
+			event.addProperty("position", Position.values()[eventMessage.getPosition()]);
 		
 		return event;
+	}
+	
+	/**
+	 * Returns an Event Message.
+	 * @param event an Event
+	 * @return EventMessage.Event
+	 */
+	protected EventMessage.Event getEventMessage(final Event event) {
+		EventMessage.Event.Builder builder = EventMessage.Event.newBuilder()
+				.setEventType(event.getEventType().ordinal())
+				.setPlayerName(event.getPlayerName());
+		
+		if(event.getProperty("numOfPlayers") != null)
+			builder.setNumOfPlayers((int)event.getProperty("numOfPlayers"));
+		if(event.getProperty("success") != null)
+			builder.setSuccess((boolean)event.getProperty("success"));
+		if(event.getProperty("message") != null)
+			builder.setMessage((String)event.getProperty("message"));
+		if(event.getProperty("statuses") != null) {
+			Boolean[] statuses = (Boolean[])event.getProperty("statuses");
+			for(int i=0; i<statuses.length; ++i)
+				builder.addStatuses(statuses[i]);	
+		}
+		if(event.getProperty("names") != null) {
+			String[] names = (String[])event.getProperty("names");
+			for(int i=0; i<names.length; ++i)
+				builder.addNames(names[i]);	
+		}
+		if(event.getProperty("finished") != null)
+			builder.setFinished((Boolean)event.getProperty("finished"));
+		if(event.getProperty("gameInProgress") != null)
+			builder.setGameInProgress((Boolean)event.getProperty("gameInProgress"));
+		if(event.getProperty("tile") != null)
+			builder.setTile((String)event.getProperty("tile"));
+		if(event.getProperty("row") != null)
+			builder.setRow((int)event.getProperty("row"));
+		if(event.getProperty("column") != null)
+			builder.setColumn((int)event.getProperty("column"));
+		if(event.getProperty("rotation") != null)
+			builder.setRotation((int)event.getProperty("rotation"));
+		if(event.getProperty("meeple") != null)
+			builder.setMeeple((int)event.getProperty("meeple"));
+		if(event.getProperty("position") != null)
+			builder.setPosition(((Position)event.getProperty("position")).ordinal());
+		
+		return builder.build();
 	}
 	
 	private class Producer implements Runnable {
 		@Override
 		public void run() {
-			while(running || !Thread.currentThread().isInterrupted()) {
+			while(running) {
 				try {
 					EventMessage.Event eventMessage = EventMessage.Event.parseDelimitedFrom(peer.getInputStream());
 					if(!eventMessage.hasEventType() || !eventMessage.hasPlayerName())
@@ -150,23 +159,32 @@ public class ProtoConnection extends Connection {
 					Event event = getEvent(eventMessage);
 					buffer.put(event);
 				} catch (Exception e) {
-					Thread.currentThread().interrupt();
+					running = false;
 				}
 			}
 		}
 	}
 	
 	private class Consumer implements Runnable {
+		private final ProtoConnection connection;
+
+		public Consumer(final ProtoConnection connection) {
+			this.connection = connection;
+		}
+		
 		@Override
 		public void run() {
 			try {
-				while(running || !Thread.currentThread().isInterrupted()) {
+				while(running) {
 					Event event = buffer.take();
+					event.addProperty("connection", connection);
+					event.addProperty("address", peer.getInetAddress().getHostAddress());
+					event.addProperty("port", peer.getPort());
 					if(event != null)
 						service.getReactor().dispatch(event);
 				}
 			} catch (Exception e) {
-				Thread.currentThread().interrupt();
+				running = false;
 			}
 		}
 	}

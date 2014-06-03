@@ -34,7 +34,7 @@ public class QuitRequestHandler implements EventHandler {
 		
 		String[] names = controller.getPlayerNames();
 		String message = null;
-		boolean[] statuses = controller.getStatuses(connections);
+		Boolean[] statuses = controller.getStatuses(connections);
 		boolean gameOver = (connections.size() == 1 && server.isGameInProgress());
 		
 		if(gameOver) {

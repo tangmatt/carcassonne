@@ -8,6 +8,7 @@ import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventHandler;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
+import edu.carleton.comp4905.carcassonne.common.Position;
 
 public class SendTileReplyHandler implements EventHandler {
 	@Override
@@ -23,11 +24,16 @@ public class SendTileReplyHandler implements EventHandler {
 				String tile = (String)event.getProperty("tile");
 				int row = (int)event.getProperty("row");
 				int column = (int)event.getProperty("column");
+				int meeple = (int)event.getProperty("meeple");
+				Position position = (Position)event.getProperty("position");
 				
 				gameController.refreshGameTiles();
 				TileContainer container = new TileContainer(tileManager.getTile(tile));
+				if(position != null)
+					container.addFollower(position, meeple, true);
 				gameController.addTile(row, column, container);	
 				gameController.firePreviewTileEvent(true);
+				//container.setEffect(new InnerShadow());
 			}
 		});
 	}

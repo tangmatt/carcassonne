@@ -3,7 +3,6 @@ package edu.carleton.comp4905.carcassonne.client.handlers;
 import edu.carleton.comp4905.carcassonne.client.Game;
 import edu.carleton.comp4905.carcassonne.client.GameController;
 import edu.carleton.comp4905.carcassonne.client.LobbyController;
-import edu.carleton.comp4905.carcassonne.client.Model;
 import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventHandler;
@@ -23,13 +22,15 @@ public class StartReplyHandler implements EventHandler {
 		
 		int index;
 		for(index = 0; index<names.length; ++index) {
-			if(names[index].equalsIgnoreCase(game.getPlayerName()))
+			if(names[index].equalsIgnoreCase(game.getPlayerName())) {
+				gameController.getModel().setIndex(index+1);
 				break;
+			}
 		}
 		
 		lobbyController.close();
 		gameController.updatePlayerPanel(names, statuses);
-		gameController.updateFollowerPanel(index+1, Model.NUM_OF_FOLLOWERS);
+		gameController.updateFollowerPanel();
 		gameController.startGame();
 	}
 }

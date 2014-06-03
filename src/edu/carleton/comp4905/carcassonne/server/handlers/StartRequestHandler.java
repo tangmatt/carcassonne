@@ -21,13 +21,15 @@ public class StartRequestHandler implements EventHandler {
 		
 		server.gameInProgress(true);
 		controller.addMessageEntry(MessageType.INFO, "Player '" + event.getPlayerName() + "' has started the game (with " + connections.size() + " players)");
-		boolean[] statuses = controller.getStatuses(connections);
+		Boolean[] statuses = controller.getStatuses(connections);
 		String[] names = controller.getPlayerNames();
+		//String[] ids = controller.getPlayerIndices();
 		
 		// send reply back to connected clients
 		Event reply = new Event(EventType.START_REPLY, event.getPlayerName());
 		reply.addProperty("statuses", statuses);
 		reply.addProperty("names", names);
+		//reply.addProperty("ids", ids);
 		connection.broadcastEvent(reply, connections);
 	}
 }

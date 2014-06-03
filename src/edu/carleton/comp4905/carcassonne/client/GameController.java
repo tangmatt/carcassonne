@@ -35,7 +35,7 @@ public class GameController implements Initializable {
 	@FXML private ImageView player1, player2, player3, player4, player5;
 	@FXML private ImageView meeple1, meeple2, meeple3, meeple4, meeple5, meeple6, meeple7; // meeple = follower
 	private TileManager tileManager;
-	private Model model;
+	private ClientData model;
 	private MouseEvent mouseEvent;
 	private LobbyDialog lobbyDialog;
 	private GameClient client;
@@ -46,7 +46,7 @@ public class GameController implements Initializable {
 		mouseEvent = new MouseEvent(MouseEvent.MOUSE_PRESSED, 0, 0, 0, 0, 
 				MouseButton.PRIMARY, 1, true, true, true, true, true, true, true, true, true, true, null);
 		tileManager = TileManager.getInstance();
-		model = new Model();
+		model = new ClientData();
 		random = new Random();
 		
 		ImageView[] playerViews = new ImageView[] { player1, player2, player3, player4, player5 };
@@ -101,8 +101,8 @@ public class GameController implements Initializable {
 			public void run() {
 				refresh();
 				int numOfHints = 0;
-				for(int c=0; c<Model.COLS; ++c) {
-					for(int r=0; r<Model.ROWS; ++r) {
+				for(int c=0; c<ClientData.COLS; ++c) {
+					for(int r=0; r<ClientData.ROWS; ++r) {
 						TileContainer currTile;
 						currTile = model.getTile(r, c);
 						if(currTile != null) {
@@ -132,26 +132,38 @@ public class GameController implements Initializable {
 	 */
 	private int showHint(final Side side, final int r, final int c, final AbstractTile container, final Segment segment) {
 		try {
-			AbstractTile selected = null;
+			TileContainer selected = null;
 			if(side == Side.TOP && model.getTile(r-1, c).isEmpty() && container.matchesBottomSegment(segment)) {
 				selected = model.getTile(r-1, c);
 				selected.setSelected(true);
-				selected.addMouseListener(this, new TileContainerHandler(selected, this, r-1, c));
+				selected.addMouseListener(this,
+						new TileContainerHandler(this, r-1, c),
+						new TileHoverHandler(this),
+						new TileExitHandler());
 			}
 			else if(side == Side.RIGHT && model.getTile(r, c+1).isEmpty() && container.matchesLeftSegment(segment)) {
 				selected = model.getTile(r, c+1);
 				selected.setSelected(true);
-				selected.addMouseListener(this, new TileContainerHandler(selected, this, r, c+1));
+				selected.addMouseListener(this, 
+						new TileContainerHandler(this, r, c+1),
+						new TileHoverHandler(this),
+						new TileExitHandler());
 			}
 			else if(side == Side.BOTTOM && model.getTile(r+1, c).isEmpty() && container.matchesTopSegment(segment)) {
 				selected = model.getTile(r+1, c);
 				selected.setSelected(true);
-				selected.addMouseListener(this, new TileContainerHandler(selected, this, r+1, c));
+				selected.addMouseListener(this, 
+						new TileContainerHandler(this, r+1, c),
+						new TileHoverHandler(this),
+						new TileExitHandler());
 			}
 			else if(side == Side.LEFT && model.getTile(r, c-1).isEmpty() && container.matchesRightSegment(segment)) {
 				selected = model.getTile(r, c-1);
 				selected.setSelected(true);
-				selected.addMouseListener(this, new TileContainerHandler(selected, this, r, c-1));
+				selected.addMouseListener(this,
+						new TileContainerHandler(this, r, c-1),
+						new TileHoverHandler(this),
+						new TileExitHandler());
 			}
 		} catch(ArrayIndexOutOfBoundsException e) {
 			return 0;
@@ -220,8 +232,8 @@ public class GameController implements Initializable {
 			public void run() {
 				for(TilePreview preview : model.getPreviews())
 					preview.setSelected(false);
-				for(int c=0; c<Model.COLS; ++c) {
-					for(int r=0; r<Model.ROWS; ++r) {
+				for(int c=0; c<ClientData.COLS; ++c) {
+					for(int r=0; r<ClientData.ROWS; ++r) {
 						model.getTile(r, c).setSelected(false);
 						model.getTile(r, c).removeMouseListener();
 					}
@@ -246,7 +258,7 @@ public class GameController implements Initializable {
 					else
 						previews[i].addTile(tileManager.getTile(original ? tile.getName() : tile.getName()+degrees));
 					if(!previews[i].getTile().getName().equals(StringConstants.EMPTY_TILE))
-						previews[i].addMouseListener(GameController.this, new TilePreviewHandler(previews[i], GameController.this));
+						previews[i].addMouseListener(GameController.this, new TilePreviewHandler(GameController.this));
 				}
 			}
 		});
@@ -277,8 +289,9 @@ public class GameController implements Initializable {
 	 * Refreshes the game tiles.
 	 */
 	public void refreshGameTiles() {
-		for(int c=0; c<Model.COLS; ++c) {
-			for(int r=0; r<Model.ROWS; ++r) {
+		for(int c=0; c<ClientData.COLS; ++c) {
+			for(int r=0; r<ClientData.ROWS; ++r) {
+				model.getTile(r, c).setEffect(null);
 				model.getTile(r, c).setSelected(false);
 				model.getTile(r, c).removeMouseListener();
 			}
@@ -342,10 +355,10 @@ public class GameController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				for(int c=0; c<Model.COLS; ++c) {
-					for(int r=0; r<Model.ROWS; ++r) {
+				for(int c=0; c<ClientData.COLS; ++c) {
+					for(int r=0; r<ClientData.ROWS; ++r) {
 						TileContainer container;
-						if(r == Model.CENTER_ROW && c == Model.CENTER_COL)
+						if(r == ClientData.CENTER_ROW && c == ClientData.CENTER_COL)
 							container = new TileContainer(tileManager.getStarterTile());
 						else
 							container = new TileContainer(tileManager.getEmptyTile());
@@ -389,18 +402,16 @@ public class GameController implements Initializable {
 	
 	/**
 	 * Shows the amount of followers for the player.
-	 * @param id player id (Integer)
-	 * @param numOfFollowers an Integer
 	 */
-	public void updateFollowerPanel(int id, int numOfFollowers) {
+	public void updateFollowerPanel() {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
 				ImageView[] followers = model.getFollowerViews();
 				for(int i=followers.length-1; i>=0; --i) {
-					if(i < (followers.length - numOfFollowers))
+					if(i < (followers.length - model.getNumOfFollowers()))
 						followers[i].setOpacity(0.2f);
-					Image image = ResourceManager.getImageFromResources("meeple" + id + ".png");
+					Image image = ResourceManager.getImageFromResources("meeple" + model.getIndex() + ".png");
 					followers[i].setImage(image);
 				}
 			}
@@ -456,7 +467,7 @@ public class GameController implements Initializable {
 	 * Returns the Model object.
 	 * @return a Model
 	 */
-	public Model getModel() {
+	public ClientData getModel() {
 		return model;
 	}
 	

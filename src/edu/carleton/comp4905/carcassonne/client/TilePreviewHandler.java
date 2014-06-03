@@ -4,21 +4,20 @@ import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 
 public class TilePreviewHandler implements EventHandler<MouseEvent> {
-	private final TilePreview preview;
 	private final GameController controller;
 	
-	public TilePreviewHandler(final TilePreview preview, final GameController controller) {
-		this.preview = preview;
+	public TilePreviewHandler(final GameController controller) {
 		this.controller = controller;
 	}
 	
 	@Override
 	public void handle(final MouseEvent event) {
+		TilePreview preview = (TilePreview) event.getSource();
+		
 		if(!event.isPrimaryButtonDown())
 			return;
 		
 		controller.getModel().setSelectedPreviewTile(preview.getTile());
-		//controller.handlePopOver(preview, event.getScreenX(), event.getScreenY());
 		controller.handleHints(preview);
 		preview.setSelected(true);
 	}

@@ -11,7 +11,6 @@ public class TilePreview extends AbstractTile {
 
 	@Override
 	public void setSelected(final boolean state) {
-		this.state = state;
 		if(state) {
 			setOpacity(1.0f);
 			setStyle(selectedStyle);

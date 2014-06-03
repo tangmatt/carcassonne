@@ -204,6 +204,26 @@ public final class EventMessage {
      * <code>optional int32 rotation = 16;</code>
      */
     int getRotation();
+
+    // optional int32 meeple = 17;
+    /**
+     * <code>optional int32 meeple = 17;</code>
+     */
+    boolean hasMeeple();
+    /**
+     * <code>optional int32 meeple = 17;</code>
+     */
+    int getMeeple();
+
+    // optional int32 position = 18;
+    /**
+     * <code>optional int32 position = 18;</code>
+     */
+    boolean hasPosition();
+    /**
+     * <code>optional int32 position = 18;</code>
+     */
+    int getPosition();
   }
   /**
    * Protobuf type {@code edu.carleton.comp4905.carcassonne.common.Event}
@@ -354,6 +374,16 @@ public final class EventMessage {
             case 128: {
               bitField0_ |= 0x00002000;
               rotation_ = input.readInt32();
+              break;
+            }
+            case 136: {
+              bitField0_ |= 0x00004000;
+              meeple_ = input.readInt32();
+              break;
+            }
+            case 144: {
+              bitField0_ |= 0x00008000;
+              position_ = input.readInt32();
               break;
             }
           }
@@ -828,6 +858,42 @@ public final class EventMessage {
       return rotation_;
     }
 
+    // optional int32 meeple = 17;
+    public static final int MEEPLE_FIELD_NUMBER = 17;
+    private int meeple_;
+    /**
+     * <code>optional int32 meeple = 17;</code>
+     */
+    @Override
+	public boolean hasMeeple() {
+      return ((bitField0_ & 0x00004000) == 0x00004000);
+    }
+    /**
+     * <code>optional int32 meeple = 17;</code>
+     */
+    @Override
+	public int getMeeple() {
+      return meeple_;
+    }
+
+    // optional int32 position = 18;
+    public static final int POSITION_FIELD_NUMBER = 18;
+    private int position_;
+    /**
+     * <code>optional int32 position = 18;</code>
+     */
+    @Override
+	public boolean hasPosition() {
+      return ((bitField0_ & 0x00008000) == 0x00008000);
+    }
+    /**
+     * <code>optional int32 position = 18;</code>
+     */
+    @Override
+	public int getPosition() {
+      return position_;
+    }
+
     private void initFields() {
       eventType_ = 0;
       playerName_ = "";
@@ -845,6 +911,8 @@ public final class EventMessage {
       row_ = 0;
       column_ = 0;
       rotation_ = 0;
+      meeple_ = 0;
+      position_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     @Override
@@ -915,6 +983,12 @@ public final class EventMessage {
       }
       if (((bitField0_ & 0x00002000) == 0x00002000)) {
         output.writeInt32(16, rotation_);
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        output.writeInt32(17, meeple_);
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        output.writeInt32(18, position_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -996,6 +1070,14 @@ public final class EventMessage {
       if (((bitField0_ & 0x00002000) == 0x00002000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(16, rotation_);
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(17, meeple_);
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(18, position_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1149,6 +1231,10 @@ public final class EventMessage {
         bitField0_ = (bitField0_ & ~0x00004000);
         rotation_ = 0;
         bitField0_ = (bitField0_ & ~0x00008000);
+        meeple_ = 0;
+        bitField0_ = (bitField0_ & ~0x00010000);
+        position_ = 0;
+        bitField0_ = (bitField0_ & ~0x00020000);
         return this;
       }
 
@@ -1249,6 +1335,14 @@ public final class EventMessage {
           to_bitField0_ |= 0x00002000;
         }
         result.rotation_ = rotation_;
+        if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
+          to_bitField0_ |= 0x00004000;
+        }
+        result.meeple_ = meeple_;
+        if (((from_bitField0_ & 0x00020000) == 0x00020000)) {
+          to_bitField0_ |= 0x00008000;
+        }
+        result.position_ = position_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1335,6 +1429,12 @@ public final class EventMessage {
         }
         if (other.hasRotation()) {
           setRotation(other.getRotation());
+        }
+        if (other.hasMeeple()) {
+          setMeeple(other.getMeeple());
+        }
+        if (other.hasPosition()) {
+          setPosition(other.getPosition());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -2200,6 +2300,76 @@ public final class EventMessage {
         return this;
       }
 
+      // optional int32 meeple = 17;
+      private int meeple_ ;
+      /**
+       * <code>optional int32 meeple = 17;</code>
+       */
+      @Override
+	public boolean hasMeeple() {
+        return ((bitField0_ & 0x00010000) == 0x00010000);
+      }
+      /**
+       * <code>optional int32 meeple = 17;</code>
+       */
+      @Override
+	public int getMeeple() {
+        return meeple_;
+      }
+      /**
+       * <code>optional int32 meeple = 17;</code>
+       */
+      public Builder setMeeple(int value) {
+        bitField0_ |= 0x00010000;
+        meeple_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 meeple = 17;</code>
+       */
+      public Builder clearMeeple() {
+        bitField0_ = (bitField0_ & ~0x00010000);
+        meeple_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional int32 position = 18;
+      private int position_ ;
+      /**
+       * <code>optional int32 position = 18;</code>
+       */
+      @Override
+	public boolean hasPosition() {
+        return ((bitField0_ & 0x00020000) == 0x00020000);
+      }
+      /**
+       * <code>optional int32 position = 18;</code>
+       */
+      @Override
+	public int getPosition() {
+        return position_;
+      }
+      /**
+       * <code>optional int32 position = 18;</code>
+       */
+      public Builder setPosition(int value) {
+        bitField0_ |= 0x00020000;
+        position_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 position = 18;</code>
+       */
+      public Builder clearPosition() {
+        bitField0_ = (bitField0_ & ~0x00020000);
+        position_ = 0;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:edu.carleton.comp4905.carcassonne.common.Event)
     }
 
@@ -2226,15 +2396,15 @@ public final class EventMessage {
   static {
     java.lang.String[] descriptorData = {
       "\n\013event.proto\022(edu.carleton.comp4905.car" +
-      "cassonne.common\"\241\002\n\005Event\022\021\n\teventType\030\001" +
+      "cassonne.common\"\303\002\n\005Event\022\021\n\teventType\030\001" +
       " \002(\005\022\022\n\nplayerName\030\002 \002(\t\022\022\n\nconnection\030\003" +
       " \001(\014\022\017\n\007address\030\004 \001(\t\022\014\n\004port\030\005 \001(\005\022\024\n\014n" +
       "umOfPlayers\030\006 \001(\005\022\017\n\007success\030\007 \001(\010\022\017\n\007me" +
       "ssage\030\010 \001(\t\022\020\n\010statuses\030\t \003(\010\022\r\n\005names\030\n" +
       " \003(\t\022\020\n\010finished\030\013 \001(\010\022\026\n\016gameInProgress" +
       "\030\014 \001(\010\022\014\n\004tile\030\r \001(\t\022\013\n\003row\030\016 \001(\005\022\016\n\006col" +
-      "umn\030\017 \001(\005\022\020\n\010rotation\030\020 \001(\005B\016B\014EventMess" +
-      "age"
+      "umn\030\017 \001(\005\022\020\n\010rotation\030\020 \001(\005\022\016\n\006meeple\030\021 " +
+      "\001(\005\022\020\n\010position\030\022 \001(\005B\016B\014EventMessage"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2247,7 +2417,7 @@ public final class EventMessage {
           internal_static_edu_carleton_comp4905_carcassonne_common_Event_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_edu_carleton_comp4905_carcassonne_common_Event_descriptor,
-              new java.lang.String[] { "EventType", "PlayerName", "Connection", "Address", "Port", "NumOfPlayers", "Success", "Message", "Statuses", "Names", "Finished", "GameInProgress", "Tile", "Row", "Column", "Rotation", });
+              new java.lang.String[] { "EventType", "PlayerName", "Connection", "Address", "Port", "NumOfPlayers", "Success", "Message", "Statuses", "Names", "Finished", "GameInProgress", "Tile", "Row", "Column", "Rotation", "Meeple", "Position", });
           return null;
         }
       };

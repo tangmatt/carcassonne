@@ -9,8 +9,7 @@ import javafx.scene.layout.StackPane;
 
 public abstract class AbstractTile extends StackPane {
 	protected GameTile tile;
-	protected EventHandler<MouseEvent> handler;
-	protected boolean state;
+	protected EventHandler<MouseEvent> pressHandler;
 	public static final String selectedStyle = "-fx-border-color: #2F8BFA;"
             + "-fx-border-width: 2;"
 			+ "-fx-border-insets: -1;"
@@ -28,7 +27,6 @@ public abstract class AbstractTile extends StackPane {
 	public void addTile(final GameTile tile) {
 		this.tile = tile;
 		getChildren().add(this.tile);
-		setSelected(state);
 	}
 	
 	/**
@@ -60,16 +58,17 @@ public abstract class AbstractTile extends StackPane {
 		return tile.getSegments();
 	}
 	
-	public void addMouseListener(final GameController controller, final EventHandler<MouseEvent> handler) {
+	public void addMouseListener(final GameController controller,
+			final EventHandler<MouseEvent> pressHandler) {
 		removeMouseListener();
-		this.handler = handler;
-		addEventHandler(MouseEvent.MOUSE_PRESSED, this.handler);
+		this.pressHandler = pressHandler;
+		if(pressHandler != null)
+			addEventHandler(MouseEvent.MOUSE_PRESSED, this.pressHandler);
 	}
 	
 	public void removeMouseListener() {
-		if(handler == null)
-			return;
-		removeEventHandler(MouseEvent.MOUSE_PRESSED, handler);
+		if(pressHandler != null)
+			removeEventHandler(MouseEvent.MOUSE_PRESSED, pressHandler);
 	}
 	
 	/**

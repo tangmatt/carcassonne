@@ -19,4 +19,6 @@ message Event {
 	optional int32 row = 14;
 	optional int32 column = 15;
 	optional int32 rotation = 16;
+	optional int32 meeple = 17;
+	optional int32 position = 18;
 }
