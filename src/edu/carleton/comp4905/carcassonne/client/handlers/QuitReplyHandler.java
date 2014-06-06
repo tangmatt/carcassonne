@@ -7,8 +7,8 @@ import edu.carleton.comp4905.carcassonne.client.MessageDialog;
 import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventHandler;
+import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
-import edu.carleton.comp4905.carcassonne.common.StringConstants;
 
 public class QuitReplyHandler implements EventHandler {
 	@Override
@@ -41,7 +41,7 @@ public class QuitReplyHandler implements EventHandler {
 					gameController.blurGame(true);
 					new MessageDialog(gameController.getGridPane().getScene().getWindow(),
 							gameController.getGameClient(),
-							StringConstants.INFO_TITLE,
+							LocalMessages.getString("InfoTitle"),
 							message)
 					.show();
 				}

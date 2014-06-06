@@ -9,11 +9,11 @@ import edu.carleton.comp4905.carcassonne.common.Connector;
 import edu.carleton.comp4905.carcassonne.common.DefaultConnector;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventType;
+import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
 import edu.carleton.comp4905.carcassonne.common.ProtoConnector;
 import edu.carleton.comp4905.carcassonne.common.Protocol;
 import edu.carleton.comp4905.carcassonne.common.Service;
-import edu.carleton.comp4905.carcassonne.common.StringConstants;
 
 public class Game extends Service implements Runnable {
 	private final String playerName;
@@ -49,7 +49,7 @@ public class Game extends Service implements Runnable {
 					controller.blurGame(true);
 					new MessageDialog(controller.getGridPane().getScene().getWindow(),
 							controller.getGameClient(),
-							StringConstants.ERR_TITLE,
+							LocalMessages.getString("ErrTitle"),
 							e.getMessage())
 					.show();
 				}

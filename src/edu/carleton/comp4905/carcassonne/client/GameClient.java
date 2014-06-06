@@ -4,8 +4,9 @@ import edu.carleton.comp4905.carcassonne.common.Address;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventType;
 import edu.carleton.comp4905.carcassonne.common.FXMLManager;
+import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.ResourceManager;
-import edu.carleton.comp4905.carcassonne.common.StringConstants;
+
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -30,7 +31,7 @@ public class GameClient extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		this.primaryStage = primaryStage;
-		primaryStage.setTitle(StringConstants.GAME_TITLE + StringConstants.SEPARATOR + playerName);
+		primaryStage.setTitle(LocalMessages.getString("GameTitle") + " - " + playerName);
 		primaryStage.getIcons().add(ResourceManager.getImageFromResources("icon.png"));
 		primaryStage.setResizable(false);
 		
@@ -50,10 +51,8 @@ public class GameClient extends Application {
 				try {
 					game.getConnection().sendEvent(new Event(EventType.QUIT_REQUEST, game.getPlayerName()));
 					Thread.sleep(33);
-				} catch(InterruptedException e) {
+				} catch(Exception e) {
 					e.printStackTrace();
-				} catch(NullPointerException e) {
-					// do nothing
 				}
 				game.shutdown();
 				primaryStage.close();

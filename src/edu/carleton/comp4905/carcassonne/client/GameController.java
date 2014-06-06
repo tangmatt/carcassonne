@@ -9,9 +9,9 @@ import org.controlsfx.control.PopOver;
 import org.controlsfx.control.PopOver.ArrowLocation;
 
 import edu.carleton.comp4905.carcassonne.client.handlers.PlayerViewHandler;
+import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
 import edu.carleton.comp4905.carcassonne.common.ResourceManager;
-import edu.carleton.comp4905.carcassonne.common.StringConstants;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -65,7 +65,7 @@ public class GameController implements Initializable {
 	 * @param c a column (integer)
 	 * @param container a TileContainer
 	 */
-	public void addTile(final int r, final int c, final TileContainer container) {
+	public synchronized void addTile(final int r, final int c, final TileContainer container) {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -79,14 +79,14 @@ public class GameController implements Initializable {
 	 * Places tiles onto the tile preview displays.
 	 * @param tile a GameTile
 	 */
-	public void setPreviewTiles(final GameTile tile) {
+	public synchronized void setPreviewTiles(final GameTile tile) {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
 				setRotatedPreviews(tile);
 				if(previewPane.getChildren().isEmpty())
 					previewPane.getChildren().addAll(model.getPreviews());
-					firePreviewTileEvent(false);
+				firePreviewTileEvent(false);
 			}
 		});
 	}
@@ -95,117 +95,151 @@ public class GameController implements Initializable {
 	 * Determines whether the chosen tile can be placed adjacent to existing tiles.
 	 * @param preview a TilePreview
 	 */
-	public void handleHints(final TilePreview preview) {
+	public synchronized void handleHints(final TilePreview preview) {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
 				refresh();
-				int numOfHints = 0;
 				for(int c=0; c<ClientData.COLS; ++c) {
 					for(int r=0; r<ClientData.ROWS; ++r) {
-						TileContainer currTile;
-						currTile = model.getTile(r, c);
-						if(currTile != null) {
-							// compare existing tile with new tile and indicating if matching
-							numOfHints += showHint(Side.TOP, r, c, preview, currTile.getTopSegment());
-							numOfHints += showHint(Side.RIGHT, r, c, preview, currTile.getRightSegment());
-							numOfHints += showHint(Side.BOTTOM, r, c, preview, currTile.getBottomSegment());
-							numOfHints += showHint(Side.LEFT, r, c, preview, currTile.getLeftSegment());
-						}
+						showHint(preview, model.getTile(r, c), r, c);
 					}
 				}
-				// if there are no place-able cards, discard current tile and re-draw
-				if(numOfHints == 0)
-					startTurn();
 			}
 		});
 	}
 	
 	/**
 	 * Manages the empty tile adjacent to an existing tile if there is a match.
-	 * @param side a Side
-	 * @param r a row (integer)
-	 * @param c a column (integer)
-	 * @param container an AbstractTile
-	 * @param segment a Segment
-	 * @return Integer
 	 */
-	private int showHint(final Side side, final int r, final int c, final AbstractTile container, final Segment segment) {
-		try {
-			TileContainer selected = null;
-			if(side == Side.TOP && model.getTile(r-1, c).isEmpty() && container.matchesBottomSegment(segment)) {
-				selected = model.getTile(r-1, c);
+	private synchronized void showHint(final TilePreview preview, final TileContainer currTile, final int r, final int c) {
+		TileContainer selected = null;
+		int tileMatches = 0, tileCount = 0;
+		
+		if(currTile.isEmpty()) {
+			// count non-empty tiles
+			tileCount += isPlayableTile(r+1, c);
+			tileCount += isPlayableTile(r-1, c);
+			tileCount += isPlayableTile(r, c-1);
+			tileCount += isPlayableTile(r, c+1);
+			
+			if(tileCount == 0) // return if there are only empty tiles around the current tile
+				return; 
+			
+			if(matchesTopSegment(preview, r, c))
+				tileMatches++;
+			if(matchesRightSegment(preview, r, c))
+				tileMatches++;
+			if(matchesBottomSegment(preview, r, c))
+				tileMatches++;
+			if(matchesLeftSegment(preview, r, c))
+				tileMatches++;
+			
+			if(tileMatches == tileCount) { // current tile must be matching with all the placed surrounding tiles
+				selected = model.getTile(r, c);
 				selected.setSelected(true);
 				selected.addMouseListener(this,
-						new TileContainerHandler(this, r-1, c),
+						new TileContainerHandler(this, r, c),
 						new TileHoverHandler(this),
 						new TileExitHandler());
 			}
-			else if(side == Side.RIGHT && model.getTile(r, c+1).isEmpty() && container.matchesLeftSegment(segment)) {
-				selected = model.getTile(r, c+1);
-				selected.setSelected(true);
-				selected.addMouseListener(this, 
-						new TileContainerHandler(this, r, c+1),
-						new TileHoverHandler(this),
-						new TileExitHandler());
-			}
-			else if(side == Side.BOTTOM && model.getTile(r+1, c).isEmpty() && container.matchesTopSegment(segment)) {
-				selected = model.getTile(r+1, c);
-				selected.setSelected(true);
-				selected.addMouseListener(this, 
-						new TileContainerHandler(this, r+1, c),
-						new TileHoverHandler(this),
-						new TileExitHandler());
-			}
-			else if(side == Side.LEFT && model.getTile(r, c-1).isEmpty() && container.matchesRightSegment(segment)) {
-				selected = model.getTile(r, c-1);
-				selected.setSelected(true);
-				selected.addMouseListener(this,
-						new TileContainerHandler(this, r, c-1),
-						new TileHoverHandler(this),
-						new TileExitHandler());
-			}
-		} catch(ArrayIndexOutOfBoundsException e) {
-			return 0;
 		}
 		
-		return 1;
+		return;
 	}
 	
 	/**
-	 * Checks to see if the tile to be placed matches the surrounding tiles.
-	 * @param side a Side
-	 * @param r a row (integer)
-	 * @param c a column (integer)
-	 * @param container an AbstractTile
-	 * @param segment a Segment
-	 * @return Integer
+	 * Returns a one if the tile at the given row and column contains a valid tile
+	 * @param r the row
+	 * @param c the column
+	 * @return integer
 	 */
-	private boolean matchesSurroundingTiles(final Side side, final int r, final int c, final AbstractTile container, final Segment segment) {
+	private int isPlayableTile(final int r, final int c) {
+		int count = 0;
 		try {
-			if(side == Side.TOP && (model.getTile(r-1, c).isEmpty() || container.matchesBottomSegment(segment)))
-				return true;
-			else if(side == Side.RIGHT && (model.getTile(r, c+1).isEmpty() || container.matchesLeftSegment(segment)))
-				return true;
-			else if(side == Side.BOTTOM && (model.getTile(r+1, c).isEmpty() || container.matchesTopSegment(segment)))
-				return true;
-			else if(side == Side.LEFT && (model.getTile(r, c-1).isEmpty() || container.matchesRightSegment(segment)))
-				return true;
+			count = (model.getTile(r, c).isEmpty() || model.getTile(r, c) == null) ? 0 : 1;
 		} catch(ArrayIndexOutOfBoundsException e) {
 			// do nothing
 		}
-		
-		return false;
+		return count;
+	}
+	
+	/**
+	 * Returns true if preview tile's bottom segment matches the top segment of the tile below.
+	 * @param preview the preview tile
+	 * @param r the row
+	 * @param c the column
+	 * @return boolean
+	 */
+	private boolean matchesBottomSegment(final TilePreview preview, final int r, final int c) {
+		boolean match = false;
+		try {
+			match = preview.matchesBottomSegment(model.getTile(r+1, c).getTopSegment());
+		} catch(ArrayIndexOutOfBoundsException e) {
+			// do nothing
+		}
+		return match;
+	}
+	
+	/**
+	 * Returns true if preview tile's top segment matches the bottom segment of the tile above.
+	 * @param preview the preview tile
+	 * @param r the row
+	 * @param c the column
+	 * @return boolean
+	 */
+	private boolean matchesTopSegment(final TilePreview preview, final int r, final int c) {
+		boolean match = false;
+		try {
+			match = preview.matchesTopSegment(model.getTile(r-1, c).getBottomSegment());
+		} catch(ArrayIndexOutOfBoundsException e) {
+			// do nothing
+		}
+		return match;
+	}
+	
+	/**
+	 * Returns true if preview tile's left segment matches the right segment of the tile left.
+	 * @param preview the preview tile
+	 * @param r the row
+	 * @param c the column
+	 * @return boolean
+	 */
+	private boolean matchesLeftSegment(final TilePreview preview, final int r, final int c) {
+		boolean match = false;
+		try {
+			match = preview.matchesLeftSegment(model.getTile(r, c-1).getRightSegment());
+		} catch(ArrayIndexOutOfBoundsException e) {
+			// do nothing
+		}
+		return match;
+	}
+	
+	/**
+	 * Returns true if preview tile's right segment matches the left segment of the tile right.
+	 * @param preview the preview tile
+	 * @param r the row
+	 * @param c the column
+	 * @return boolean
+	 */
+	private boolean matchesRightSegment(final TilePreview preview, final int r, final int c) {
+		boolean match = false;
+		try {
+			match = preview.matchesRightSegment(model.getTile(r, c+1).getLeftSegment());
+		} catch(ArrayIndexOutOfBoundsException e) {
+			// do nothing
+		}
+		return match;
 	}
 	
 	/**
 	 * Initializes the start of a game.
 	 */
-	public void startGame() {
+	public synchronized void startGame() {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				startTurn(); // TODO temporary; for testing
+				startTurn();
 			}
 		});
 	}
@@ -213,7 +247,7 @@ public class GameController implements Initializable {
 	/**
 	 * Handles the start of the turn for the current client.
 	 */
-	public void startTurn() {
+	public synchronized void startTurn() {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -226,7 +260,7 @@ public class GameController implements Initializable {
 	/**
 	 * Handles the end of the turn for current client.
 	 */
-	public void endTurn() {
+	public synchronized void endTurn() {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -246,7 +280,7 @@ public class GameController implements Initializable {
 	 * Sets previews to be given tile and its rotated views and adds mouse listener to it.
 	 * @param tile a GameTile
 	 */
-	private void setRotatedPreviews(final GameTile tile) {
+	private synchronized void setRotatedPreviews(final GameTile tile) {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -257,7 +291,7 @@ public class GameController implements Initializable {
 						previews[i] = new TilePreview(tileManager.getTile(original ? tile.getName() : tile.getName()+degrees));
 					else
 						previews[i].addTile(tileManager.getTile(original ? tile.getName() : tile.getName()+degrees));
-					if(!previews[i].getTile().getName().equals(StringConstants.EMPTY_TILE))
+					if(!previews[i].getTile().getName().equals(LocalMessages.getString("EmptyTile")))
 						previews[i].addMouseListener(GameController.this, new TilePreviewHandler(GameController.this));
 				}
 			}
@@ -267,7 +301,7 @@ public class GameController implements Initializable {
 	/**
 	 * Refreshes the preview and game tiles.
 	 */
-	public void refresh() {
+	public synchronized void refresh() {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -280,7 +314,7 @@ public class GameController implements Initializable {
 	/**
 	 * Refreshes the preview tiles.
 	 */
-	public void refreshPreviews() {
+	public synchronized void refreshPreviews() {
 		for(TilePreview preview : model.getPreviews())
 			preview.setSelected(false);
 	}
@@ -288,7 +322,7 @@ public class GameController implements Initializable {
 	/**
 	 * Refreshes the game tiles.
 	 */
-	public void refreshGameTiles() {
+	public synchronized void refreshGameTiles() {
 		for(int c=0; c<ClientData.COLS; ++c) {
 			for(int r=0; r<ClientData.ROWS; ++r) {
 				model.getTile(r, c).setEffect(null);
@@ -302,7 +336,7 @@ public class GameController implements Initializable {
 	 * Fires the event to handle mouse presses on preview tiles.
 	 * @param keepState a boolean
 	 */
-	public void firePreviewTileEvent(boolean keepState) {
+	public synchronized void firePreviewTileEvent(boolean keepState) {
 		if(keepState)
 			Event.fireEvent(model.getSelectedPreviewTile(), mouseEvent);
 		else
@@ -312,7 +346,7 @@ public class GameController implements Initializable {
 	/**
 	 * Creates a PopOver component.
 	 */
-	private PopOver createPopOver() {
+	private synchronized PopOver createPopOver() {
 		PopOver popOver = new PopOver();
 		popOver.setArrowSize(10f);
 		popOver.setArrowIndent(15f);
@@ -326,7 +360,7 @@ public class GameController implements Initializable {
 	/**
 	 * Creates a dialog for displaying the player queue and pre-game interaction.
 	 */
-	private void createLobby() {
+	private synchronized void createLobby() {
 		PlatformManager.runLater(new Runnable() { // Note: must use runLater otherwise LoadException
 			@Override
 			public void run() {
@@ -338,7 +372,7 @@ public class GameController implements Initializable {
 	/**
 	 * Shows the lobby dialog.
 	 */
-	public void showLobbyDialog() {
+	public synchronized void showLobbyDialog() {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -351,7 +385,7 @@ public class GameController implements Initializable {
 	/**
 	 * Initializes the game board with empty tiles and the starting tile at the center.
 	 */
-	private void createGameBoard() {
+	private synchronized void createGameBoard() {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -374,7 +408,7 @@ public class GameController implements Initializable {
 	 * @param names an array of Strings
 	 * @param statuses an array of booleans
 	 */
-	public void updatePlayerPanel(final String[] names, final boolean[] statuses) {
+	public synchronized void updatePlayerPanel(final String[] names, final boolean[] statuses) {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -403,7 +437,7 @@ public class GameController implements Initializable {
 	/**
 	 * Shows the amount of followers for the player.
 	 */
-	public void updateFollowerPanel() {
+	public synchronized void updateFollowerPanel() {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -421,7 +455,7 @@ public class GameController implements Initializable {
 	/**
 	 * Clear the preview tiles and replace with empty tiles.
 	 */
-	public void clearPreviews() {
+	public synchronized void clearPreviews() {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -438,7 +472,7 @@ public class GameController implements Initializable {
 	 * Adds/removes blur from the interface.
 	 * @param state
 	 */
-	public void blurGame(final boolean state) {
+	public synchronized void blurGame(final boolean state) {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -451,7 +485,7 @@ public class GameController implements Initializable {
 	 * Returns the pane containing the preview tiles. 
 	 * @return a HBox
 	 */
-	public HBox getPreviewPane() {
+	public synchronized HBox getPreviewPane() {
 		return previewPane;
 	}
 	
@@ -459,7 +493,7 @@ public class GameController implements Initializable {
 	 * Returns the pane containing the game tiles.
 	 * @return a GridPane
 	 */
-	public GridPane getGridPane() {
+	public synchronized GridPane getGridPane() {
 		return gridPane;
 	}
 	
@@ -467,7 +501,7 @@ public class GameController implements Initializable {
 	 * Returns the Model object.
 	 * @return a Model
 	 */
-	public ClientData getModel() {
+	public synchronized ClientData getModel() {
 		return model;
 	}
 	
@@ -475,7 +509,7 @@ public class GameController implements Initializable {
 	 * Returns the LobbyController object.
 	 * @return a LobbyController
 	 */
-	public LobbyController getLobbyController() {
+	public synchronized LobbyController getLobbyController() {
 		return lobbyDialog.getController();
 	}
 	
@@ -483,7 +517,7 @@ public class GameController implements Initializable {
 	 * Returns the GameClient object.
 	 * @return a GameClient;
 	 */
-	public GameClient getGameClient() {
+	public synchronized GameClient getGameClient() {
 		return client;
 	}
 	
@@ -491,7 +525,7 @@ public class GameController implements Initializable {
 	 * Initializes data for this controller.
 	 * @param client a GameClient
 	 */
-	public void initData(final GameClient client) {
+	public synchronized void initData(final GameClient client) {
 		this.client = client;
 	}
 }

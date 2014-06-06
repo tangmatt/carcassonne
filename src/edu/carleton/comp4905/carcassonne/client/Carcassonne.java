@@ -1,7 +1,7 @@
 package edu.carleton.comp4905.carcassonne.client;
 
+import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.ResourceManager;
-import edu.carleton.comp4905.carcassonne.common.StringConstants;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -19,7 +19,7 @@ public class Carcassonne extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		primaryStage.setTitle(StringConstants.MANAGER_TITLE + StringConstants.SEPARATOR + StringConstants.GAME_TITLE);
+		primaryStage.setTitle(LocalMessages.getString("ManagerTitle") + " - " + LocalMessages.getString("GameTitle"));
 		primaryStage.getIcons().add(ResourceManager.getImageFromResources("icon.png"));
 		primaryStage.setResizable(false);
 		

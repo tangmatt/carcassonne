@@ -43,8 +43,7 @@ public class ProtoConnection extends Connection {
 			EventMessage.Event eventMessage = getEventMessage(event);
 			eventMessage.writeDelimitedTo(peer.getOutputStream());
 		} catch (IOException e) {
-			e.printStackTrace();
-			running = false;
+			// do nothing
 		}
 	}
 	

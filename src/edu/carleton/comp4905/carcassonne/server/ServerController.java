@@ -78,7 +78,7 @@ public class ServerController implements Initializable {
 	 * @param address an address (String)
 	 * @param port a port (String)
 	 */
-	public void connectPlayer(final String name, final String address, final String port) {
+	public synchronized void connectPlayer(final String name, final String address, final String port) {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -95,7 +95,7 @@ public class ServerController implements Initializable {
 	 * @param status a Status
 	 * @return boolean
 	 */
-	public boolean updatePlayer(final String name, final String address, final String port, final Status status) {
+	public synchronized boolean updatePlayer(final String name, final String address, final String port, final Status status) {
 		Player temp = new Player.PlayerBuilder(name, address, port, status).build();
 		int index = 0;
 		Iterator<Player> it = playerData.iterator();
@@ -117,7 +117,7 @@ public class ServerController implements Initializable {
 	 * @param port a port (String)
 	 * @return boolean
 	 */
-	public void removePlayer(final String name, final String address, final String port, final Status status) {
+	public synchronized void removePlayer(final String name, final String address, final String port, final Status status) {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -138,7 +138,7 @@ public class ServerController implements Initializable {
 	 * @param address a String
 	 * @param port an Integer
 	 */
-	public void removeConnection(final Map<Address, Connection> connections, final String address, final int port) {
+	public synchronized void removeConnection(final Map<Address, Connection> connections, final String address, final int port) {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -157,7 +157,7 @@ public class ServerController implements Initializable {
 	 * Returns the players' status.
 	 * @return an array of booleans
 	 */
-	public Boolean[] getStatuses(final Map<Address, Connection> connections) {
+	public synchronized Boolean[] getStatuses(final Map<Address, Connection> connections) {
 		Boolean[] statuses = new Boolean[playerData.size()];
 		for(int i=0; i<statuses.length; ++i)
 			statuses[i] = playerData.get(i).isConnected();
@@ -168,7 +168,7 @@ public class ServerController implements Initializable {
 	 * Returns all players' names.
 	 * @return an array of Strings
 	 */
-	public String[] getPlayerNames() {
+	public synchronized String[] getPlayerNames() {
 		String[] names = new String[playerData.size()];
 		for(int i=0; i<names.length; ++i)
 			names[i] = playerData.get(i).getName();
@@ -179,7 +179,7 @@ public class ServerController implements Initializable {
 	 * Returns the remaining player (assumes only one player is connected)
 	 * @return Player
 	 */
-	public Player getRemainingPlayer() {
+	public synchronized Player getRemainingPlayer() {
 		for(Player player : playerData) {
 			if(player.isConnected()) {
 				return player;
@@ -193,7 +193,7 @@ public class ServerController implements Initializable {
 	 * @param playerName a String
 	 * @return a boolean
 	 */
-	public boolean playerExists(final String playerName) {
+	public synchronized boolean playerExists(final String playerName) {
 		for(Player player : playerData) {
 			if(player.getName().equalsIgnoreCase(playerName)) {
 				return true;
@@ -206,7 +206,7 @@ public class ServerController implements Initializable {
 	 * Returns the players' index in the list.
 	 * @return an array of String
 	 */
-	public String[] getPlayerIndices() {
+	public synchronized String[] getPlayerIndices() {
 		String[] list = new String[playerData.size()];
 		int index = 0;
 		for(Player player : playerData) {
@@ -218,7 +218,7 @@ public class ServerController implements Initializable {
 	/**
 	 * Handles when the game is over.
 	 */
-	public void handleGameFinish() {
+	public synchronized void handleGameFinish() {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -232,7 +232,7 @@ public class ServerController implements Initializable {
 	 * @param type a MessageType
 	 * @param message a message (String)
 	 */
-	public void addMessageEntry(final MessageType type, final String message) {
+	public synchronized void addMessageEntry(final MessageType type, final String message) {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -245,7 +245,7 @@ public class ServerController implements Initializable {
 	 * Returns the AnchorPane object.
 	 * @return an AnchorPane
 	 */
-	public AnchorPane getAnchorPane() {
+	public synchronized AnchorPane getAnchorPane() {
 		return anchorPane;
 	}
 	
@@ -253,7 +253,7 @@ public class ServerController implements Initializable {
 	 * Returns the ServerClient object.
 	 * @return a ServerClient
 	 */
-	public ServerClient getServerClient() {
+	public synchronized ServerClient getServerClient() {
 		return client;
 	}
 	
@@ -261,7 +261,7 @@ public class ServerController implements Initializable {
 	 * Returns a list of players.
 	 * @return an ObservableList
 	 */
-	public ObservableList<Player> getPlayers() {
+	public synchronized ObservableList<Player> getPlayers() {
 		return playerData;
 	}
 	
@@ -269,7 +269,7 @@ public class ServerController implements Initializable {
 	 * Initializes data for this controller.
 	 * @param client a ServerClient
 	 */
-	public void initData(final ServerClient client) {
+	public synchronized void initData(final ServerClient client) {
 		this.client = client;
 	}
 }

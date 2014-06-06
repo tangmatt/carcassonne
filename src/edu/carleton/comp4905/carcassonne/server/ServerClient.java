@@ -1,8 +1,8 @@
 package edu.carleton.comp4905.carcassonne.server;
 
 import edu.carleton.comp4905.carcassonne.common.FXMLManager;
+import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.ResourceManager;
-import edu.carleton.comp4905.carcassonne.common.StringConstants;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -28,7 +28,7 @@ public class ServerClient extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		this.primaryStage = primaryStage;
-		primaryStage.setTitle(StringConstants.SERVER_TITLE + StringConstants.SEPARATOR + StringConstants.GAME_TITLE);
+		primaryStage.setTitle(LocalMessages.getString("ServerTitle") + " - " + LocalMessages.getString("GameTitle"));
 		primaryStage.getIcons().add(ResourceManager.getImageFromResources("icon.png"));
 		
 		fxmlLoader = FXMLManager.getFXML(getClass(), "ServerLogScene.fxml");

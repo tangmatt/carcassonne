@@ -10,8 +10,8 @@ import org.ini4j.Ini;
 import org.ini4j.InvalidFileFormatException;
 import org.ini4j.Profile.Section;
 
+import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.Position;
-import edu.carleton.comp4905.carcassonne.common.StringConstants;
 
 public class TileManager {
 	private static volatile TileManager instance = null;
@@ -64,7 +64,7 @@ public class TileManager {
 				}
 				tiles.put(key, gameTile);
 				addTileCombinations(gameTile, top, right, bottom, left);
-				if(!(key.equals(StringConstants.EMPTY_TILE) || key.equals(StringConstants.STARTER_TILE)))
+				if(!(key.equals(LocalMessages.getString("EmptyTile")) || key.equals(LocalMessages.getString("StarterTile"))))
 					NUM_OF_TILES++;
 			}
 		} catch (InvalidFileFormatException e) {
@@ -87,6 +87,7 @@ public class TileManager {
 	protected void addTileCombinations(final GameTile tile, final Segment top, final Segment right, final Segment bottom, final Segment left) {
 		for(int i=1, degrees=90; i<Side.values().length; ++i, degrees+=90) {
 			GameTile rotatedTile = new GameTile(tile);
+			rotatedTile.setName(tile.getName() + degrees);
 			rotatedTile.rotate(degrees);
 			tiles.put(tile.getName()+degrees, rotatedTile);
 		}
@@ -97,7 +98,7 @@ public class TileManager {
 	 * @param key a key
 	 * @return a GameTile
 	 */
-	public GameTile getTile(final String key) {
+	public GameTile getTile(final String key) {	
 		return new GameTile(tiles.get(key));
 	}
 	
@@ -106,7 +107,7 @@ public class TileManager {
 	 * @return a GameTile
 	 */
 	public GameTile getEmptyTile() {
-		return getTile(StringConstants.EMPTY_TILE);
+		return getTile(LocalMessages.getString("EmptyTile"));
 	}
 	
 	/**
@@ -114,6 +115,6 @@ public class TileManager {
 	 * @return a GameTile
 	 */
 	public GameTile getStarterTile() {
-		return getTile(StringConstants.STARTER_TILE);
+		return getTile(LocalMessages.getString("StarterTile"));
 	}
 }

@@ -9,12 +9,12 @@ import edu.carleton.comp4905.carcassonne.common.Acceptor;
 import edu.carleton.comp4905.carcassonne.common.Address;
 import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.DefaultAcceptor;
+import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.MessageType;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
 import edu.carleton.comp4905.carcassonne.common.ProtoAcceptor;
 import edu.carleton.comp4905.carcassonne.common.Protocol;
 import edu.carleton.comp4905.carcassonne.common.Service;
-import edu.carleton.comp4905.carcassonne.common.StringConstants;
 
 public class Server extends Service implements Runnable {
 	private final ConcurrentMap<Address, Connection> connections;
@@ -95,7 +95,7 @@ public class Server extends Service implements Runnable {
 				public void run() {
 					new MessageDialog(controller.getAnchorPane().getScene().getWindow(),
 							controller.getServerClient(),
-							StringConstants.ERR_TITLE,
+							LocalMessages.getString("ErrTitle"),
 							e.getMessage())
 					.show();
 				}

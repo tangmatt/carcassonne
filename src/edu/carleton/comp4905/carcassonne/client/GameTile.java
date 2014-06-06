@@ -1,38 +1,38 @@
 package edu.carleton.comp4905.carcassonne.client;
 
 import java.util.EnumMap;
-import java.util.EnumSet;
 import java.util.Map;
-import java.util.Set;
 
 import edu.carleton.comp4905.carcassonne.common.Position;
 import edu.carleton.comp4905.carcassonne.common.ResourceManager;
 import javafx.scene.image.ImageView;
 
-public class GameTile extends ImageView implements Cloneable {
-	private Segment top, right, bottom, left;
+public class GameTile extends ImageView {
 	private String name;
+	private Map<Position, Segment> segments;
 	private Map<Position, Boolean> positions;
 	
 	public GameTile() {
 		super();
+		segments = new EnumMap<Position, Segment>(Position.class);
 		positions = new EnumMap<Position, Boolean>(Position.class);
 	}
 	
 	public GameTile(final GameTile tile) {
-		this.name = tile.getName();
-		setTile(tile);
-		positions = new EnumMap<Position, Boolean>(tile.getPositions());
-		rotate(tile.getRotate());
+		this();
+		name = tile.getName();
+		/*setTile(tile);
+		positions = tile.getPositions();*/
+		for(Position pos : tile.getSegments().keySet())
+			segments.put(pos, tile.getSegments().get(pos));
+		for(Position pos : tile.getPositions().keySet())
+			positions.put(pos, tile.getPositions().get(pos));
+		setImage(tile.getImage());
+		setRotate(tile.getRotate());
 	}
 	
-	/**
-	 * Sets the tile image and respective segments.
-	 * @param tile a GameTile
-	 */
-	private void setTile(GameTile tile) {
-		setSegments(tile.top, tile.right, tile.bottom, tile.left);
-		setImage(tile.getImage());
+	public void setName(final String name) {
+		this.name = name;
 	}
 	
 	/**
@@ -57,10 +57,10 @@ public class GameTile extends ImageView implements Cloneable {
 	 * @param left a Segment
 	 */
 	public void setSegments(final Segment top, final Segment right, final Segment bottom, final Segment left) {
-		this.top = top;
-		this.right = right;
-		this.bottom = bottom;
-		this.left = left;
+		segments.put(Position.TOP, top);
+		segments.put(Position.RIGHT, right);
+		segments.put(Position.BOTTOM, bottom);
+		segments.put(Position.LEFT, left);
 	}
 	
 	/**
@@ -105,7 +105,6 @@ public class GameTile extends ImageView implements Cloneable {
 		positions.put(Position.BOTTOM_LEFT, temp.get(Position.TOP_RIGHT));
 		positions.put(Position.TOP_LEFT, temp.get(Position.BOTTOM_RIGHT));
 		removeNullPositions();
-
 	}
 	
 	/**
@@ -153,11 +152,11 @@ public class GameTile extends ImageView implements Cloneable {
 	}
 	
 	/**
-	 * Returns a set of segments.
-	 * @return Set<Segment>
+	 * Returns the segments.
+	 * @return the segments
 	 */
-	public Set<Segment> getSegments() {
-		return EnumSet.of(top, right, bottom, left);
+	public Map<Position, Segment> getSegments() {
+		return segments;
 	}
 	
 	/**
@@ -165,7 +164,7 @@ public class GameTile extends ImageView implements Cloneable {
 	 * @return a Segment
 	 */
 	public Segment getTopSegment() {
-		return top;
+		return segments.get(Position.TOP);
 	}
 	
 	/**
@@ -173,7 +172,7 @@ public class GameTile extends ImageView implements Cloneable {
 	 * @return a Segment
 	 */
 	public Segment getRightSegment() {
-		return right;
+		return segments.get(Position.RIGHT);
 	}
 	
 	/**
@@ -181,7 +180,7 @@ public class GameTile extends ImageView implements Cloneable {
 	 * @return a Segment
 	 */
 	public Segment getBottomSegment() {
-		return bottom;
+		return segments.get(Position.BOTTOM);
 	}
 	
 	/**
@@ -189,7 +188,7 @@ public class GameTile extends ImageView implements Cloneable {
 	 * @return a Segment
 	 */
 	public Segment getLeftSegment() {
-		return left;
+		return segments.get(Position.LEFT);
 	}
 	
 	/**
@@ -205,28 +204,19 @@ public class GameTile extends ImageView implements Cloneable {
 	 * @param degrees the degrees
 	 */
 	public void rotate(final double degrees) {
+		Segment left = getLeftSegment(), top = getTopSegment(), right = getRightSegment(), bottom = getBottomSegment();
 		if(degrees == 90) {
-			setSegments(left, top, right, bottom);
 			positionsRotated90();
+			setSegments(left, top, right, bottom);
 		}
 		else if(degrees == 180) {
-			setSegments(bottom, left, top, right);
 			positionsRotated180();
+			setSegments(bottom, left, top, right);
 		}
 		else if(degrees == 270) {
-			setSegments(right, bottom, left, top);
 			positionsRotated270();
+			setSegments(right, bottom, left, top);
 		}
 		setRotate(degrees);
-	}
-	
-	@Override
-	public Object clone() {
-		try {
-			return super.clone();
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 }

@@ -1,5 +1,6 @@
 package edu.carleton.comp4905.carcassonne.server.handlers;
 
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentMap;
 
 import edu.carleton.comp4905.carcassonne.common.Address;
@@ -35,8 +36,8 @@ public class QuitRequestHandler implements EventHandler {
 		String[] names = controller.getPlayerNames();
 		String message = null;
 		Boolean[] statuses = controller.getStatuses(connections);
-		boolean gameOver = (connections.size() == 1 && server.isGameInProgress());
-		
+		boolean gameOver = (getNumOfPlayersConnected(statuses) == 1) && server.isGameInProgress();
+
 		if(gameOver) {
 			Player player = controller.getRemainingPlayer();
 			message = player.getName() + " (" + player.getAddress() + ":" + player.getPort() + ") is the winner!";
@@ -54,5 +55,20 @@ public class QuitRequestHandler implements EventHandler {
 		reply.addProperty("message", message);
 		reply.addProperty("gameInProgress", server.isGameInProgress());
 		connection.broadcastEvent(reply, connections);
+	}
+	
+	/**
+	 * Returns the number of players connected
+	 * @param statuses the statuses
+	 * @return the number of players connected
+	 */
+	private int getNumOfPlayersConnected(final Boolean[] statuses) {
+		int total = 0;
+		for(Boolean status : statuses) {
+			if(status.booleanValue()) {
+				total++;
+			}
+		}
+		return total;
 	}
 }

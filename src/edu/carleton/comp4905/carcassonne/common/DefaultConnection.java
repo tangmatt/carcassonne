@@ -43,8 +43,7 @@ public class DefaultConnection extends Connection {
 		try {
 			new ObjectOutputStream(peer.getOutputStream()).writeObject(event);
 		} catch (IOException e) {
-			e.printStackTrace();
-			running = false;
+			// do nothing
 		}
 	}
 

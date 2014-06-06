@@ -26,6 +26,7 @@ public class DialogController implements Initializable {
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 		closeButton.setImage(ResourceManager.getImageFromResources("close.png"));
+		okButton.setText(LocalMessages.getString("Ok"));
 		
 		anchorPane.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override

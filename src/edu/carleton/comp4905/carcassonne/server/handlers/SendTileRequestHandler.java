@@ -31,7 +31,7 @@ public class SendTileRequestHandler implements EventHandler {
 		
 		// send reply back to connected clients
 		Event reply = new Event(EventType.SEND_TILE_REPLY, event.getPlayerName());
-		reply.addProperty("tile", rotation == 0 ? tile : tile+rotation); // append degrees to name to get the rotated tile (tile name convention from TileManager)
+		reply.addProperty("tile", tile);
 		reply.addProperty("row", row);
 		reply.addProperty("column", column);
 		reply.addProperty("meeple", meeple);

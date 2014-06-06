@@ -10,7 +10,7 @@
 
 <AnchorPane id="AnchorPane" fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" opacity="0.75" prefHeight="156.9609375" prefWidth="270.0" style="-fx-background-color: #06060A;&#10;-fx-border-color: #3B3B3B;&#10;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="edu.carleton.comp4905.carcassonne.client.LobbyController">
   <children>
-    <Label alignment="CENTER" contentDisplay="LEFT" layoutX="14.0" layoutY="0.0" prefHeight="45.0" prefWidth="242.0" style="-fx-border-color: transparent transparent gray transparent;" text="Waiting for other players..." textFill="WHITE" />
+    <Label fx:id="title" alignment="CENTER" contentDisplay="LEFT" layoutX="14.0" layoutY="0.0" prefHeight="45.0" prefWidth="242.0" style="-fx-border-color: transparent transparent gray transparent;" text="" textFill="WHITE" />
     <HBox layoutX="67.0" layoutY="68.0" prefHeight="-1.0" prefWidth="-1.0" spacing="5.0">
       <children>
         <ImageView fx:id="player1" fitHeight="29.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true" />
@@ -23,7 +23,7 @@
     <ImageView fx:id="closeButton" fitHeight="11.0" fitWidth="11.0" layoutX="251.0" layoutY="9.0" onMouseEntered="#handleCloseButtonEntered" onMouseExited="#handleCloseButtonExited" onMousePressed="#handleCloseButtonPressed" opacity="0.6" pickOnBounds="true" preserveRatio="true" smooth="true" />
     <HBox alignment="CENTER" prefHeight="39.0" prefWidth="268.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="116.96">
       <children>
-        <Button fx:id="startButton" cancelButton="false" disable="true" focusTraversable="false" mnemonicParsing="false" onMouseEntered="#handleStartButtonEntered" onMouseExited="#handleStartButtonExited" onMousePressed="#handleStartButtonPressed" opacity="0.4" prefWidth="53.0" style="-fx-background-color: linear-gradient(#3C73B6 0%, #1F4471 49%, #153A67 50%, #0E2949 100%);&#10;-fx-background-radius: 1;&#10;-fx-border-radius: 1;&#10;-fx-border-width: 1;&#10;-fx-border-color: #5892D9 #2E5687 #183557 #305179;" text="Play" textFill="WHITE">
+        <Button fx:id="startButton" cancelButton="false" disable="true" focusTraversable="false" mnemonicParsing="false" onMouseEntered="#handleStartButtonEntered" onMouseExited="#handleStartButtonExited" onMousePressed="#handleStartButtonPressed" opacity="0.4" prefWidth="53.0" style="-fx-background-color: linear-gradient(#3C73B6 0%, #1F4471 49%, #153A67 50%, #0E2949 100%);&#10;-fx-background-radius: 1;&#10;-fx-border-radius: 1;&#10;-fx-border-width: 1;&#10;-fx-border-color: #5892D9 #2E5687 #183557 #305179;" text="" textFill="WHITE">
           <effect>
             <ColorAdjust />
           </effect>

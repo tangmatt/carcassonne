@@ -7,6 +7,7 @@ import java.util.ResourceBundle;
 
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventType;
+import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
 import edu.carleton.comp4905.carcassonne.common.ResourceManager;
 import javafx.event.EventHandler;
@@ -14,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.effect.Glow;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -22,6 +24,7 @@ import javafx.stage.Stage;
 
 public class LobbyController implements Initializable {
 	@FXML private AnchorPane anchorPane;
+	@FXML private Label title;
 	@FXML private Button startButton;
 	@FXML private ImageView closeButton;
 	@FXML private ImageView player1, player2, player3, player4, player5;
@@ -33,6 +36,8 @@ public class LobbyController implements Initializable {
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 		closeButton.setImage(ResourceManager.getImageFromResources("close.png"));
+		title.setText(LocalMessages.getString("LobbyTitle"));
+		startButton.setText(LocalMessages.getString("Play"));
 		
 		playerIcons = new ArrayList<>();
 		playerIcons.add(player1);

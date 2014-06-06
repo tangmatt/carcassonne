@@ -1,8 +1,7 @@
 package edu.carleton.comp4905.carcassonne.client;
 
-import java.util.Set;
+import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 
-import edu.carleton.comp4905.carcassonne.common.StringConstants;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
@@ -42,20 +41,7 @@ public abstract class AbstractTile extends StackPane {
 	 * @return boolean
 	 */
 	public boolean isEmpty() {
-		if(getChildren().size() == 0)
-			return true;
-		if(getChildren().size() > 1)
-			return false;
-		GameTile child = (GameTile)getChildren().get(0);
-		return child.getName().equals(StringConstants.EMPTY_TILE);
-	}
-	
-	/**
-	 * Returns a set of Segments.
-	 * @return Set<Segment>
-	 */
-	public Set<Segment> getTileSegments() {
-		return tile.getSegments();
+		return tile.getName().equals(LocalMessages.getString("EmptyTile"));
 	}
 	
 	public void addMouseListener(final GameController controller,
