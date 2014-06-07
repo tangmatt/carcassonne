@@ -37,7 +37,7 @@ public class QuitReplyHandler implements EventHandler {
 					lobbyController.handleStartAvailability(numOfPlayers);
 				}
 				
-				if(finished && message != null && !event.getPlayerName().equals(game.getPlayerName())) {
+				if(finished && message != null) {
 					gameController.blurGame(true);
 					new MessageDialog(gameController.getGridPane().getScene().getWindow(),
 							gameController.getGameClient(),
