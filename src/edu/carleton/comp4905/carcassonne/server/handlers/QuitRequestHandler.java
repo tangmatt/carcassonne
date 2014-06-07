@@ -1,6 +1,5 @@
 package edu.carleton.comp4905.carcassonne.server.handlers;
 
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentMap;
 
 import edu.carleton.comp4905.carcassonne.common.Address;

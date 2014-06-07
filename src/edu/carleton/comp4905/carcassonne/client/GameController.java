@@ -36,14 +36,14 @@ public class GameController implements Initializable {
 	@FXML private ImageView meeple1, meeple2, meeple3, meeple4, meeple5, meeple6, meeple7; // meeple = follower
 	private TileManager tileManager;
 	private ClientData model;
-	private MouseEvent mouseEvent;
+	private MouseEvent mousePressEvent;
 	private LobbyDialog lobbyDialog;
 	private GameClient client;
 	private Random random;
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
-		mouseEvent = new MouseEvent(MouseEvent.MOUSE_PRESSED, 0, 0, 0, 0, 
+		mousePressEvent = new MouseEvent(MouseEvent.MOUSE_PRESSED, 0, 0, 0, 0, 
 				MouseButton.PRIMARY, 1, true, true, true, true, true, true, true, true, true, true, null);
 		tileManager = TileManager.getInstance();
 		model = new ClientData();
@@ -113,7 +113,6 @@ public class GameController implements Initializable {
 	 * Manages the empty tile adjacent to an existing tile if there is a match.
 	 */
 	private synchronized void showHint(final TilePreview preview, final TileContainer currTile, final int r, final int c) {
-		TileContainer selected = null;
 		int tileMatches = 0, tileCount = 0;
 		
 		if(currTile.isEmpty()) {
@@ -136,7 +135,7 @@ public class GameController implements Initializable {
 				tileMatches++;
 			
 			if(tileMatches == tileCount) { // current tile must be matching with all the placed surrounding tiles
-				selected = model.getTile(r, c);
+				TileContainer selected = model.getTile(r, c);
 				selected.setSelected(true);
 				selected.addMouseListener(this,
 						new TileContainerHandler(this, r, c),
@@ -144,8 +143,6 @@ public class GameController implements Initializable {
 						new TileExitHandler());
 			}
 		}
-		
-		return;
 	}
 	
 	/**
@@ -280,7 +277,7 @@ public class GameController implements Initializable {
 	 * Sets previews to be given tile and its rotated views and adds mouse listener to it.
 	 * @param tile a GameTile
 	 */
-	private synchronized void setRotatedPreviews(final GameTile tile) {
+	private void setRotatedPreviews(final GameTile tile) {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -320,14 +317,20 @@ public class GameController implements Initializable {
 	}
 	
 	/**
-	 * Refreshes the game tiles.
+	 * Refreshes all of the game tiles.
 	 */
 	public synchronized void refreshGameTiles() {
 		for(int c=0; c<ClientData.COLS; ++c) {
 			for(int r=0; r<ClientData.ROWS; ++r) {
-				model.getTile(r, c).setEffect(null);
-				model.getTile(r, c).setSelected(false);
-				model.getTile(r, c).removeMouseListener();
+				TileContainer container = model.getTile(r, c);
+				container.setEffect(null);
+				container.setSelected(false);
+				container.removeMouseListener();
+				
+				if(container.getHoverHandle() != null) {
+					container.getChildren().clear();
+					container.addTile(tileManager.getEmptyTile());
+				}
 			}
 		}
 	}
@@ -338,15 +341,15 @@ public class GameController implements Initializable {
 	 */
 	public synchronized void firePreviewTileEvent(boolean keepState) {
 		if(keepState)
-			Event.fireEvent(model.getSelectedPreviewTile(), mouseEvent);
+			Event.fireEvent(model.getSelectedPreviewTile(), mousePressEvent);
 		else
-			Event.fireEvent(model.getPreviews()[0], mouseEvent);
+			Event.fireEvent(model.getPreviews()[0], mousePressEvent);
 	}
 	
 	/**
 	 * Creates a PopOver component.
 	 */
-	private synchronized PopOver createPopOver() {
+	private PopOver createPopOver() {
 		PopOver popOver = new PopOver();
 		popOver.setArrowSize(10f);
 		popOver.setArrowIndent(15f);
@@ -360,7 +363,7 @@ public class GameController implements Initializable {
 	/**
 	 * Creates a dialog for displaying the player queue and pre-game interaction.
 	 */
-	private synchronized void createLobby() {
+	private void createLobby() {
 		PlatformManager.runLater(new Runnable() { // Note: must use runLater otherwise LoadException
 			@Override
 			public void run() {
@@ -385,7 +388,7 @@ public class GameController implements Initializable {
 	/**
 	 * Initializes the game board with empty tiles and the starting tile at the center.
 	 */
-	private synchronized void createGameBoard() {
+	private void createGameBoard() {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -495,6 +498,14 @@ public class GameController implements Initializable {
 	 */
 	public synchronized GridPane getGridPane() {
 		return gridPane;
+	}
+	
+	/**
+	 * Returns the pane containing all the panels for the game.
+	 * @return a BorderPane
+	 */
+	public synchronized BorderPane getRootPane() {
+		return rootPane;
 	}
 	
 	/**

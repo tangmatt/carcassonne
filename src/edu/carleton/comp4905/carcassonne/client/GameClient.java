@@ -37,6 +37,7 @@ public class GameClient extends Application {
 		
 		fxmlLoader = FXMLManager.getFXML(getClass(), "GameScene.fxml");
 		BorderPane borderPane = fxmlLoader.load();
+		borderPane.setDisable(true);
 		controller = fxmlLoader.getController();
 		controller.initData(this);
 		
@@ -49,7 +50,8 @@ public class GameClient extends Application {
 			@Override
 			public void handle(WindowEvent event) {
 				try {
-					game.getConnection().sendEvent(new Event(EventType.QUIT_REQUEST, game.getPlayerName()));
+					if(game.getConnection() != null)
+						game.getConnection().sendEvent(new Event(EventType.QUIT_REQUEST, game.getPlayerName()));
 					Thread.sleep(33);
 				} catch(Exception e) {
 					e.printStackTrace();

@@ -149,6 +149,14 @@ public class TileContainer extends AbstractTile {
 	public Position getFollowerPosition() {
 		return selectedFollower;
 	}
+	
+	/**
+	 * Returns the mouse hover event handler.
+	 * @return the EventHandler
+	 */
+	public EventHandler<MouseEvent> getHoverHandle() {
+		return hoverHandler;
+	}
 
 	@Override
 	public void setSelected(final boolean state) {
