@@ -32,7 +32,6 @@ public class Server extends Service implements Runnable {
 	
 	public Server(final int port) {
 		super();
-		initialize("server.properties");
 		PORT = port;
 		connections = new ConcurrentHashMap<Address, Connection>();
 		running = false;

@@ -4,39 +4,62 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import edu.carleton.comp4905.carcassonne.client.Game;
+import edu.carleton.comp4905.carcassonne.server.Server;
+
 public abstract class Service {
-	protected Reactor reactor;
-	protected PropertyLoader propertyLoader;
+	protected final Reactor reactor;
 	protected Protocol protocol;
-	protected ExecutorService pool;
+	protected Mode mode;
+	protected String properties;
+	protected final ExecutorService pool;
+	public static final String FILENAME = "app.properties";
 	
 	public Service() {
-		propertyLoader = new PropertyLoader();
 		reactor = new Reactor();
 		pool = Executors.newCachedThreadPool();
+		initGame();
+		initReactor();
+	}
+	
+	/**
+	 * Initializes the game settings.
+	 */
+	protected void initGame() {
+		PropertyLoader propertyLoader = new PropertyLoader();
+		propertyLoader.loadProperty(FILENAME);
+		for(Object propertyType : propertyLoader.getProperties().keySet()) {
+			String value = propertyLoader.getProperty((String)propertyType);
+			if(value != null) {
+				try {
+					if(((String)propertyType).equalsIgnoreCase("PROTOCOL"))
+						protocol = Protocol.valueOf(value);
+					else if(((String)propertyType).equalsIgnoreCase("MODE"))
+						mode = Mode.valueOf(value);
+					else if(((String)propertyType).equalsIgnoreCase("CLIENT") && this.getClass() == Game.class)
+						properties = value;
+					else if(((String)propertyType).equalsIgnoreCase("SERVER") && this.getClass() == Server.class)
+						properties = value;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 	
 	/**
 	 * Initializes the reactor with event handlers and instantiates them.
-	 * Also reads in other information such as protocol.
 	 */
-	protected void initialize(String filename) {
-		propertyLoader.loadProperty(filename);
+	protected void initReactor() {
+		PropertyLoader propertyLoader = new PropertyLoader();
+		propertyLoader.loadProperty(properties);
 		for(Object propertyType : propertyLoader.getProperties().keySet()) {
 			String handlerName = propertyLoader.getProperty((String)propertyType);
 			if(handlerName != null) {
-				if(((String)propertyType).equalsIgnoreCase("PROTOCOL")) {
-					protocol = Protocol.valueOf(handlerName);
-				} else {
-					try {
-						reactor.addHandler(EventType.valueOf((String)propertyType), getEventHandler(propertyLoader.getProperties(), handlerName));
-					} catch (ClassNotFoundException e) {
-						e.printStackTrace();
-					} catch (InstantiationException e) {
-						e.printStackTrace();
-					} catch (IllegalAccessException e) {
-						e.printStackTrace();
-					}
+				try {
+					reactor.addHandler(EventType.valueOf((String)propertyType), getEventHandler(propertyLoader.getProperties(), handlerName));
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 		}
@@ -48,14 +71,6 @@ public abstract class Service {
 	 */
 	public Reactor getReactor() {
 		return reactor;
-	}
-	
-	/**
-	 * Returns the PropertyLoader object.
-	 * @return a PropertyLoader
-	 */
-	public PropertyLoader getPropertyLoader() {
-		return propertyLoader;
 	}
 	
 	/**

@@ -283,7 +283,6 @@ public class GameTile extends ImageView {
 		Set<Position> traversed = new HashSet<Position>();
 		traversed.add(position);
 		positions.put(position, name);
-		System.out.println("[" + tileName + "] " + position + ", " + getSegment(position) + ": " + name);
 		updateSegmentOwners(segment, position, name, traversed);
 	}
 	
@@ -303,7 +302,6 @@ public class GameTile extends ImageView {
 			if(segment == segments.get(newPos) && !traversed.contains(newPos)) {
 				positions.put(newPos, name);
 				traversed.add(current);
-				System.out.println("[" + tileName + "] " + newPos + ", " + getSegment(newPos) + ": " + name);
 				updateSegmentOwners(segment, newPos, name, traversed);
 			}
 		}
@@ -312,7 +310,6 @@ public class GameTile extends ImageView {
 			if(segment == segments.get(newPos) && !traversed.contains(newPos)) {
 				traversed.add(current);
 				positions.put(newPos, name);
-				System.out.println("[" + tileName + "] " + newPos + ", " + getSegment(newPos) + ": " + name);
 				updateSegmentOwners(segment, newPos, name, traversed);
 			}
 		}
@@ -321,7 +318,6 @@ public class GameTile extends ImageView {
 			if(segment == segments.get(newPos) && !traversed.contains(newPos)) {
 				positions.put(newPos, name);
 				traversed.add(current);
-				System.out.println("[" + tileName + "] " + newPos + ", " + getSegment(newPos) + ": " + name);
 				updateSegmentOwners(segment, newPos, name, traversed);
 			}
 		}
@@ -330,7 +326,6 @@ public class GameTile extends ImageView {
 			if(segment == segments.get(newPos) && !traversed.contains(newPos)) {
 				positions.put(newPos, name);
 				traversed.add(current);
-				System.out.println("[" + tileName + "] " + newPos + ", " + getSegment(newPos) + ": " + name);
 				updateSegmentOwners(segment, newPos, name, traversed);
 			}
 		}

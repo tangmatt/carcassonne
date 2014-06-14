@@ -24,7 +24,6 @@ public class Game extends Service implements Runnable {
 	
 	public Game(final String playerName, final Address address, final GameController gameController) {
 		super();
-		initialize("client.properties");
 		this.address = address;
 		this.playerName = playerName;
 		if(protocol == Protocol.JAVA_SERIALIZE)

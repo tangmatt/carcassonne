@@ -507,7 +507,6 @@ public class GameController implements Initializable {
 					|| temp.getTile().getFollowerOwner(Position.BOTTOM).equals(name))) {
 				temp.getTile().updateSegmentOwners(Position.BOTTOM, name);
 				traversed.add(temp);
-				temp.showFollower(Position.BOTTOM, 4);
 				updateConnectedSegments(temp, temp.getBottomSegment(), Position.BOTTOM, name, traversed);
 			}
 		}
@@ -518,7 +517,6 @@ public class GameController implements Initializable {
 					|| temp.getTile().getFollowerOwner(Position.TOP).equals(name))) {
 				temp.getTile().updateSegmentOwners(Position.TOP, name);
 				traversed.add(temp);
-				temp.showFollower(Position.TOP, 4);
 				updateConnectedSegments(temp, temp.getTopSegment(), Position.TOP, name, traversed);
 			}
 		}
@@ -529,7 +527,6 @@ public class GameController implements Initializable {
 					|| temp.getTile().getFollowerOwner(Position.RIGHT).equals(name))) {
 				temp.getTile().updateSegmentOwners(Position.RIGHT, name);
 				traversed.add(temp);
-				temp.showFollower(Position.RIGHT, 4);
 				updateConnectedSegments(temp, temp.getRightSegment(), Position.RIGHT, name, traversed);
 			}
 		}
@@ -540,7 +537,6 @@ public class GameController implements Initializable {
 					|| temp.getTile().getFollowerOwner(Position.LEFT).equals(name))) {
 				temp.getTile().updateSegmentOwners(Position.LEFT, name);
 				traversed.add(temp);
-				temp.showFollower(Position.LEFT, 4);
 				updateConnectedSegments(temp, temp.getLeftSegment(), Position.LEFT, name, traversed);
 			}
 		}
