@@ -1,7 +1,7 @@
 package edu.carleton.comp4905.carcassonne.client;
 
 import edu.carleton.comp4905.carcassonne.common.LocalMessages;
-
+import edu.carleton.comp4905.carcassonne.common.Position;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
@@ -87,6 +87,15 @@ public abstract class AbstractTile extends StackPane {
 	 */
 	public Segment getLeftSegment() {
 		return tile.getLeftSegment();
+	}
+	
+	/**
+	 * Returns segment at specified position.
+	 * @param position the position
+	 * @return the segment
+	 */
+	public Segment getSegment(final Position position) {
+		return tile.getSegment(position);
 	}
 	
 	/**

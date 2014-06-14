@@ -21,7 +21,7 @@ public class JoinRequestHandler implements EventHandler {
 		Server server = (Server)connection.getService();
 		ServerController controller = server.getController();
 		ConcurrentMap<Address, Connection> connections = server.getConnections();
-		
+
 		// send reply back to sending client if game is in progress or player name already taken
 		if(server.isGameInProgress()) {
 			Event reply = new Event(EventType.JOIN_REPLY, event.getPlayerName());
@@ -37,12 +37,19 @@ public class JoinRequestHandler implements EventHandler {
 			reply.addProperty("message", "Player name already exists.");
 			connection.sendEvent(reply);
 			return;
+		} else if(connections.size() >= 5) {
+			Event reply = new Event(EventType.JOIN_REPLY, event.getPlayerName());
+			reply.addProperty("numOfPlayers", connections.size());
+			reply.addProperty("success", false);
+			reply.addProperty("message", "Lobby has reached the player limit.");
+			connection.sendEvent(reply);
+			return;
 		}
 		
 		connections.put(new Address(address, port), connection);
 		controller.connectPlayer(event.getPlayerName(), address, portAsString);
 		controller.addMessageEntry(MessageType.INFO, "Player '" + event.getPlayerName() + "' has joined the lobby");
-		
+
 		// send reply back to connected clients
 		Event reply = new Event(EventType.JOIN_REPLY, event.getPlayerName());
 		reply.addProperty("numOfPlayers", connections.size());

@@ -21,4 +21,5 @@ message Event {
 	optional int32 rotation = 16;
 	optional int32 meeple = 17;
 	optional int32 position = 18;
+	optional bool shield = 19;
 }

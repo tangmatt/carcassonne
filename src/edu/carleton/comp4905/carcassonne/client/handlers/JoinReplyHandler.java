@@ -28,12 +28,14 @@ public class JoinReplyHandler implements EventHandler {
 					lobbyController.updatePlayerIcons(numOfPlayers);
 					lobbyController.handleStartAvailability(numOfPlayers);
 					gameController.showLobbyDialog();
+					gameController.addPlayerScore(event.getPlayerName(), 0);
 				} else {
 					gameController.blurGame(true);
 					new MessageDialog(gameController.getGridPane().getScene().getWindow(),
 							gameController.getGameClient(),
 							LocalMessages.getString("RefusedTitle"),
-							message)
+							message,
+							true)
 					.show();
 				}
 			}

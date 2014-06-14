@@ -1,9 +1,10 @@
 package edu.carleton.comp4905.carcassonne.client;
 
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Random;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.PopOver.ArrowLocation;
@@ -11,6 +12,7 @@ import org.controlsfx.control.PopOver.ArrowLocation;
 import edu.carleton.comp4905.carcassonne.client.handlers.PlayerViewHandler;
 import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
+import edu.carleton.comp4905.carcassonne.common.Position;
 import edu.carleton.comp4905.carcassonne.common.ResourceManager;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -34,25 +36,27 @@ public class GameController implements Initializable {
 	@FXML private Button endTurnButton;
 	@FXML private ImageView player1, player2, player3, player4, player5;
 	@FXML private ImageView meeple1, meeple2, meeple3, meeple4, meeple5, meeple6, meeple7; // meeple = follower
+	private TileDeck deck;
 	private TileManager tileManager;
-	private ClientData model;
+	private GameData gameData;
+	private ScoreData scoreData;
 	private MouseEvent mousePressEvent;
 	private LobbyDialog lobbyDialog;
 	private GameClient client;
-	private Random random;
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 		mousePressEvent = new MouseEvent(MouseEvent.MOUSE_PRESSED, 0, 0, 0, 0, 
 				MouseButton.PRIMARY, 1, true, true, true, true, true, true, true, true, true, true, null);
+		deck = new TileDeck();
+		gameData = new GameData();
+		scoreData = new ScoreData();
 		tileManager = TileManager.getInstance();
-		model = new ClientData();
-		random = new Random();
 		
 		ImageView[] playerViews = new ImageView[] { player1, player2, player3, player4, player5 };
 		ImageView[] followerViews = new ImageView[] { meeple1, meeple2, meeple3, meeple4, meeple5, meeple6, meeple7 };
-		model.addPlayerViews(playerViews, createPopOver());
-		model.addFollowerViews(followerViews);
+		gameData.addPlayerViews(playerViews, createPopOver());
+		gameData.addFollowerViews(followerViews);
 		setPreviewTiles(tileManager.getEmptyTile()); // initializes the preview tiles to be empty
 		
 		createGameBoard();
@@ -61,16 +65,14 @@ public class GameController implements Initializable {
 	
 	/**
 	 * Adds a TileContainer object to specified row and column of layout.
-	 * @param r a row (integer)
-	 * @param c a column (integer)
 	 * @param container a TileContainer
 	 */
-	public synchronized void addTile(final int r, final int c, final TileContainer container) {
+	public synchronized void addTile(final TileContainer container) {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				model.setTile(r, c, container);
-				gridPane.add(container, c, r);
+				gameData.setTile(container);
+				gridPane.add(container, container.c, container.r);
 			}
 		});
 	}
@@ -85,7 +87,7 @@ public class GameController implements Initializable {
 			public void run() {
 				setRotatedPreviews(tile);
 				if(previewPane.getChildren().isEmpty())
-					previewPane.getChildren().addAll(model.getPreviews());
+					previewPane.getChildren().addAll(gameData.getPreviews());
 				firePreviewTileEvent(false);
 			}
 		});
@@ -100,9 +102,9 @@ public class GameController implements Initializable {
 			@Override
 			public void run() {
 				refresh();
-				for(int c=0; c<ClientData.COLS; ++c) {
-					for(int r=0; r<ClientData.ROWS; ++r) {
-						showHint(preview, model.getTile(r, c), r, c);
+				for(int c=0; c<GameData.COLS; ++c) {
+					for(int r=0; r<GameData.ROWS; ++r) {
+						showHint(preview, gameData.getTile(r, c), r, c);
 					}
 				}
 			}
@@ -135,8 +137,9 @@ public class GameController implements Initializable {
 				tileMatches++;
 			
 			if(tileMatches == tileCount) { // current tile must be matching with all the placed surrounding tiles
-				TileContainer selected = model.getTile(r, c);
+				TileContainer selected = gameData.getTile(r, c);
 				selected.setSelected(true);
+				selected.setHoverTile(true);
 				selected.addMouseListener(this,
 						new TileContainerHandler(this, r, c),
 						new TileHoverHandler(this),
@@ -154,7 +157,7 @@ public class GameController implements Initializable {
 	private int isPlayableTile(final int r, final int c) {
 		int count = 0;
 		try {
-			count = (model.getTile(r, c).isEmpty() || model.getTile(r, c) == null) ? 0 : 1;
+			count = (gameData.getTile(r, c).isEmpty() || gameData.getTile(r, c) == null) ? 0 : 1;
 		} catch(ArrayIndexOutOfBoundsException e) {
 			// do nothing
 		}
@@ -171,7 +174,7 @@ public class GameController implements Initializable {
 	private boolean matchesBottomSegment(final TilePreview preview, final int r, final int c) {
 		boolean match = false;
 		try {
-			match = preview.matchesBottomSegment(model.getTile(r+1, c).getTopSegment());
+			match = preview.matchesBottomSegment(gameData.getTile(r+1, c).getTopSegment());
 		} catch(ArrayIndexOutOfBoundsException e) {
 			// do nothing
 		}
@@ -188,7 +191,7 @@ public class GameController implements Initializable {
 	private boolean matchesTopSegment(final TilePreview preview, final int r, final int c) {
 		boolean match = false;
 		try {
-			match = preview.matchesTopSegment(model.getTile(r-1, c).getBottomSegment());
+			match = preview.matchesTopSegment(gameData.getTile(r-1, c).getBottomSegment());
 		} catch(ArrayIndexOutOfBoundsException e) {
 			// do nothing
 		}
@@ -205,7 +208,7 @@ public class GameController implements Initializable {
 	private boolean matchesLeftSegment(final TilePreview preview, final int r, final int c) {
 		boolean match = false;
 		try {
-			match = preview.matchesLeftSegment(model.getTile(r, c-1).getRightSegment());
+			match = preview.matchesLeftSegment(gameData.getTile(r, c-1).getRightSegment());
 		} catch(ArrayIndexOutOfBoundsException e) {
 			// do nothing
 		}
@@ -222,7 +225,7 @@ public class GameController implements Initializable {
 	private boolean matchesRightSegment(final TilePreview preview, final int r, final int c) {
 		boolean match = false;
 		try {
-			match = preview.matchesRightSegment(model.getTile(r, c+1).getLeftSegment());
+			match = preview.matchesRightSegment(gameData.getTile(r, c+1).getLeftSegment());
 		} catch(ArrayIndexOutOfBoundsException e) {
 			// do nothing
 		}
@@ -236,6 +239,7 @@ public class GameController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
+				deck.shuffle();
 				startTurn();
 			}
 		});
@@ -248,8 +252,10 @@ public class GameController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				int index = random.nextInt(TileManager.NUM_OF_TILES) + 1;
-				setPreviewTiles(tileManager.getTile("tile" + index + ".png"));
+				GameTile tile = deck.draw();
+				//if(deck.isEmpty())
+				// TODO do what after deck is empty??
+				setPreviewTiles(tile);
 			}
 		});
 	}
@@ -261,12 +267,12 @@ public class GameController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				for(TilePreview preview : model.getPreviews())
+				for(TilePreview preview : gameData.getPreviews())
 					preview.setSelected(false);
-				for(int c=0; c<ClientData.COLS; ++c) {
-					for(int r=0; r<ClientData.ROWS; ++r) {
-						model.getTile(r, c).setSelected(false);
-						model.getTile(r, c).removeMouseListener();
+				for(int c=0; c<GameData.COLS; ++c) {
+					for(int r=0; r<GameData.ROWS; ++r) {
+						gameData.getTile(r, c).setSelected(false);
+						gameData.getTile(r, c).removeMouseListener();
 					}
 				}
 			}
@@ -281,7 +287,7 @@ public class GameController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				TilePreview[] previews = model.getPreviews();
+				TilePreview[] previews = gameData.getPreviews();
 				for(int i=0, degrees=0; i<previews.length; ++i, degrees+=90) {
 					boolean original = (degrees == 0);
 					if(previews[i] == null)
@@ -312,7 +318,7 @@ public class GameController implements Initializable {
 	 * Refreshes the preview tiles.
 	 */
 	public synchronized void refreshPreviews() {
-		for(TilePreview preview : model.getPreviews())
+		for(TilePreview preview : gameData.getPreviews())
 			preview.setSelected(false);
 	}
 	
@@ -320,9 +326,9 @@ public class GameController implements Initializable {
 	 * Refreshes all of the game tiles.
 	 */
 	public synchronized void refreshGameTiles() {
-		for(int c=0; c<ClientData.COLS; ++c) {
-			for(int r=0; r<ClientData.ROWS; ++r) {
-				TileContainer container = model.getTile(r, c);
+		for(int c=0; c<GameData.COLS; ++c) {
+			for(int r=0; r<GameData.ROWS; ++r) {
+				TileContainer container = gameData.getTile(r, c);
 				container.setEffect(null);
 				container.setSelected(false);
 				container.removeMouseListener();
@@ -341,9 +347,9 @@ public class GameController implements Initializable {
 	 */
 	public synchronized void firePreviewTileEvent(boolean keepState) {
 		if(keepState)
-			Event.fireEvent(model.getSelectedPreviewTile(), mousePressEvent);
+			Event.fireEvent(gameData.getSelectedPreviewTile(), mousePressEvent);
 		else
-			Event.fireEvent(model.getPreviews()[0], mousePressEvent);
+			Event.fireEvent(gameData.getPreviews()[0], mousePressEvent);
 	}
 	
 	/**
@@ -392,14 +398,14 @@ public class GameController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				for(int c=0; c<ClientData.COLS; ++c) {
-					for(int r=0; r<ClientData.ROWS; ++r) {
+				for(int c=0; c<GameData.COLS; ++c) {
+					for(int r=0; r<GameData.ROWS; ++r) {
 						TileContainer container;
-						if(r == ClientData.CENTER_ROW && c == ClientData.CENTER_COL)
-							container = new TileContainer(tileManager.getStarterTile());
+						if(r == GameData.CENTER_ROW && c == GameData.CENTER_COL)
+							container = new TileContainer(tileManager.getStarterTile(), r, c);
 						else
-							container = new TileContainer(tileManager.getEmptyTile());
-						addTile(r, c, container);
+							container = new TileContainer(tileManager.getEmptyTile(), r, c);
+						addTile(container);
 					}
 				}
 			}
@@ -415,7 +421,7 @@ public class GameController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				Map<ImageView, PopOver> players = model.getPlayerViews();
+				Map<ImageView, PopOver> players = gameData.getPlayerViews();
 				int i=0;
 				for(ImageView imageView : players.keySet()) {
 					if(i >= statuses.length) // only loop through the number of connected players
@@ -424,13 +430,15 @@ public class GameController implements Initializable {
 					PopOver popOver = players.get(imageView);
 					
 					// create node to place into PopOver content
-					Label label = new Label(names[i]);
-					label.setPadding(new Insets(5, 5, 5, 5));
+					Label nameLabel = new Label(names[i]);
+					nameLabel.setPadding(new Insets(5, 5, 2, 5));
+					Label scoreLabel = new Label("Score: " + Integer.toString(scoreData.getPlayerScore(names[i])));
+					scoreLabel.setPadding(new Insets(2, 5, 5, 5));
 					
 					// update player icons according to connection status
 					Image image = ResourceManager.getImageFromResources(statuses[i] ? "joined.png" : "disconnected.png");
 					imageView.setImage(image);
-					imageView.addEventHandler(MouseEvent.MOUSE_ENTERED, new PlayerViewHandler(imageView, popOver, label));
+					imageView.addEventHandler(MouseEvent.MOUSE_ENTERED, new PlayerViewHandler(imageView, popOver, nameLabel, scoreLabel));
 					i++;
 				}
 			}
@@ -444,15 +452,144 @@ public class GameController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				ImageView[] followers = model.getFollowerViews();
+				ImageView[] followers = gameData.getFollowerViews();
 				for(int i=followers.length-1; i>=0; --i) {
-					if(i < (followers.length - model.getNumOfFollowers()))
+					if(i < (followers.length - gameData.getNumOfFollowers()))
 						followers[i].setOpacity(0.2f);
-					Image image = ResourceManager.getImageFromResources("meeple" + model.getIndex() + ".png");
+					Image image = ResourceManager.getImageFromResources("meeple" + gameData.getIndex() + ".png");
 					followers[i].setImage(image);
 				}
 			}
 		});
+	}
+	
+	/**
+	 * Retrieves all of the followers and recalculates the connected segment data.
+	 */
+	public synchronized void updateFollowers() {
+		for(TileContainer container : gameData.getTilesWithFollowers().keySet()) {
+			String playerName = gameData.getTilesWithFollowers().get(container);
+			updateConnectedSegments(container, container.getFollowerPosition(), container.getSegment(container.getFollowerPosition()), playerName);
+		}
+	}
+	
+	/**
+	 * Updates the connected segments with the player name if they have a follower connected to the segment.
+	 * @param container the container
+	 * @param position the position
+	 * @param segment the segment
+	 * @param name the name
+	 */
+	public void updateConnectedSegments(final TileContainer container, final Position position, final Segment segment, final String name) {
+		Set<TileContainer> traversed = new HashSet<TileContainer>();
+		container.getTile().updateSegmentOwners(position, name);
+		traversed.add(container);
+		updateConnectedSegments(container, segment, position, name, traversed);
+		System.out.println("_____");
+	}
+	
+	/**
+	 * Updates the connected segments with the player name if they have a follower connected to the segment.
+	 * @param container the container
+	 * @param segment the segment
+	 * @param position the position
+	 * @param name the name
+	 * @param traversed the list of traversed tiles
+	 */
+	private void updateConnectedSegments(final TileContainer container, final Segment segment,
+			final Position position, final String name, final Set<TileContainer> traversed) {
+		int r = container.r, c = container.c;
+
+		if(r-1 >= 0) {
+			TileContainer temp = gameData.getTile(r-1, c);
+			if(segment == temp.getBottomSegment() && !traversed.contains(temp)
+					&& (temp.getTile().getFollowerOwner(Position.BOTTOM) == null || temp.getTile().getFollowerOwner(Position.BOTTOM).isEmpty()
+					|| temp.getTile().getFollowerOwner(Position.BOTTOM).equals(name))) {
+				temp.getTile().updateSegmentOwners(Position.BOTTOM, name);
+				traversed.add(temp);
+				temp.showFollower(Position.BOTTOM, 4);
+				updateConnectedSegments(temp, temp.getBottomSegment(), Position.BOTTOM, name, traversed);
+			}
+		}
+		if(r+1 < 9) {
+			TileContainer temp = gameData.getTile(r+1, c);
+			if(segment == temp.getTopSegment() && !traversed.contains(temp)
+					&& (temp.getTile().getFollowerOwner(Position.TOP) == null || temp.getTile().getFollowerOwner(Position.TOP).isEmpty()
+					|| temp.getTile().getFollowerOwner(Position.TOP).equals(name))) {
+				temp.getTile().updateSegmentOwners(Position.TOP, name);
+				traversed.add(temp);
+				temp.showFollower(Position.TOP, 4);
+				updateConnectedSegments(temp, temp.getTopSegment(), Position.TOP, name, traversed);
+			}
+		}
+		if(c-1 >= 0) {
+			TileContainer temp = gameData.getTile(r, c-1);
+			if(segment == temp.getRightSegment() && !traversed.contains(temp)
+					&& (temp.getTile().getFollowerOwner(Position.RIGHT) == null || temp.getTile().getFollowerOwner(Position.RIGHT).isEmpty()
+					|| temp.getTile().getFollowerOwner(Position.RIGHT).equals(name))) {
+				temp.getTile().updateSegmentOwners(Position.RIGHT, name);
+				traversed.add(temp);
+				temp.showFollower(Position.RIGHT, 4);
+				updateConnectedSegments(temp, temp.getRightSegment(), Position.RIGHT, name, traversed);
+			}
+		}
+		if(c+1 < 9) {
+			TileContainer temp = gameData.getTile(r, c+1);
+			if(segment == temp.getLeftSegment() && !traversed.contains(temp)
+					&& (temp.getTile().getFollowerOwner(Position.LEFT) == null || temp.getTile().getFollowerOwner(Position.LEFT).isEmpty()
+					|| temp.getTile().getFollowerOwner(Position.LEFT).equals(name))) {
+				temp.getTile().updateSegmentOwners(Position.LEFT, name);
+				traversed.add(temp);
+				temp.showFollower(Position.LEFT, 4);
+				updateConnectedSegments(temp, temp.getLeftSegment(), Position.LEFT, name, traversed);
+			}
+		}
+	}
+	
+	/**
+	 * Updates the game board regarding the completed segments.
+	 */
+	public synchronized void updateGameBoard() {
+		updateCloister();
+	}
+	
+	/**
+	 * Checks for completed cloisters and handles accordingly.
+	 */
+	private void updateCloister() {
+		for(int c=0; c<GameData.COLS; ++c) {
+			for(int r=0; r<GameData.ROWS; ++r) {
+				TileContainer container = gameData.getTile(r, c);
+				if(container.getTile().getSegment(Position.CENTER) == Segment.CLOISTER && container.getFollowerPosition() != null) {
+					int count = 0;
+					if(r-1 >= 0 && !gameData.getTile(r-1, c).isHoverTile() && !gameData.getTile(r-1, c).isEmpty())
+						count++;
+					if(r+1 < 9 && !gameData.getTile(r+1, c).isHoverTile() && !gameData.getTile(r+1, c).isEmpty())
+						count++;
+					if(c-1 >= 0 && !gameData.getTile(r, c-1).isHoverTile() && !gameData.getTile(r, c-1).isEmpty())
+						count++;
+					if(c+1 < 9 && !gameData.getTile(r, c+1).isHoverTile() && !gameData.getTile(r, c+1).isEmpty())
+						count++;
+					if(count == 4) {
+						container.getChildren().remove(container.follower);
+						//addPlayerScore(container.getTile().getFollowerOwner(Position.CENTER), 9);
+						// TODO display score
+						gameData.increaseNumOfFollowers();
+						updateFollowerPanel();
+						System.out.println("CLOISTER COMPLETED");
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Deducts specified score points from the player.
+	 * @param name the player name
+	 * @param points the score points
+	 */
+	public synchronized void addPlayerScore(final String name, final int points) {
+		scoreData.addPlayerScore(name, points);
 	}
 	
 	/**
@@ -462,7 +599,7 @@ public class GameController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				for(TilePreview preview : model.getPreviews()) {
+				for(TilePreview preview : gameData.getPreviews()) {
 					preview.setSelected(false);
 					preview.removeMouseListener();
 					preview.addTile(tileManager.getEmptyTile());
@@ -509,11 +646,19 @@ public class GameController implements Initializable {
 	}
 	
 	/**
-	 * Returns the Model object.
-	 * @return a Model
+	 * Returns the GameData object.
+	 * @return a GameData
 	 */
-	public synchronized ClientData getModel() {
-		return model;
+	public synchronized GameData getGameData() {
+		return gameData;
+	}
+	
+	/**
+	 * Returns the ScoreData object.
+	 * @return a ScoreData
+	 */
+	public synchronized ScoreData getScoreData() {
+		return scoreData;
 	}
 	
 	/**

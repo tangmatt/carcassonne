@@ -35,15 +35,21 @@ public class QuitReplyHandler implements EventHandler {
 				else {
 					lobbyController.updatePlayerIcons(numOfPlayers);
 					lobbyController.handleStartAvailability(numOfPlayers);
+					gameController.getScoreData().removePlayer(event.getPlayerName());
 				}
 				
 				if(finished && message != null) {
-					gameController.blurGame(true);
-					new MessageDialog(gameController.getGridPane().getScene().getWindow(),
-							gameController.getGameClient(),
-							LocalMessages.getString("InfoTitle"),
-							message)
-					.show();
+					if(event.getPlayerName().equals(game.getPlayerName())) {
+						gameController.getGameClient().getStage().getOnCloseRequest().handle(null);
+					} else {
+						gameController.blurGame(true);
+						new MessageDialog(gameController.getGameClient().getStage(),
+								gameController.getGameClient(),
+								LocalMessages.getString("InfoTitle"),
+								message,
+								true)
+						.show();
+					}
 				}
 			}
 		});

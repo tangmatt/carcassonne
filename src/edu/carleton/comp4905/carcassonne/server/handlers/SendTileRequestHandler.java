@@ -26,8 +26,9 @@ public class SendTileRequestHandler implements EventHandler {
 		int column = (int)event.getProperty("column");
 		int meeple = (int)event.getProperty("meeple");
 		Position position = (Position)event.getProperty("position");
+		boolean shield = (boolean)event.getProperty("shield");
 		
-		controller.addMessageEntry(MessageType.INFO, "Player '" + event.getPlayerName() + "' has placed a tile at row=" + row + ", column=" + column + ", name="+tile + ", rotation=" + rotation);
+		controller.addMessageEntry(MessageType.INFO, "Player '" + event.getPlayerName() + "' has placed a tile at row=" + row + ", column=" + column + ", name="+tile + ", rotation=" + rotation + ", shield=" + shield);
 		
 		// send reply back to connected clients
 		Event reply = new Event(EventType.SEND_TILE_REPLY, event.getPlayerName());
@@ -36,6 +37,7 @@ public class SendTileRequestHandler implements EventHandler {
 		reply.addProperty("column", column);
 		reply.addProperty("meeple", meeple);
 		reply.addProperty("position", position);
+		reply.addProperty("shield", shield);
 		connection.broadcastEvent(reply, connections);
 	}
 }

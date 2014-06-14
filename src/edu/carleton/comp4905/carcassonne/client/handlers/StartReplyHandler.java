@@ -23,11 +23,11 @@ public class StartReplyHandler implements EventHandler {
 		int index;
 		for(index = 0; index<names.length; ++index) {
 			if(names[index].equalsIgnoreCase(game.getPlayerName())) {
-				gameController.getModel().setIndex(index+1);
+				gameController.getGameData().setIndex(index+1);
 				break;
 			}
 		}
-		
+
 		lobbyController.close();
 		gameController.updatePlayerPanel(names, statuses);
 		gameController.updateFollowerPanel();

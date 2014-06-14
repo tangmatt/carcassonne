@@ -8,7 +8,7 @@ import edu.carleton.comp4905.carcassonne.common.Dialog;
 
 public class MessageDialog extends Dialog {
 
-	public MessageDialog(Window window, Application client, String title, String message) {
+	public MessageDialog(final Window window, final Application client, final String title, final String message) {
 		super(window, client, title, message);
 		
 		setOnCloseRequest(new EventHandler<WindowEvent>() {

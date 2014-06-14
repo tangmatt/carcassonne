@@ -1,13 +1,11 @@
 package edu.carleton.comp4905.carcassonne.client;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.ini4j.Ini;
-import org.ini4j.InvalidFileFormatException;
 import org.ini4j.Profile.Section;
 
 import edu.carleton.comp4905.carcassonne.common.LocalMessages;
@@ -16,11 +14,14 @@ import edu.carleton.comp4905.carcassonne.common.Position;
 public class TileManager {
 	private static volatile TileManager instance = null;
 	private Map<String, GameTile> tiles;
+	private Map<String, Integer> counters;
 	public static final String CONFIG_DIR = "config/tiles.ini";
 	public static int NUM_OF_TILES = 0;
+	public static final int TOTAL_ROTATED_VIEWS = 4;
 	
 	private TileManager() {
 		tiles = new HashMap<String, GameTile>();
+		counters = new HashMap<String, Integer>();
 		initialize();
 	}
 	
@@ -43,49 +44,59 @@ public class TileManager {
 			ini.load(new FileInputStream(CONFIG_DIR));
 			for(String key : ini.keySet()) {
 				Section section = ini.get(key);
-				Segment top = Segment.valueOf(section.get(Side.TOP.toString()));
-				Segment right = Segment.valueOf(section.get(Side.RIGHT.toString()));
-				Segment bottom = Segment.valueOf(section.get(Side.BOTTOM.toString()));
-				Segment left = Segment.valueOf(section.get(Side.LEFT.toString()));
+				Map<Position, Segment> segments = getSegments(section);
 				GameTile gameTile = new GameTile();
-				gameTile.setTile(key, top, right, bottom, left);
+				gameTile.setTile(key, segments);
+				gameTile.setShield(section.get("SHIELD") != null && section.get("SHIELD").equalsIgnoreCase("TRUE"));
 				if(section.get("FOLLOWERS") != null) {
 					String followers = section.get("FOLLOWERS").replace(" ", "");
 					if(followers.contains(",")) {
 						String[] splitted = followers.split(",");
 						for(int i=0; i<splitted.length; ++i) {
 							Position pos = Position.valueOf(splitted[i]);
-							gameTile.addPosition(pos);
+							gameTile.setPosition(pos, "");
 						}
 					} else {
 						Position pos = Position.valueOf(followers);
-						gameTile.addPosition(pos);
+						gameTile.setPosition(pos, "");
 					}				
 				}
 				tiles.put(key, gameTile);
-				addTileCombinations(gameTile, top, right, bottom, left);
+				counters.put(key, Integer.parseInt(section.get("COUNT")));
+				addTileCombinations(gameTile);
 				if(!(key.equals(LocalMessages.getString("EmptyTile")) || key.equals(LocalMessages.getString("StarterTile"))))
 					NUM_OF_TILES++;
 			}
-		} catch (InvalidFileFormatException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
 	/**
+	 * Returns a map of segments mapped to their positions.
+	 * @param section the section
+	 * @return the map of segments to positions
+	 */
+	protected Map<Position, Segment> getSegments(final Section section) {
+		Map<Position, Segment> segments = new EnumMap<Position, Segment>(Position.class);
+		segments.put(Position.TOP, Segment.valueOf(section.get(Position.TOP.toString())));
+		segments.put(Position.RIGHT, Segment.valueOf(section.get(Position.RIGHT.toString())));
+		segments.put(Position.BOTTOM, Segment.valueOf(section.get(Position.BOTTOM.toString())));
+		segments.put(Position.LEFT, Segment.valueOf(section.get(Position.LEFT.toString())));
+		segments.put(Position.CENTER, Segment.valueOf(section.get(Position.CENTER.toString())));
+		segments.put(Position.TOP_LEFT, Segment.valueOf(section.get(Position.TOP_LEFT.toString())));
+		segments.put(Position.TOP_RIGHT, Segment.valueOf(section.get(Position.TOP_RIGHT.toString())));
+		segments.put(Position.BOTTOM_LEFT, Segment.valueOf(section.get(Position.BOTTOM_LEFT.toString())));
+		segments.put(Position.BOTTOM_RIGHT, Segment.valueOf(section.get(Position.BOTTOM_RIGHT.toString())));
+		return segments;
+	}
+	
+	/**
 	 * Adds the original tile and its various rotations.
 	 * @param gameTile a GameTile
-	 * @param top a Segment
-	 * @param right a Segment 
-	 * @param bottom a Segment
-	 * @param left a Segment
 	 */
-	protected void addTileCombinations(final GameTile tile, final Segment top, final Segment right, final Segment bottom, final Segment left) {
-		for(int i=1, degrees=90; i<Side.values().length; ++i, degrees+=90) {
+	protected void addTileCombinations(final GameTile tile) {
+		for(int i=1, degrees=90; i<TOTAL_ROTATED_VIEWS; ++i, degrees+=90) {
 			GameTile rotatedTile = new GameTile(tile);
 			rotatedTile.setName(tile.getName() + degrees);
 			rotatedTile.rotate(degrees);
@@ -116,5 +127,30 @@ public class TileManager {
 	 */
 	public GameTile getStarterTile() {
 		return getTile(LocalMessages.getString("StarterTile"));
+	}
+	
+	/**
+	 * Returns the tiles mapped to their name.
+	 * @return the tiles mapped to their name
+	 */
+	public Map<String, GameTile> getTiles() {
+		return tiles;
+	}
+	
+	/**
+	 * Returns the map containing the count associated with each tile
+	 * @return the map containing the count associated with each tile
+	 */
+	public Map<String, Integer> getCounters() {
+		return counters;
+	}
+	
+	/**
+	 * Returns the number of repetitions of specified tile.
+	 * @param key the tile name
+	 * @return the number of repetitions of specified tile
+	 */
+	public int getTileCount(final String key) {
+		return counters.get(key);
 	}
 }

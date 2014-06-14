@@ -19,7 +19,6 @@ public class HostGameController extends InputController implements Initializable
 	@FXML private Label title, sceneDesc, usernameLabel, servAddrLabel, servPortLabel;
 	@FXML private Button joinButton, hostButton, submitButton;
 	private ScreensController screensController;
-	private Carcassonne client;
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -64,14 +63,6 @@ public class HostGameController extends InputController implements Initializable
 	 */
 	private synchronized void handleJoinGame(final ActionEvent event) {
 		screensController.setScreen(Carcassonne.JOIN_SCREEN);
-	}
-	
-	/**
-	 * Initializes data for this controller.
-	 * @param client a Carcassonne
-	 */
-	public synchronized void initData(final Carcassonne client) {
-		this.client = client;
 	}
 
 	@Override

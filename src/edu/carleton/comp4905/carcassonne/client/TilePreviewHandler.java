@@ -17,7 +17,7 @@ public class TilePreviewHandler implements EventHandler<MouseEvent> {
 		if(!event.isPrimaryButtonDown())
 			return;
 
-		controller.getModel().setSelectedPreviewTile(preview.getTile());
+		controller.getGameData().setSelectedPreviewTile(preview.getTile());
 		controller.handleHints(preview);
 		preview.setSelected(true);
 	}

@@ -12,18 +12,51 @@ public class TileContainer extends AbstractTile {
 		    + "-fx-border-style: dashed;";
 	protected EventHandler<MouseEvent> hoverHandler, exitHandler;
 	protected Position selectedFollower;
+	protected int r, c;
+	protected Follower follower;
+	private boolean isHoverTile;
 	
-	public TileContainer(final GameTile tile) {
+	public TileContainer(final GameTile tile, final int r, final int c) {
 		super(tile);
+		this.r = r;
+		this.c = c;
+		this.isHoverTile = false;
+	}
+	
+	/**
+	 * Shows the follower based on position and registers hover/exit mouse handlers.
+	 * @param position the position
+	 * @param index the meeple identifier
+	 */
+	public void showFollower(final Position position, final int index) {
+		Follower follower = addFollower(position, index, null);
+		follower.setOpacity(0.6f);
+		
+		follower.addEventHandler(MouseEvent.MOUSE_ENTERED, new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				follower.setOpacity(1f);
+				TileContainer.this.setFollower(position, "");
+			}
+		});
+		
+		follower.addEventHandler(MouseEvent.MOUSE_EXITED, new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				follower.setOpacity(0.6f);
+				TileContainer.this.setFollower(null, "");
+			}
+		});
 	}
 	
 	/**
 	 * Adds a follower mapped to a side.
 	 * @param position the position
 	 * @param index the meeple index
+	 * @param name the player name
 	 */
-	public void addFollower(final Position position, final int index, final boolean permanent) {
-		Follower follower = new Follower(position);
+	public Follower addFollower(final Position position, final int index, final String name) {
+		follower = new Follower(position);
 		follower.setImage(ResourceManager.getImageFromResources("meeple" + index + ".png"));
 		
 		if(position == Position.TOP)
@@ -51,26 +84,8 @@ public class TileContainer extends AbstractTile {
 			follower.setTranslateX(getLeftPositionX(tile, follower));
 		}
 		
-		if(!permanent) {
-			follower.setOpacity(0.6f);
-			follower.addEventHandler(MouseEvent.MOUSE_ENTERED, new EventHandler<MouseEvent>() {
-				@Override
-				public void handle(MouseEvent event) {
-					follower.setOpacity(1f);
-					TileContainer.this.setFollowerPosition(position);
-				}
-			});
-			
-			follower.addEventHandler(MouseEvent.MOUSE_EXITED, new EventHandler<MouseEvent>() {
-				@Override
-				public void handle(MouseEvent event) {
-					follower.setOpacity(0.6f);
-					TileContainer.this.setFollowerPosition(null);
-				}
-			});
-		}
-		
 		getChildren().add(follower);
+		return follower;
 	}
 	
 	public void addMouseListener(final GameController controller,
@@ -135,11 +150,13 @@ public class TileContainer extends AbstractTile {
 	}
 	
 	/**
-	 * Sets the follower position.
-	 * @param position a Position
+	 * Sets the follower position and owner.
+	 * @param position the follower position
+	 * @param name the player name
 	 */
-	public void setFollowerPosition(final Position position) {
+	public void setFollower(final Position position, final String name) {
 		selectedFollower = position;
+		tile.setPosition(position, name);
 	}
 	
 	/**
@@ -151,11 +168,52 @@ public class TileContainer extends AbstractTile {
 	}
 	
 	/**
+	 * Returns the name of the follower placer.
+	 * @param position the position
+	 * @return the name of the follower placer
+	 */
+	public String getFollowerOwner(final Position position) {
+		return tile.getFollowerOwner(position);
+	}
+	
+	/**
 	 * Returns the mouse hover event handler.
 	 * @return the EventHandler
 	 */
 	public EventHandler<MouseEvent> getHoverHandle() {
 		return hoverHandler;
+	}
+	
+	/**
+	 * Returns the row index.
+	 * @return the row
+	 */
+	public int getRow() {
+		return r;
+	}
+	
+	/**
+	 * Returns the column index.
+	 * @return the column
+	 */
+	public int getColumn() {
+		return c;
+	}
+	
+	/**
+	 * Determines whether the tile is a hover tile or not.
+	 * @param state the state
+	 */
+	public void setHoverTile(final boolean state) {
+		isHoverTile = state;
+	}
+	
+	/**
+	 * Returns true if this tile container is simply a hovered tile that is not permanent to the board.
+	 * @return a boolean
+	 */
+	public boolean isHoverTile() {
+		return isHoverTile;
 	}
 
 	@Override

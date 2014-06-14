@@ -21,19 +21,29 @@ public class SendTileReplyHandler implements EventHandler {
 				GameController gameController = game.getGameController();
 				TileManager tileManager = TileManager.getInstance();
 				
+				String player = (String)event.getPlayerName();
 				String tile = (String)event.getProperty("tile");
 				int row = (int)event.getProperty("row");
 				int column = (int)event.getProperty("column");
 				int meeple = (int)event.getProperty("meeple");
 				Position position = (Position)event.getProperty("position");
+				boolean shield = (boolean)event.getProperty("shield");
 				
+				gameController.startTurn();
 				gameController.refreshGameTiles();
-				TileContainer container = new TileContainer(tileManager.getTile(tile));
-				if(position != null)
-					container.addFollower(position, meeple, true);
-				gameController.addTile(row, column, container);	
+				TileContainer container = new TileContainer(tileManager.getTile(tile), row, column);
+				container.getTile().setShield(shield);
+				if(position != null) {
+					container.addFollower(position, meeple, player);
+					container.setFollower(position, player);
+					gameController.getGameData().getTilesWithFollowers().put(container, player);
+					gameController.updateConnectedSegments(container, position, container.getSegment(position), player);
+				}
+				
+				gameController.addTile(container);
+				gameController.updateFollowers();
+				gameController.updateGameBoard();
 				gameController.firePreviewTileEvent(true);
-				//container.setEffect(new InnerShadow());
 			}
 		});
 	}

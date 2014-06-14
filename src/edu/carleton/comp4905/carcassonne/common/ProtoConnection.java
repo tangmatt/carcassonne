@@ -97,6 +97,8 @@ public class ProtoConnection extends Connection {
 			event.addProperty("meeple", eventMessage.getMeeple());
 		if(eventMessage.hasPosition())
 			event.addProperty("position", Position.values()[eventMessage.getPosition()]);
+		if(eventMessage.hasShield())
+			event.addProperty("shield", eventMessage.getShield());
 		
 		return event;
 	}
@@ -143,6 +145,8 @@ public class ProtoConnection extends Connection {
 			builder.setMeeple((int)event.getProperty("meeple"));
 		if(event.getProperty("position") != null)
 			builder.setPosition(((Position)event.getProperty("position")).ordinal());
+		if(event.getProperty("shield") != null)
+			builder.setShield((boolean)event.getProperty("shield"));
 		
 		return builder.build();
 	}

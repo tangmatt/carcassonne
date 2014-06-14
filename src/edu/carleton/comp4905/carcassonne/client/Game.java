@@ -50,7 +50,8 @@ public class Game extends Service implements Runnable {
 					new MessageDialog(controller.getGridPane().getScene().getWindow(),
 							controller.getGameClient(),
 							LocalMessages.getString("ErrTitle"),
-							e.getMessage())
+							e.getMessage(),
+							true)
 					.show();
 				}
 			});

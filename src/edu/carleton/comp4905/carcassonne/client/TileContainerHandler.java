@@ -3,6 +3,7 @@ package edu.carleton.comp4905.carcassonne.client;
 import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventType;
+import edu.carleton.comp4905.carcassonne.common.Position;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 
@@ -22,15 +23,17 @@ public class TileContainerHandler implements EventHandler<MouseEvent> {
 		TileContainer container = (TileContainer) event.getSource();
 		Game game = controller.getGameClient().getGame();
 		Connection connection = controller.getGameClient().getGame().getConnection();
-		GameTile selectedTile = controller.getModel().getCopyOfSelectedPreviewTile();
+		GameTile selectedTile = controller.getGameData().getCopyOfSelectedPreviewTile();
+		Position position = container.getFollowerPosition();
+		container.setHoverTile(false);
 		
 		if(!event.isPrimaryButtonDown())
 			return;
 		
-		if(container.getFollowerPosition() != null) {
-			if(controller.getModel().getNumOfFollowers() <= 0)
+		if(position != null) {
+			if(controller.getGameData().getNumOfFollowers() <= 0)
 				return;
-			controller.getModel().decreaseNumOfFollowers();
+			controller.getGameData().decreaseNumOfFollowers();
 			controller.updateFollowerPanel();
 		}
 		
@@ -40,11 +43,11 @@ public class TileContainerHandler implements EventHandler<MouseEvent> {
 		gameEvent.addProperty("rotation", ((Double)selectedTile.getRotate()).intValue());
 		gameEvent.addProperty("row", row);
 		gameEvent.addProperty("column", column);
-		gameEvent.addProperty("meeple", controller.getModel().getIndex());
+		gameEvent.addProperty("meeple", controller.getGameData().getIndex());
 		gameEvent.addProperty("position", container.getFollowerPosition());
+		gameEvent.addProperty("shield", container.getTile().hasShield());
 		connection.sendEvent(gameEvent);
 		
 		controller.endTurn();
-		controller.startTurn();
 	}
 }
