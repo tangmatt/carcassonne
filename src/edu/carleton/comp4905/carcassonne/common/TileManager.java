@@ -15,7 +15,7 @@ public class TileManager {
 	private static TileManager instance = null;
 	private Map<String, GameTile> tiles;
 	private Map<String, Integer> counters;
-	public static final String TILES_PATH = "config/tiles.ini";
+	public static final String TILES_PATH = "config/tiles_test.ini";
 	public static int NUM_OF_TILES = 0;
 	public static final int TOTAL_ROTATED_VIEWS = 4;
 	

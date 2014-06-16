@@ -54,6 +54,9 @@ public class QuitRequestHandler implements EventHandler {
 		reply.addProperty("message", message);
 		reply.addProperty("gameInProgress", server.isGameInProgress());
 		connection.broadcastEvent(reply, connections);
+		
+		if(gameOver)
+			controller.closeApplication();
 	}
 	
 	/**

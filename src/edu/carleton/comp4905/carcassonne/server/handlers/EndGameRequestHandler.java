@@ -20,10 +20,13 @@ public class EndGameRequestHandler implements EventHandler {
 		ConcurrentMap<Address, Connection> connections = server.getConnections();
 
 		controller.addMessageEntry(MessageType.INFO, "There are no more tiles in the deck.");
-		
+		server.getReactor().removeHandler(EventType.QUIT_REQUEST);
+
 		// send reply back to connected client
 		Event reply = new Event(EventType.END_GAME_REPLY, event.getPlayerName());
 		reply.addProperty("message", "There are no more tiles in the deck.");
 		connection.broadcastEvent(reply, connections);
+		
+		controller.closeApplication();
 	}
 }

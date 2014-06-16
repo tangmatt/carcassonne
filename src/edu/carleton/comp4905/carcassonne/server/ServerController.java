@@ -257,6 +257,18 @@ public class ServerController implements Initializable {
 	}
 	
 	/**
+	 * Closes the server application.
+	 */
+	public synchronized void closeApplication() {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				client.getStage().getOnCloseRequest().handle(null);
+			}
+		});
+	}
+	
+	/**
 	 * Returns the AnchorPane object.
 	 * @return an AnchorPane
 	 */

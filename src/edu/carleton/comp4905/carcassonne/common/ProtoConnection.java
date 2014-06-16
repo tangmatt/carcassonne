@@ -44,13 +44,11 @@ public class ProtoConnection extends Connection {
 			eventMessage.writeDelimitedTo(peer.getOutputStream());
 		} catch (IOException e) {
 			// do nothing
-			e.printStackTrace();
 		}
 	}
 	
 	@Override
 	public synchronized void broadcastEvent(final Event event, final ConcurrentMap<Address, Connection> connections) {
-		System.out.println("-- HELLO PROTO");
 		for(Address address : connections.keySet()) {
 			Connection connection = connections.get(address);
 			connection.sendEvent(event);
