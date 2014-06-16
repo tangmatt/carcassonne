@@ -93,13 +93,18 @@ public class LobbyController implements Initializable {
 	 * @param numbOfPlayers
 	 */
 	public void handleStartAvailability(final int numOfPlayers) {
-		if(numOfPlayers < 2) {
-			startButton.setOpacity(0.4f);
-			startButton.setDisable(true);
-		} else {
-			startButton.setOpacity(1);
-			startButton.setDisable(false);
-		}
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				if(numOfPlayers < 2) {
+					startButton.setOpacity(0.4f);
+					startButton.setDisable(true);
+				} else {
+					startButton.setOpacity(1);
+					startButton.setDisable(false);
+				}
+			}
+		});
 	}
 	
 	/**

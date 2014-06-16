@@ -1,5 +1,6 @@
 package edu.carleton.comp4905.carcassonne.client;
 
+import edu.carleton.comp4905.carcassonne.common.TileManager;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 

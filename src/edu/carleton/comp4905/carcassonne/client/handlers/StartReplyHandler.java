@@ -31,7 +31,6 @@ public class StartReplyHandler implements EventHandler {
 		lobbyController.close();
 		gameController.updatePlayerPanel(names, statuses);
 		gameController.updateFollowerPanel();
-		gameController.startGame();
-		gameController.getRootPane().setDisable(false);
+		gameController.sendTurnRequest();
 	}
 }

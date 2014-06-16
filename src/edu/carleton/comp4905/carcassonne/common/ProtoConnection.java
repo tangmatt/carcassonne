@@ -38,17 +38,19 @@ public class ProtoConnection extends Connection {
 	}
 
 	@Override
-	public void sendEvent(final Event event) {
+	public synchronized void sendEvent(final Event event) {
 		try {
 			EventMessage.Event eventMessage = getEventMessage(event);
 			eventMessage.writeDelimitedTo(peer.getOutputStream());
 		} catch (IOException e) {
 			// do nothing
+			e.printStackTrace();
 		}
 	}
 	
 	@Override
-	public void broadcastEvent(final Event event, final ConcurrentMap<Address, Connection> connections) {
+	public synchronized void broadcastEvent(final Event event, final ConcurrentMap<Address, Connection> connections) {
+		System.out.println("-- HELLO PROTO");
 		for(Address address : connections.keySet()) {
 			Connection connection = connections.get(address);
 			connection.sendEvent(event);
@@ -99,6 +101,10 @@ public class ProtoConnection extends Connection {
 			event.addProperty("position", Position.values()[eventMessage.getPosition()]);
 		if(eventMessage.hasShield())
 			event.addProperty("shield", eventMessage.getShield());
+		if(eventMessage.hasTarget())
+			event.addProperty("target", eventMessage.getTarget());
+		if(eventMessage.hasPoints())
+			event.addProperty("points", eventMessage.getPoints());
 		
 		return event;
 	}
@@ -147,6 +153,10 @@ public class ProtoConnection extends Connection {
 			builder.setPosition(((Position)event.getProperty("position")).ordinal());
 		if(event.getProperty("shield") != null)
 			builder.setShield((boolean)event.getProperty("shield"));
+		if(event.getProperty("target") != null)
+			builder.setTarget((String)event.getProperty("target"));
+		if(event.getProperty("points") != null)
+			builder.setPoints((int)event.getProperty("points"));
 		
 		return builder.build();
 	}

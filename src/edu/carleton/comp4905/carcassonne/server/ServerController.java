@@ -7,6 +7,7 @@ import java.util.ResourceBundle;
 
 import edu.carleton.comp4905.carcassonne.common.Address;
 import edu.carleton.comp4905.carcassonne.common.Connection;
+import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.Message;
 import edu.carleton.comp4905.carcassonne.common.MessageType;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
@@ -36,10 +37,12 @@ public class ServerController implements Initializable {
 	private final ObservableList<Player> playerData;
 	private final ObservableList<Message> messageData;
 	private ServerClient client;
+	private TileDeck deck;
 	
 	public ServerController() {
 		playerData = FXCollections.observableArrayList();
 		messageData = FXCollections.observableArrayList();
+		deck = new TileDeck();
 	}
 
 	@Override
@@ -66,8 +69,8 @@ public class ServerController implements Initializable {
 						messageDesc.setText(selectedMessage.getMessage());
 				});
 				
-				playerView.setPlaceholder(new Text("There are no players in the game."));
-				logView.setPlaceholder(new Text("There are no log messages."));
+				playerView.setPlaceholder(new Text(LocalMessages.getString("NoPlayersMessage")));
+				logView.setPlaceholder(new Text(LocalMessages.getString("NoLogMessage")));
 			}
 		});
 	}
@@ -228,6 +231,18 @@ public class ServerController implements Initializable {
 	}
 	
 	/**
+	 * Adds to the player's score.
+	 * @param name the player name
+	 */
+	public synchronized void addPlayerScore(final String name, int points) {
+		for(Player player : playerData) {
+			if(player.getName().equalsIgnoreCase(name)) {
+				player.addPoints(points);
+			}
+		}
+	}
+	
+	/**
 	 * Adds a message to the log messages list.
 	 * @param type a MessageType
 	 * @param message a message (String)
@@ -263,6 +278,14 @@ public class ServerController implements Initializable {
 	 */
 	public synchronized ObservableList<Player> getPlayers() {
 		return playerData;
+	}
+	
+	/**
+	 * Returns the deck.
+	 * @return the deck
+	 */
+	public synchronized TileDeck getDeck() {
+		return deck;
 	}
 	
 	/**

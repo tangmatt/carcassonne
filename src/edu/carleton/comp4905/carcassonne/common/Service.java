@@ -9,11 +9,11 @@ import edu.carleton.comp4905.carcassonne.server.Server;
 
 public abstract class Service {
 	protected final Reactor reactor;
-	protected Protocol protocol;
+	protected Serializer serializer;
 	protected Mode mode;
 	protected String properties;
 	protected final ExecutorService pool;
-	public static final String FILENAME = "app.properties";
+	public static final String FILENAME = "config/app.properties";
 	
 	public Service() {
 		reactor = new Reactor();
@@ -32,8 +32,8 @@ public abstract class Service {
 			String value = propertyLoader.getProperty((String)propertyType);
 			if(value != null) {
 				try {
-					if(((String)propertyType).equalsIgnoreCase("PROTOCOL"))
-						protocol = Protocol.valueOf(value);
+					if(((String)propertyType).equalsIgnoreCase("SERIALIZER"))
+						serializer = Serializer.valueOf(value);
 					else if(((String)propertyType).equalsIgnoreCase("MODE"))
 						mode = Mode.valueOf(value);
 					else if(((String)propertyType).equalsIgnoreCase("CLIENT") && this.getClass() == Game.class)

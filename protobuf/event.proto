@@ -22,4 +22,7 @@ message Event {
 	optional int32 meeple = 17;
 	optional int32 position = 18;
 	optional bool shield = 19;
+	optional string target = 20;
+	optional int32 points = 21;
+	optional int32 followers = 22;
 }

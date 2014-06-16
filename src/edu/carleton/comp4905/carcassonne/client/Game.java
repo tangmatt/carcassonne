@@ -12,7 +12,7 @@ import edu.carleton.comp4905.carcassonne.common.EventType;
 import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
 import edu.carleton.comp4905.carcassonne.common.ProtoConnector;
-import edu.carleton.comp4905.carcassonne.common.Protocol;
+import edu.carleton.comp4905.carcassonne.common.Serializer;
 import edu.carleton.comp4905.carcassonne.common.Service;
 
 public class Game extends Service implements Runnable {
@@ -26,9 +26,9 @@ public class Game extends Service implements Runnable {
 		super();
 		this.address = address;
 		this.playerName = playerName;
-		if(protocol == Protocol.JAVA_SERIALIZE)
+		if(serializer == Serializer.JAVA_SERIALIZE)
 			this.connector = new DefaultConnector(this);
-		else if(protocol == Protocol.GOOGLE_PROTOBUF)
+		else if(serializer == Serializer.GOOGLE_PROTOBUF)
 			this.connector = new ProtoConnector(this);
 		this.controller = gameController;
 	}

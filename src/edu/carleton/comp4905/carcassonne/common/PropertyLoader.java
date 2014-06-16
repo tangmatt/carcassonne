@@ -5,7 +5,6 @@ import java.util.Properties;
 
 public class PropertyLoader {
 	private final Properties properties;
-	private final String configDir = "config/";
 	
 	public PropertyLoader() {
 		this.properties = new Properties();
@@ -13,13 +12,13 @@ public class PropertyLoader {
 	
 	/**
 	 * Loads the properties file.
-	 * @param name
+	 * @param path the path
 	 */
-	public void loadProperty(final String name) {
+	public void loadProperty(final String path) {
 		try {
-			properties.load(new FileInputStream(configDir + name));
+			properties.load(new FileInputStream(path));
 		} catch (Exception e) {
-			System.err.println("Unable to locate property file '" + name + "' on your system.");
+			System.err.println("Unable to locate property file '" + path + "' on your system.");
 		}
 	}
 	

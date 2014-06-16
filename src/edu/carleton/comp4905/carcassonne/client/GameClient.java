@@ -49,13 +49,8 @@ public class GameClient extends Application {
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent event) {
-				try {
-					if(game.getConnection() != null)
-						game.getConnection().sendEvent(new Event(EventType.QUIT_REQUEST, game.getPlayerName()));
-					Thread.sleep(33);
-				} catch(Exception e) {
-					e.printStackTrace();
-				}
+				if(game.getConnection() != null)
+					game.getConnection().sendEvent(new Event(EventType.QUIT_REQUEST, game.getPlayerName()));
 				game.shutdown();
 				primaryStage.close();
 			}

@@ -13,7 +13,7 @@ import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.MessageType;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
 import edu.carleton.comp4905.carcassonne.common.ProtoAcceptor;
-import edu.carleton.comp4905.carcassonne.common.Protocol;
+import edu.carleton.comp4905.carcassonne.common.Serializer;
 import edu.carleton.comp4905.carcassonne.common.Service;
 
 public class Server extends Service implements Runnable {
@@ -74,9 +74,9 @@ public class Server extends Service implements Runnable {
 	public void run() {
 		try {
 			listener = new ServerSocket(PORT);
-			if(protocol == Protocol.JAVA_SERIALIZE)
+			if(serializer == Serializer.JAVA_SERIALIZE)
 				acceptor = new DefaultAcceptor(this, listener);
-			else if(protocol == Protocol.GOOGLE_PROTOBUF)
+			else if(serializer == Serializer.GOOGLE_PROTOBUF)
 				acceptor = new ProtoAcceptor(this, listener);
 			controller.addMessageEntry(MessageType.INFO, "Server listening on port " + PORT);
 			running = true;

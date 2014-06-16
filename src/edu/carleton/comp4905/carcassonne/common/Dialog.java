@@ -28,7 +28,7 @@ public class Dialog extends Stage {
 			controller.initData(this, title, message);
 			
 			Scene scene = new Scene(anchorPane);
-			setScene(scene);	
+			setScene(scene);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

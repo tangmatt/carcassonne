@@ -11,23 +11,19 @@ import edu.carleton.comp4905.carcassonne.common.MessageType;
 import edu.carleton.comp4905.carcassonne.server.Server;
 import edu.carleton.comp4905.carcassonne.server.ServerController;
 
-public class StartRequestHandler implements EventHandler {
+public class EndGameRequestHandler implements EventHandler {
 	@Override
 	public void handleEvent(final Event event) {
 		Connection connection = (Connection)event.getProperty("connection");
 		Server server = (Server)connection.getService();
 		ServerController controller = server.getController();
 		ConcurrentMap<Address, Connection> connections = server.getConnections();
+
+		controller.addMessageEntry(MessageType.INFO, "There are no more tiles in the deck.");
 		
-		server.gameInProgress(true);
-		controller.addMessageEntry(MessageType.INFO, "Player '" + event.getPlayerName() + "' has started the game (with " + connections.size() + " players)");
-		Boolean[] statuses = controller.getStatuses(connections);
-		String[] names = controller.getPlayerNames();
-		
-		// send reply back to connected clients
-		Event startReply = new Event(EventType.START_REPLY, event.getPlayerName());
-		startReply.addProperty("names", names);
-		startReply.addProperty("statuses", statuses);
-		connection.broadcastEvent(startReply, connections);
+		// send reply back to connected client
+		Event reply = new Event(EventType.END_GAME_REPLY, event.getPlayerName());
+		reply.addProperty("message", "There are no more tiles in the deck.");
+		connection.broadcastEvent(reply, connections);
 	}
 }

@@ -39,8 +39,9 @@ public class DefaultConnection extends Connection {
 	}
 
 	@Override
-	public void sendEvent(final Event event) {
+	public synchronized void sendEvent(final Event event) {
 		try {
+			System.out.println(event.getEventType() + " ------ " + service.getClass().getName());
 			new ObjectOutputStream(peer.getOutputStream()).writeObject(event);
 		} catch (IOException e) {
 			// do nothing
@@ -48,11 +49,12 @@ public class DefaultConnection extends Connection {
 	}
 
 	@Override
-	public void broadcastEvent(final Event event, final ConcurrentMap<Address, Connection> connections) {
+	public synchronized void broadcastEvent(final Event event, final ConcurrentMap<Address, Connection> connections) {
+		System.out.println(event.getEventType() + " ------ " + service.getClass().getName());
 		for(Address address : connections.keySet()) {
 			Connection connection = connections.get(address);
 			connection.sendEvent(event);
-		} 
+		}
 	}
 
 	private class Producer implements Runnable {

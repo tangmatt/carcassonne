@@ -8,13 +8,15 @@ public class Player {
 	private final String name;
 	private final String address;
 	private final String port;
+	private int score;
 	private Status status;
 	
 	public Player(final PlayerBuilder builder) {
-		this.name = builder.name;
-		this.address = builder.address;
-		this.port = builder.port;
-		this.status = builder.status;
+		name = builder.name;
+		address = builder.address;
+		port = builder.port;
+		status = builder.status;
+		score = 0;
 	}
 	
 	/**
@@ -53,8 +55,24 @@ public class Player {
 	 * Sets the status to specified status.
 	 * @param status a Status
 	 */
-	public void setStatus(Status status) {
+	public void setStatus(final Status status) {
 		this.status = status;
+	}
+	
+	/**
+	 * Adds points to player's score.
+	 * @param points the points to be added
+	 */
+	public void addPoints(final int points) {
+		score += points;
+	}
+	
+	/**
+	 * Deducts points from player's score.
+	 * @param points the points to be deducted
+	 */
+	public void deductPoints(final int points) {
+		score -= points;
 	}
 	
 	/**

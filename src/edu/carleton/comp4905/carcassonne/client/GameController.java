@@ -10,11 +10,14 @@ import org.controlsfx.control.PopOver;
 import org.controlsfx.control.PopOver.ArrowLocation;
 
 import edu.carleton.comp4905.carcassonne.client.handlers.PlayerViewHandler;
+import edu.carleton.comp4905.carcassonne.common.Connection;
+import edu.carleton.comp4905.carcassonne.common.Event;
+import edu.carleton.comp4905.carcassonne.common.EventType;
 import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
 import edu.carleton.comp4905.carcassonne.common.Position;
 import edu.carleton.comp4905.carcassonne.common.ResourceManager;
-import javafx.event.Event;
+import edu.carleton.comp4905.carcassonne.common.TileManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -36,7 +39,6 @@ public class GameController implements Initializable {
 	@FXML private Button endTurnButton;
 	@FXML private ImageView player1, player2, player3, player4, player5;
 	@FXML private ImageView meeple1, meeple2, meeple3, meeple4, meeple5, meeple6, meeple7; // meeple = follower
-	private TileDeck deck;
 	private TileManager tileManager;
 	private GameData gameData;
 	private ScoreData scoreData;
@@ -48,7 +50,6 @@ public class GameController implements Initializable {
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 		mousePressEvent = new MouseEvent(MouseEvent.MOUSE_PRESSED, 0, 0, 0, 0, 
 				MouseButton.PRIMARY, 1, true, true, true, true, true, true, true, true, true, true, null);
-		deck = new TileDeck();
 		gameData = new GameData();
 		scoreData = new ScoreData();
 		tileManager = TileManager.getInstance();
@@ -57,8 +58,8 @@ public class GameController implements Initializable {
 		ImageView[] followerViews = new ImageView[] { meeple1, meeple2, meeple3, meeple4, meeple5, meeple6, meeple7 };
 		gameData.addPlayerViews(playerViews, createPopOver());
 		gameData.addFollowerViews(followerViews);
-		setPreviewTiles(tileManager.getEmptyTile()); // initializes the preview tiles to be empty
 		
+		setPreviewTiles(tileManager.getEmptyTile()); // initializes the preview tiles to be empty
 		createGameBoard();
 		createLobby();
 	}
@@ -233,29 +234,42 @@ public class GameController implements Initializable {
 	}
 	
 	/**
-	 * Initializes the start of a game.
+	 * Sends the turn request to the server.
 	 */
-	public synchronized void startGame() {
-		PlatformManager.run(new Runnable() {
-			@Override
-			public void run() {
-				deck.shuffle();
-				startTurn();
-			}
-		});
+	public synchronized void sendTurnRequest() {
+		Connection connection = client.getGame().getConnection();
+		Event event = new Event(EventType.START_TURN_REQUEST, client.getGame().getPlayerName());
+		connection.sendEvent(event);
+	}
+	
+	/**
+	 * Sends the end game request to the server.
+	 */
+	public synchronized void sendEndGameRequest() {
+		Connection connection = client.getGame().getConnection();
+		Event event = new Event(EventType.END_GAME_REQUEST, client.getGame().getPlayerName());
+		connection.sendEvent(event);
+	}
+	
+	/**
+	 * Sends the end turn request to the server.
+	 */
+	public synchronized void sendEndTurnRequest() {
+		Connection connection = client.getGame().getConnection();
+		Event event = new Event(EventType.END_TURN_REQUEST, client.getGame().getPlayerName());
+		connection.sendEvent(event);
 	}
 	
 	/**
 	 * Handles the start of the turn for the current client.
+	 * @param tile the drawn tile
 	 */
-	public synchronized void startTurn() {
+	public synchronized void startTurn(final String tile) {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				GameTile tile = deck.draw();
-				//if(deck.isEmpty())
-				// TODO do what after deck is empty??
-				setPreviewTiles(tile);
+				setPreviewTiles(tileManager.getTile(tile));
+				stopInteraction(false);
 			}
 		});
 	}
@@ -275,8 +289,19 @@ public class GameController implements Initializable {
 						gameData.getTile(r, c).removeMouseListener();
 					}
 				}
+				sendEndTurnRequest();
+				stopInteraction(true);
 			}
 		});
+	}
+	
+	/**
+	 * Determines whether to disable the preview and grid panel.
+	 * @param state the state
+	 */
+	public synchronized void stopInteraction(final boolean state) {
+		previewPane.setDisable(state);
+		gridPane.setDisable(state);
 	}
 	
 	/**
@@ -326,19 +351,24 @@ public class GameController implements Initializable {
 	 * Refreshes all of the game tiles.
 	 */
 	public synchronized void refreshGameTiles() {
-		for(int c=0; c<GameData.COLS; ++c) {
-			for(int r=0; r<GameData.ROWS; ++r) {
-				TileContainer container = gameData.getTile(r, c);
-				container.setEffect(null);
-				container.setSelected(false);
-				container.removeMouseListener();
-				
-				if(container.getHoverHandle() != null) {
-					container.getChildren().clear();
-					container.addTile(tileManager.getEmptyTile());
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				for(int c=0; c<GameData.COLS; ++c) {
+					for(int r=0; r<GameData.ROWS; ++r) {
+						TileContainer container = gameData.getTile(r, c);
+						container.setEffect(null);
+						container.setSelected(false);
+						container.removeMouseListener();
+
+						if(container.getHoverHandle() != null) {
+							container.getChildren().clear();
+							container.addTile(tileManager.getEmptyTile());
+						}
+					}
 				}
 			}
-		}
+		});
 	}
 	
 	/**
@@ -346,10 +376,15 @@ public class GameController implements Initializable {
 	 * @param keepState a boolean
 	 */
 	public synchronized void firePreviewTileEvent(boolean keepState) {
-		if(keepState)
-			Event.fireEvent(gameData.getSelectedPreviewTile(), mousePressEvent);
-		else
-			Event.fireEvent(gameData.getPreviews()[0], mousePressEvent);
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				if(keepState)
+					javafx.event.Event.fireEvent(gameData.getSelectedPreviewTile(), mousePressEvent);
+				else
+					javafx.event.Event.fireEvent(gameData.getPreviews()[0], mousePressEvent);
+			}
+		});
 	}
 	
 	/**
@@ -369,7 +404,7 @@ public class GameController implements Initializable {
 	/**
 	 * Creates a dialog for displaying the player queue and pre-game interaction.
 	 */
-	private void createLobby() {
+	public synchronized void createLobby() {
 		PlatformManager.runLater(new Runnable() { // Note: must use runLater otherwise LoadException
 			@Override
 			public void run() {
@@ -394,7 +429,7 @@ public class GameController implements Initializable {
 	/**
 	 * Initializes the game board with empty tiles and the starting tile at the center.
 	 */
-	private void createGameBoard() {
+	public synchronized void createGameBoard() {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -467,10 +502,15 @@ public class GameController implements Initializable {
 	 * Retrieves all of the followers and recalculates the connected segment data.
 	 */
 	public synchronized void updateFollowers() {
-		for(TileContainer container : gameData.getTilesWithFollowers().keySet()) {
-			String playerName = gameData.getTilesWithFollowers().get(container);
-			updateConnectedSegments(container, container.getFollowerPosition(), container.getSegment(container.getFollowerPosition()), playerName);
-		}
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				for(TileContainer container : gameData.getTilesWithFollowers().keySet()) {
+					String playerName = gameData.getTilesWithFollowers().get(container);
+					updateConnectedSegments(container, container.getFollowerPosition(), container.getSegment(container.getFollowerPosition()), playerName);
+				}
+			}
+		});
 	}
 	
 	/**
@@ -480,12 +520,16 @@ public class GameController implements Initializable {
 	 * @param segment the segment
 	 * @param name the name
 	 */
-	public void updateConnectedSegments(final TileContainer container, final Position position, final Segment segment, final String name) {
-		Set<TileContainer> traversed = new HashSet<TileContainer>();
-		container.getTile().updateSegmentOwners(position, name);
-		traversed.add(container);
-		updateConnectedSegments(container, segment, position, name, traversed);
-		System.out.println("_____");
+	public synchronized void updateConnectedSegments(final TileContainer container, final Position position, final Segment segment, final String name) {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				Set<TileContainer> traversed = new HashSet<TileContainer>();
+				container.getTile().updateSegmentOwners(position, name);
+				traversed.add(container);
+				updateConnectedSegments(container, segment, position, name, traversed);
+			}
+		});
 	}
 	
 	/**
@@ -546,7 +590,12 @@ public class GameController implements Initializable {
 	 * Updates the game board regarding the completed segments.
 	 */
 	public synchronized void updateGameBoard() {
-		updateCloister();
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				updateCloister();
+			}
+		});
 	}
 	
 	/**
@@ -570,9 +619,8 @@ public class GameController implements Initializable {
 						container.getChildren().remove(container.follower);
 						//addPlayerScore(container.getTile().getFollowerOwner(Position.CENTER), 9);
 						// TODO display score
-						gameData.increaseNumOfFollowers();
+						//updatePlayerData(container.getTile().getFollowerOwner(Position.CENTER), 9);
 						updateFollowerPanel();
-						System.out.println("CLOISTER COMPLETED");
 					}
 				}
 			}
@@ -580,12 +628,16 @@ public class GameController implements Initializable {
 	}
 	
 	/**
-	 * Deducts specified score points from the player.
+	 * Updates the player's information.
 	 * @param name the player name
 	 * @param points the score points
 	 */
-	public synchronized void addPlayerScore(final String name, final int points) {
-		scoreData.addPlayerScore(name, points);
+	public synchronized void updatePlayerData(final String name, final int points) {
+		Connection connection = client.getGame().getConnection();
+		Event event = new Event(EventType.PLAYER_UPDATE_REQUEST, client.getGame().getPlayerName());
+		event.addProperty("target", name);
+		event.addProperty("points", points);
+		connection.sendEvent(event);
 	}
 	
 	/**
@@ -613,6 +665,7 @@ public class GameController implements Initializable {
 			@Override
 			public void run() {
 				rootPane.setEffect(state ? new GaussianBlur() : null);
+				rootPane.setDisable(state);
 			}
 		});
 	}

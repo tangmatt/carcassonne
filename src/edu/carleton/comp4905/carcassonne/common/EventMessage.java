@@ -234,6 +234,41 @@ public final class EventMessage {
      * <code>optional bool shield = 19;</code>
      */
     boolean getShield();
+
+    // optional string target = 20;
+    /**
+     * <code>optional string target = 20;</code>
+     */
+    boolean hasTarget();
+    /**
+     * <code>optional string target = 20;</code>
+     */
+    java.lang.String getTarget();
+    /**
+     * <code>optional string target = 20;</code>
+     */
+    com.google.protobuf.ByteString
+        getTargetBytes();
+
+    // optional int32 points = 21;
+    /**
+     * <code>optional int32 points = 21;</code>
+     */
+    boolean hasPoints();
+    /**
+     * <code>optional int32 points = 21;</code>
+     */
+    int getPoints();
+
+    // optional int32 followers = 22;
+    /**
+     * <code>optional int32 followers = 22;</code>
+     */
+    boolean hasFollowers();
+    /**
+     * <code>optional int32 followers = 22;</code>
+     */
+    int getFollowers();
   }
   /**
    * Protobuf type {@code edu.carleton.comp4905.carcassonne.common.Event}
@@ -398,6 +433,21 @@ public final class EventMessage {
             case 152: {
               bitField0_ |= 0x00010000;
               shield_ = input.readBool();
+              break;
+            }
+            case 162: {
+              bitField0_ |= 0x00020000;
+              target_ = input.readBytes();
+              break;
+            }
+            case 168: {
+              bitField0_ |= 0x00040000;
+              points_ = input.readInt32();
+              break;
+            }
+            case 176: {
+              bitField0_ |= 0x00080000;
+              followers_ = input.readInt32();
               break;
             }
           }
@@ -879,6 +929,81 @@ public final class EventMessage {
       return shield_;
     }
 
+    // optional string target = 20;
+    public static final int TARGET_FIELD_NUMBER = 20;
+    private java.lang.Object target_;
+    /**
+     * <code>optional string target = 20;</code>
+     */
+    public boolean hasTarget() {
+      return ((bitField0_ & 0x00020000) == 0x00020000);
+    }
+    /**
+     * <code>optional string target = 20;</code>
+     */
+    public java.lang.String getTarget() {
+      java.lang.Object ref = target_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          target_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string target = 20;</code>
+     */
+    public com.google.protobuf.ByteString
+        getTargetBytes() {
+      java.lang.Object ref = target_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        target_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional int32 points = 21;
+    public static final int POINTS_FIELD_NUMBER = 21;
+    private int points_;
+    /**
+     * <code>optional int32 points = 21;</code>
+     */
+    public boolean hasPoints() {
+      return ((bitField0_ & 0x00040000) == 0x00040000);
+    }
+    /**
+     * <code>optional int32 points = 21;</code>
+     */
+    public int getPoints() {
+      return points_;
+    }
+
+    // optional int32 followers = 22;
+    public static final int FOLLOWERS_FIELD_NUMBER = 22;
+    private int followers_;
+    /**
+     * <code>optional int32 followers = 22;</code>
+     */
+    public boolean hasFollowers() {
+      return ((bitField0_ & 0x00080000) == 0x00080000);
+    }
+    /**
+     * <code>optional int32 followers = 22;</code>
+     */
+    public int getFollowers() {
+      return followers_;
+    }
+
     private void initFields() {
       eventType_ = 0;
       playerName_ = "";
@@ -899,6 +1024,9 @@ public final class EventMessage {
       meeple_ = 0;
       position_ = 0;
       shield_ = false;
+      target_ = "";
+      points_ = 0;
+      followers_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -976,6 +1104,15 @@ public final class EventMessage {
       }
       if (((bitField0_ & 0x00010000) == 0x00010000)) {
         output.writeBool(19, shield_);
+      }
+      if (((bitField0_ & 0x00020000) == 0x00020000)) {
+        output.writeBytes(20, getTargetBytes());
+      }
+      if (((bitField0_ & 0x00040000) == 0x00040000)) {
+        output.writeInt32(21, points_);
+      }
+      if (((bitField0_ & 0x00080000) == 0x00080000)) {
+        output.writeInt32(22, followers_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -1068,6 +1205,18 @@ public final class EventMessage {
       if (((bitField0_ & 0x00010000) == 0x00010000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(19, shield_);
+      }
+      if (((bitField0_ & 0x00020000) == 0x00020000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(20, getTargetBytes());
+      }
+      if (((bitField0_ & 0x00040000) == 0x00040000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(21, points_);
+      }
+      if (((bitField0_ & 0x00080000) == 0x00080000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(22, followers_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1223,6 +1372,12 @@ public final class EventMessage {
         bitField0_ = (bitField0_ & ~0x00020000);
         shield_ = false;
         bitField0_ = (bitField0_ & ~0x00040000);
+        target_ = "";
+        bitField0_ = (bitField0_ & ~0x00080000);
+        points_ = 0;
+        bitField0_ = (bitField0_ & ~0x00100000);
+        followers_ = 0;
+        bitField0_ = (bitField0_ & ~0x00200000);
         return this;
       }
 
@@ -1330,6 +1485,18 @@ public final class EventMessage {
           to_bitField0_ |= 0x00010000;
         }
         result.shield_ = shield_;
+        if (((from_bitField0_ & 0x00080000) == 0x00080000)) {
+          to_bitField0_ |= 0x00020000;
+        }
+        result.target_ = target_;
+        if (((from_bitField0_ & 0x00100000) == 0x00100000)) {
+          to_bitField0_ |= 0x00040000;
+        }
+        result.points_ = points_;
+        if (((from_bitField0_ & 0x00200000) == 0x00200000)) {
+          to_bitField0_ |= 0x00080000;
+        }
+        result.followers_ = followers_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1424,6 +1591,17 @@ public final class EventMessage {
         }
         if (other.hasShield()) {
           setShield(other.getShield());
+        }
+        if (other.hasTarget()) {
+          bitField0_ |= 0x00080000;
+          target_ = other.target_;
+          onChanged();
+        }
+        if (other.hasPoints()) {
+          setPoints(other.getPoints());
+        }
+        if (other.hasFollowers()) {
+          setFollowers(other.getFollowers());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -2347,6 +2525,146 @@ public final class EventMessage {
         return this;
       }
 
+      // optional string target = 20;
+      private java.lang.Object target_ = "";
+      /**
+       * <code>optional string target = 20;</code>
+       */
+      public boolean hasTarget() {
+        return ((bitField0_ & 0x00080000) == 0x00080000);
+      }
+      /**
+       * <code>optional string target = 20;</code>
+       */
+      public java.lang.String getTarget() {
+        java.lang.Object ref = target_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          target_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string target = 20;</code>
+       */
+      public com.google.protobuf.ByteString
+          getTargetBytes() {
+        java.lang.Object ref = target_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          target_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string target = 20;</code>
+       */
+      public Builder setTarget(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00080000;
+        target_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string target = 20;</code>
+       */
+      public Builder clearTarget() {
+        bitField0_ = (bitField0_ & ~0x00080000);
+        target_ = getDefaultInstance().getTarget();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string target = 20;</code>
+       */
+      public Builder setTargetBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00080000;
+        target_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional int32 points = 21;
+      private int points_ ;
+      /**
+       * <code>optional int32 points = 21;</code>
+       */
+      public boolean hasPoints() {
+        return ((bitField0_ & 0x00100000) == 0x00100000);
+      }
+      /**
+       * <code>optional int32 points = 21;</code>
+       */
+      public int getPoints() {
+        return points_;
+      }
+      /**
+       * <code>optional int32 points = 21;</code>
+       */
+      public Builder setPoints(int value) {
+        bitField0_ |= 0x00100000;
+        points_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 points = 21;</code>
+       */
+      public Builder clearPoints() {
+        bitField0_ = (bitField0_ & ~0x00100000);
+        points_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional int32 followers = 22;
+      private int followers_ ;
+      /**
+       * <code>optional int32 followers = 22;</code>
+       */
+      public boolean hasFollowers() {
+        return ((bitField0_ & 0x00200000) == 0x00200000);
+      }
+      /**
+       * <code>optional int32 followers = 22;</code>
+       */
+      public int getFollowers() {
+        return followers_;
+      }
+      /**
+       * <code>optional int32 followers = 22;</code>
+       */
+      public Builder setFollowers(int value) {
+        bitField0_ |= 0x00200000;
+        followers_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 followers = 22;</code>
+       */
+      public Builder clearFollowers() {
+        bitField0_ = (bitField0_ & ~0x00200000);
+        followers_ = 0;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:edu.carleton.comp4905.carcassonne.common.Event)
     }
 
@@ -2373,7 +2691,7 @@ public final class EventMessage {
   static {
     java.lang.String[] descriptorData = {
       "\n\013event.proto\022(edu.carleton.comp4905.car" +
-      "cassonne.common\"\323\002\n\005Event\022\021\n\teventType\030\001" +
+      "cassonne.common\"\206\003\n\005Event\022\021\n\teventType\030\001" +
       " \002(\005\022\022\n\nplayerName\030\002 \002(\t\022\022\n\nconnection\030\003" +
       " \001(\014\022\017\n\007address\030\004 \001(\t\022\014\n\004port\030\005 \001(\005\022\024\n\014n" +
       "umOfPlayers\030\006 \001(\005\022\017\n\007success\030\007 \001(\010\022\017\n\007me" +
@@ -2381,8 +2699,9 @@ public final class EventMessage {
       " \003(\t\022\020\n\010finished\030\013 \001(\010\022\026\n\016gameInProgress" +
       "\030\014 \001(\010\022\014\n\004tile\030\r \001(\t\022\013\n\003row\030\016 \001(\005\022\016\n\006col" +
       "umn\030\017 \001(\005\022\020\n\010rotation\030\020 \001(\005\022\016\n\006meeple\030\021 " +
-      "\001(\005\022\020\n\010position\030\022 \001(\005\022\016\n\006shield\030\023 \001(\010B\016B",
-      "\014EventMessage"
+      "\001(\005\022\020\n\010position\030\022 \001(\005\022\016\n\006shield\030\023 \001(\010\022\016\n",
+      "\006target\030\024 \001(\t\022\016\n\006points\030\025 \001(\005\022\021\n\tfollowe" +
+      "rs\030\026 \001(\005B\016B\014EventMessage"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2394,7 +2713,7 @@ public final class EventMessage {
           internal_static_edu_carleton_comp4905_carcassonne_common_Event_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_edu_carleton_comp4905_carcassonne_common_Event_descriptor,
-              new java.lang.String[] { "EventType", "PlayerName", "Connection", "Address", "Port", "NumOfPlayers", "Success", "Message", "Statuses", "Names", "Finished", "GameInProgress", "Tile", "Row", "Column", "Rotation", "Meeple", "Position", "Shield", });
+              new java.lang.String[] { "EventType", "PlayerName", "Connection", "Address", "Port", "NumOfPlayers", "Success", "Message", "Statuses", "Names", "Finished", "GameInProgress", "Tile", "Row", "Column", "Rotation", "Meeple", "Position", "Shield", "Target", "Points", "Followers", });
           return null;
         }
       };

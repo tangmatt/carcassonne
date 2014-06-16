@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.controlsfx.control.PopOver;
 
+import edu.carleton.comp4905.carcassonne.common.TileManager;
 import javafx.scene.image.ImageView;
 
 public class GameData {

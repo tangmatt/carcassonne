@@ -1,5 +1,6 @@
 package edu.carleton.comp4905.carcassonne.client;
 
+
 public class TilePreview extends AbstractTile {
 	public static final String defaultStyle = "-fx-border-color: #3B3B3B;"
             + "-fx-border-width: 1;"

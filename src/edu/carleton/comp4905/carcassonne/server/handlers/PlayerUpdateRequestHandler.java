@@ -6,28 +6,21 @@ import edu.carleton.comp4905.carcassonne.common.Address;
 import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventHandler;
-import edu.carleton.comp4905.carcassonne.common.EventType;
-import edu.carleton.comp4905.carcassonne.common.MessageType;
 import edu.carleton.comp4905.carcassonne.server.Server;
 import edu.carleton.comp4905.carcassonne.server.ServerController;
 
-public class StartRequestHandler implements EventHandler {
+public class PlayerUpdateRequestHandler implements EventHandler {
 	@Override
 	public void handleEvent(final Event event) {
 		Connection connection = (Connection)event.getProperty("connection");
+		String address = (String)event.getProperty("address");
+		Integer port = (Integer)event.getProperty("port");
+		String portAsString = port.toString();
 		Server server = (Server)connection.getService();
 		ServerController controller = server.getController();
 		ConcurrentMap<Address, Connection> connections = server.getConnections();
 		
-		server.gameInProgress(true);
-		controller.addMessageEntry(MessageType.INFO, "Player '" + event.getPlayerName() + "' has started the game (with " + connections.size() + " players)");
-		Boolean[] statuses = controller.getStatuses(connections);
-		String[] names = controller.getPlayerNames();
 		
-		// send reply back to connected clients
-		Event startReply = new Event(EventType.START_REPLY, event.getPlayerName());
-		startReply.addProperty("names", names);
-		startReply.addProperty("statuses", statuses);
-		connection.broadcastEvent(startReply, connections);
+		//controller.addPlayerScore(name, points);
 	}
 }
