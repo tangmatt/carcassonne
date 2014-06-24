@@ -17,7 +17,7 @@ public class SendTileReplyHandler implements EventHandler {
 		GameController gameController = game.getGameController();
 		TileManager tileManager = TileManager.getInstance();
 		
-		String player = (String)event.getPlayerName();
+		String player = event.getPlayerName();
 		String tile = (String)event.getProperty("tile");
 		int row = (int)event.getProperty("row");
 		int column = (int)event.getProperty("column");
@@ -38,6 +38,5 @@ public class SendTileReplyHandler implements EventHandler {
 		gameController.addTile(container);
 		gameController.updateFollowers();
 		gameController.updateGameBoard();
-		gameController.firePreviewTileEvent(true);
 	}
 }

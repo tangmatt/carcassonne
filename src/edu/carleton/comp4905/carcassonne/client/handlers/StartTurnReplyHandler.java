@@ -12,7 +12,16 @@ public class StartTurnReplyHandler implements EventHandler {
 		Connection connection = (Connection)event.getProperty("connection");
 		Game game = (Game)connection.getService();
 		GameController gameController = game.getGameController();
+		
+		String player = event.getPlayerName();
+		String target = (String)event.getProperty("target");
 		String tile = (String)event.getProperty("tile");
-		gameController.startTurn(tile);
+		int targetIndex = (int)event.getProperty("targetIndex");
+		Boolean[] statusesObj = (Boolean[])event.getProperty("statuses");
+		boolean[] statuses = new boolean[statusesObj.length];
+		for(int i=0; i<statusesObj.length; ++i)
+			statuses[i] = statusesObj[i].booleanValue();
+		
+		gameController.handleStartTurn(player, tile, target, targetIndex, statuses.length);
 	}
 }

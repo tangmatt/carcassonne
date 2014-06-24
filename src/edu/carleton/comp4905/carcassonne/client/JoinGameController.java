@@ -4,7 +4,6 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import edu.carleton.comp4905.carcassonne.common.Address;
-import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -20,14 +19,7 @@ public class JoinGameController extends InputController implements Initializable
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
-		joinButton.setText(LocalMessages.getString("Join"));
-		hostButton.setText(LocalMessages.getString("Host"));
-		submitButton.setText(LocalMessages.getString("ConnectButton"));
-		title.setText(LocalMessages.getString("GameTitle"));
-		sceneDesc.setText(LocalMessages.getString("ConnectFormDesc"));
-		usernameLabel.setText(LocalMessages.getString("Username"));
-		servAddrLabel.setText(LocalMessages.getString("ServerAddr"));
-		servPortLabel.setText(LocalMessages.getString("ServerPort"));
+		// do nothing
 	}
 	
 	@FXML

@@ -1,5 +1,6 @@
 package edu.carleton.comp4905.carcassonne.server.handlers;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 
 import edu.carleton.comp4905.carcassonne.common.Address;
@@ -23,7 +24,9 @@ public class QuitRequestHandler implements EventHandler {
 		Server server = (Server)connection.getService();
 		ServerController controller = server.getController();
 		ConcurrentMap<Address, Connection> connections = server.getConnections();
+		List<String> players = server.getPlayers();
 		
+		players.remove(event.getPlayerName());
 		controller.removeConnection(connections, address, port);
 		if(!controller.updatePlayer(event.getPlayerName(), address, portAsString, Status.DISCONNECTED))
 			return;

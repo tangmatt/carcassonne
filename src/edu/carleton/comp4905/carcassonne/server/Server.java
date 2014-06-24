@@ -2,6 +2,8 @@ package edu.carleton.comp4905.carcassonne.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -11,6 +13,7 @@ import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.DefaultAcceptor;
 import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.MessageType;
+import edu.carleton.comp4905.carcassonne.common.Mode;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
 import edu.carleton.comp4905.carcassonne.common.ProtoAcceptor;
 import edu.carleton.comp4905.carcassonne.common.Serializer;
@@ -23,6 +26,8 @@ public class Server extends Service implements Runnable {
 	private ServerController controller;
 	private boolean running;
 	private boolean gameInProgress;
+	private final List<String> players;
+	private int turn;
 	
 	public static int PORT = 5000;
 	
@@ -36,6 +41,8 @@ public class Server extends Service implements Runnable {
 		connections = new ConcurrentHashMap<Address, Connection>();
 		running = false;
 		gameInProgress = false;
+		turn = (mode == Mode.SYNC) ? 0 : -1;
+		players = new ArrayList<String>();
 	}
 	
 	/**
@@ -60,6 +67,14 @@ public class Server extends Service implements Runnable {
 	 */
 	public ServerController getController() {
 		return controller;
+	}
+	
+	/**
+	 * Returns the current turn index.
+	 * @return the turn index
+	 */
+	public int getTurn() {
+		return turn;
 	}
 	
 	/**
@@ -115,6 +130,31 @@ public class Server extends Service implements Runnable {
 	 */
 	public boolean isGameInProgress() {
 		return gameInProgress;
+	}
+	
+	/**
+	 * Returns the list of player order.
+	 * @return the list of players
+	 */
+	public List<String> getPlayers() {
+		return players;
+	}
+	
+	/**
+	 * Returns the current player's name.
+	 * @return the player name
+	 */
+	public String getCurrentPlayer() {
+		if(turn < 0)
+			return null;
+		return players.get(turn);
+	}
+	
+	/**
+	 * Increments the turn counter.
+	 */
+	public void setNextPlayer() {
+		turn = (turn + 1) % players.size();
 	}
 	
 	@Override

@@ -2,6 +2,7 @@ package edu.carleton.comp4905.carcassonne.client;
 
 import java.net.URL;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -14,6 +15,7 @@ import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventType;
 import edu.carleton.comp4905.carcassonne.common.LocalMessages;
+import edu.carleton.comp4905.carcassonne.common.Mode;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
 import edu.carleton.comp4905.carcassonne.common.Position;
 import edu.carleton.comp4905.carcassonne.common.ResourceManager;
@@ -59,9 +61,9 @@ public class GameController implements Initializable {
 		gameData.addPlayerViews(playerViews, createPopOver());
 		gameData.addFollowerViews(followerViews);
 		
-		setPreviewTiles(tileManager.getEmptyTile()); // initializes the preview tiles to be empty
 		createGameBoard();
 		createLobby();
+		removePreviewTiles();
 	}
 	
 	/**
@@ -81,15 +83,31 @@ public class GameController implements Initializable {
 	/**
 	 * Places tiles onto the tile preview displays.
 	 * @param tile a GameTile
+	 * @param clickFirstTile a boolean to mouse press on first tile
 	 */
-	public synchronized void setPreviewTiles(final GameTile tile) {
+	public synchronized void setPreviewTiles(final GameTile tile, final boolean clickFirstTile) {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
 				setRotatedPreviews(tile);
 				if(previewPane.getChildren().isEmpty())
 					previewPane.getChildren().addAll(gameData.getPreviews());
-				firePreviewTileEvent(false);
+				if(clickFirstTile)
+					firePreviewTileEvent(false);
+			}
+		});
+	}
+	
+	/**
+	 * Removes the preview tiles.
+	 */
+	public synchronized void removePreviewTiles() {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				stopInteraction(true);
+				setPreviewTiles(tileManager.getEmptyTile(), false);
+				clearBoard();
 			}
 		});
 	}
@@ -268,8 +286,13 @@ public class GameController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				setPreviewTiles(tileManager.getTile(tile));
-				stopInteraction(false);
+				try {
+					setPreviewTiles(tileManager.getTile(tile), true);
+					stopInteraction(false);
+					//firePreviewTileEvent(true); // TODO check this in ASYNC mode
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
 			}
 		});
 	}
@@ -278,6 +301,20 @@ public class GameController implements Initializable {
 	 * Handles the end of the turn for current client.
 	 */
 	public synchronized void endTurn() {
+		sendEndTurnRequest();
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				clearBoard();
+				stopInteraction(true);
+			}
+		});
+	}
+	
+	/**
+	 * Clears the board such as the preview tiles and the board.
+	 */
+	private void clearBoard() {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -289,8 +326,6 @@ public class GameController implements Initializable {
 						gameData.getTile(r, c).removeMouseListener();
 					}
 				}
-				sendEndTurnRequest();
-				stopInteraction(true);
 			}
 		});
 	}
@@ -300,8 +335,13 @@ public class GameController implements Initializable {
 	 * @param state the state
 	 */
 	public synchronized void stopInteraction(final boolean state) {
-		previewPane.setDisable(state);
-		gridPane.setDisable(state);
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				previewPane.setDisable(state);
+				gridPane.setDisable(state);
+			}
+		});
 	}
 	
 	/**
@@ -343,8 +383,13 @@ public class GameController implements Initializable {
 	 * Refreshes the preview tiles.
 	 */
 	public synchronized void refreshPreviews() {
-		for(TilePreview preview : gameData.getPreviews())
-			preview.setSelected(false);
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				for(TilePreview preview : gameData.getPreviews())
+				preview.setSelected(false);
+			}
+		});
 	}
 	
 	/**
@@ -379,10 +424,14 @@ public class GameController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				if(keepState)
-					javafx.event.Event.fireEvent(gameData.getSelectedPreviewTile(), mousePressEvent);
-				else
-					javafx.event.Event.fireEvent(gameData.getPreviews()[0], mousePressEvent);
+				try {
+					if(keepState)
+						javafx.event.Event.fireEvent(gameData.getSelectedPreviewTile(), mousePressEvent);
+					else
+						javafx.event.Event.fireEvent(gameData.getPreviews()[0], mousePressEvent);
+				} catch(Exception e) {
+					// do nothing
+				}
 			}
 		});
 	}
@@ -423,6 +472,28 @@ public class GameController implements Initializable {
 				blurGame(true);
 				lobbyDialog.show();
 			}		
+		});
+	}
+	
+	/**
+	 * Shows the current player's turn on the player panel.
+	 * @param index the player index
+	 * @param numOfPlayers the number of players
+	 */
+	public synchronized void showCurrentPlayerTurn(final int index, final int numOfPlayers) {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				Map<ImageView, PopOver> map = gameData.getPlayerViews();
+				Iterator<ImageView> it = map.keySet().iterator();
+				int i = 0;
+				while(it.hasNext()) {
+					ImageView view = it.next();
+					if(i >= numOfPlayers)
+						break;
+					view.setImage(ResourceManager.getImageFromResources((i++ == index) ? "current.png" : "joined.png"));
+				}
+			}
 		});
 	}
 	
@@ -641,19 +712,51 @@ public class GameController implements Initializable {
 	}
 	
 	/**
-	 * Clear the preview tiles and replace with empty tiles.
+	 * Handles the start of a turn.
+	 * @param playerName the player name
+	 * @param targetIndex the target index
+	 * @param numOfPlayers the number of players
+	 * @param tile the tile name
 	 */
-	public synchronized void clearPreviews() {
-		PlatformManager.run(new Runnable() {
-			@Override
-			public void run() {
-				for(TilePreview preview : gameData.getPreviews()) {
-					preview.setSelected(false);
-					preview.removeMouseListener();
-					preview.addTile(tileManager.getEmptyTile());
-				}
-			}
-		});
+	public synchronized void handleStartTurn(final String playerName, final String tile, final String targetName, final int targetIndex, final int numOfPlayers) {
+		// return if there is no tile
+		if(tile == null)
+			return;
+		
+		if(client.getGame().getMode() == Mode.SYNC) {
+			showCurrentPlayerTurn(targetIndex, numOfPlayers);
+			if(client.getGame().getPlayerName().equalsIgnoreCase(targetName))
+				startTurn(tile);
+		} else if(client.getGame().getMode() == Mode.ASYNC) {
+			if(client.getGame().getPlayerName().equalsIgnoreCase(playerName))
+				startTurn(tile);
+			else
+				firePreviewTileEvent(true);
+		}
+	}
+	
+	/**
+	 * Handles the end of a turn.
+	 * @param success true if deck is not empty
+	 * @param playerName the player name
+	 * @param targetName the target name
+	 */
+	public synchronized void handleEndTurn(final boolean success, final String playerName, final String targetName) {
+		if(client.getGame().getPlayerName().equalsIgnoreCase(playerName))
+			removePreviewTiles();
+		
+		if(!success) {
+			sendEndGameRequest();
+			return;
+		}
+		
+		if(client.getGame().getMode() == Mode.SYNC) {
+			if(success && client.getGame().getPlayerName().equalsIgnoreCase(targetName))
+				sendTurnRequest();
+		} else if(client.getGame().getMode() == Mode.ASYNC) {
+			if(success && client.getGame().getPlayerName().equalsIgnoreCase(playerName))
+				sendTurnRequest();
+		}
 	}
 	
 	/**
@@ -668,6 +771,15 @@ public class GameController implements Initializable {
 				rootPane.setDisable(state);
 			}
 		});
+	}
+	
+	/**
+	 * Returns true if the specified player name is the client's player name.
+	 * @param player the player name
+	 * @return a boolean
+	 */
+	public synchronized boolean isPlayerTurn(final String player) {
+		return client.getGame().getMode() == Mode.ASYNC || player.equalsIgnoreCase(client.getGame().getPlayerName());
 	}
 	
 	/**

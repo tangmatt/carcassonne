@@ -14,6 +14,7 @@ public class StartReplyHandler implements EventHandler {
 		Game game = (Game)connection.getService();
 		GameController gameController = game.getGameController();
 		LobbyController lobbyController = gameController.getLobbyController();
+		String target = (String)event.getProperty("target");
 		String[] names = (String[])event.getProperty("names");
 		Boolean[] statusesObj = (Boolean[])event.getProperty("statuses");
 		boolean[] statuses = new boolean[statusesObj.length];
@@ -31,6 +32,8 @@ public class StartReplyHandler implements EventHandler {
 		lobbyController.close();
 		gameController.updatePlayerPanel(names, statuses);
 		gameController.updateFollowerPanel();
-		gameController.sendTurnRequest();
+		
+		if(gameController.isPlayerTurn(target))
+			gameController.sendTurnRequest();
 	}
 }

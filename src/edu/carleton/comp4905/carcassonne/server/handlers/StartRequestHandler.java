@@ -25,9 +25,10 @@ public class StartRequestHandler implements EventHandler {
 		String[] names = controller.getPlayerNames();
 		
 		// send reply back to connected clients
-		Event startReply = new Event(EventType.START_REPLY, event.getPlayerName());
-		startReply.addProperty("names", names);
-		startReply.addProperty("statuses", statuses);
-		connection.broadcastEvent(startReply, connections);
+		Event reply = new Event(EventType.START_REPLY, event.getPlayerName());
+		reply.addProperty("names", names);
+		reply.addProperty("statuses", statuses);
+		reply.addProperty("target", server.getCurrentPlayer());
+		connection.broadcastEvent(reply, connections);
 	}
 }

@@ -82,6 +82,22 @@ public abstract class Service {
 	}
 	
 	/**
+	 * Returns the gameplay mode.
+	 * @return the mode
+	 */
+	public Mode getMode() {
+		return mode;
+	}
+	
+	/**
+	 * Returns the serializer method.
+	 * @return the serializer
+	 */
+	public Serializer getSerializer() {
+		return serializer;
+	}
+	
+	/**
 	 * Shuts down the service.
 	 */
 	public void shutdown() {

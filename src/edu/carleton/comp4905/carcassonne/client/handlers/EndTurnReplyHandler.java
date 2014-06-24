@@ -12,11 +12,11 @@ public class EndTurnReplyHandler implements EventHandler {
 		Connection connection = (Connection)event.getProperty("connection");
 		Game game = (Game)connection.getService();
 		GameController gameController = game.getGameController();
+		
+		String player = event.getPlayerName();
 		boolean success = (boolean)event.getProperty("success");
+		String target = (String)event.getProperty("target");
 
-		if(success)
-			gameController.sendTurnRequest();
-		else
-			gameController.sendEndGameRequest();
+		gameController.handleEndTurn(success, player, target);
 	}
 }

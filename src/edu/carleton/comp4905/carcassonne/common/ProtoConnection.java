@@ -103,6 +103,8 @@ public class ProtoConnection extends Connection {
 			event.addProperty("target", eventMessage.getTarget());
 		if(eventMessage.hasPoints())
 			event.addProperty("points", eventMessage.getPoints());
+		if(eventMessage.hasTargetIndex())
+			event.addProperty("targetIndex", eventMessage.getTargetIndex());
 		
 		return event;
 	}
@@ -155,6 +157,8 @@ public class ProtoConnection extends Connection {
 			builder.setTarget((String)event.getProperty("target"));
 		if(event.getProperty("points") != null)
 			builder.setPoints((int)event.getProperty("points"));
+		if(event.getProperty("targetIndex") != null)
+			builder.setTargetIndex((int)event.getProperty("targetIndex"));
 		
 		return builder.build();
 	}

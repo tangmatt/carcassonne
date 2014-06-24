@@ -85,7 +85,7 @@ public class ServerController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				playerData.add(new Player.PlayerBuilder(name, address, port, Status.CONNECTED).build());
+				playerData.add(new Player.PlayerBuilder(name, address, port, Status.CONNECTED, false).build());
 			}
 		});
 	}
@@ -99,7 +99,7 @@ public class ServerController implements Initializable {
 	 * @return boolean
 	 */
 	public synchronized boolean updatePlayer(final String name, final String address, final String port, final Status status) {
-		Player temp = new Player.PlayerBuilder(name, address, port, status).build();
+		Player temp = new Player.PlayerBuilder(name, address, port, status, false).build();
 		int index = 0;
 		Iterator<Player> it = playerData.iterator();
 		while(it.hasNext()) { // replace matching player with updated status
@@ -124,7 +124,7 @@ public class ServerController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				Player temp = new Player.PlayerBuilder(name, address, port, status).build();
+				Player temp = new Player.PlayerBuilder(name, address, port, status, false).build();
 				Iterator<Player> it = playerData.iterator();
 				while(it.hasNext()) {
 					Player p = it.next();
@@ -216,6 +216,32 @@ public class ServerController implements Initializable {
 			list[index++] = player.getName();
 		}
 		return list;
+	}
+	
+	/**
+	 * Updates whether the player has a tile in their hand.
+	 * @param playerName the player name
+	 * @param hasTile true if player has tile
+	 */
+	public synchronized void updatePlayerHand(final String playerName, final boolean hasTile) {
+		for(Player player : playerData) {
+			if(player.getName().equals(playerName)) {
+				player.setHasTile(hasTile);
+				break;
+			}
+		}
+	}
+	
+	/**
+	 * Returns true if all players have no tile at hand.
+	 * @return true if all players have no tile at hand
+	 */
+	public synchronized boolean allPlayersHaveNoTile() {
+		for(Player player : playerData) {
+			if(player.isConnected() && player.hasTile())
+				return false;
+		}
+		return true;
 	}
 	
 	/**

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.carleton.comp4905.carcassonne.common.FXMLManager;
+import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -38,6 +39,7 @@ public class ScreensController extends StackPane {
 	public boolean loadScreen(final String name, final String resource) {
 		try {
 			FXMLLoader fxmlLoader = FXMLManager.getFXML(getClass(), resource);
+			fxmlLoader.setResources(LocalMessages.RES_BUNDLE);
 			Parent loadScreen = (Parent)fxmlLoader.load();
 			Object controller = fxmlLoader.getController();
 			if(controller instanceof JoinGameController)

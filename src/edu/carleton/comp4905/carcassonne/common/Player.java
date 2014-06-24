@@ -9,14 +9,16 @@ public class Player {
 	private final String address;
 	private final String port;
 	private int score;
-	private Status status;
+	private final Status status;
+	private boolean hasTile;
 	
 	public Player(final PlayerBuilder builder) {
 		name = builder.name;
 		address = builder.address;
 		port = builder.port;
 		status = builder.status;
-		score = 0;
+		score = builder.score;
+		hasTile = builder.hasTile;
 	}
 	
 	/**
@@ -44,19 +46,11 @@ public class Player {
 	}
 	
 	/**
-	 * Returns the name of the status/
+	 * Returns the name of the status.
 	 * @return a String
 	 */
 	public String getStatus() {
 		return status.name();
-	}
-	
-	/**
-	 * Sets the status to specified status.
-	 * @param status a Status
-	 */
-	public void setStatus(final Status status) {
-		this.status = status;
 	}
 	
 	/**
@@ -84,6 +78,22 @@ public class Player {
 	}
 	
 	/**
+	 * Sets the flag indicating the player has a tile.
+	 * @param hasTile a boolean
+	 */
+	public void setHasTile(final boolean hasTile) {
+		this.hasTile = hasTile;
+	}
+	
+	/**
+	 * Returns true if the player has a tile.
+	 * @return a boolean
+	 */
+	public boolean hasTile() {
+		return hasTile;
+	}
+	
+	/**
 	 * Returns true if the player name, address and port is the same as the Player object given associatively.
 	 * @param p a Player
 	 * @return a boolean
@@ -99,12 +109,20 @@ public class Player {
 		private final String address;
 		private final String port;
 		private final Status status;
+		private int score;
+		private final boolean hasTile;
 		
-		public PlayerBuilder(final String name, final String address, final String port, final Status status) {
+		public PlayerBuilder(final String name, final String address, final String port, final Status status, final boolean hasTile) {
 			this.name = name;
 			this.address = address;
 			this.port = port;
 			this.status = status;
+			this.hasTile = hasTile;
+		}
+		
+		public PlayerBuilder score(final int score) {
+			this.score = score;
+			return this;
 		}
 		
 		@Override

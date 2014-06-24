@@ -1,5 +1,6 @@
 package edu.carleton.comp4905.carcassonne.server.handlers;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 
 import edu.carleton.comp4905.carcassonne.common.Address;
@@ -21,6 +22,7 @@ public class JoinRequestHandler implements EventHandler {
 		Server server = (Server)connection.getService();
 		ServerController controller = server.getController();
 		ConcurrentMap<Address, Connection> connections = server.getConnections();
+		List<String> players = server.getPlayers();
 
 		// send reply back to sending client if game is in progress or player name already taken
 		if(server.isGameInProgress()) {
@@ -46,6 +48,7 @@ public class JoinRequestHandler implements EventHandler {
 			return;
 		}
 		
+		players.add(event.getPlayerName());
 		connections.put(new Address(address, port), connection);
 		controller.connectPlayer(event.getPlayerName(), address, portAsString);
 		controller.addMessageEntry(MessageType.INFO, "Player '" + event.getPlayerName() + "' has joined the lobby");

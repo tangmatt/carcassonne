@@ -8,8 +8,8 @@ public class LocalMessages {
 		// prevent instantiation
 	}
 	
-	private static final String BUNDLE_NAME = "edu.carleton.comp4905.carcassonne.common.localmessages";
-	private static ResourceBundle RES_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+	public static final String BUNDLE_NAME = "edu.carleton.comp4905.carcassonne.common.localmessages";
+	public static ResourceBundle RES_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 	
 	public static void setLocale(final Locale locale) {
 		RES_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, locale);

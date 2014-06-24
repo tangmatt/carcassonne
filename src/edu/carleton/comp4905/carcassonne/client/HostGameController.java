@@ -5,7 +5,6 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ResourceBundle;
 
-import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.server.ServerClient;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -22,15 +21,6 @@ public class HostGameController extends InputController implements Initializable
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
-		joinButton.setText(LocalMessages.getString("Join"));
-		hostButton.setText(LocalMessages.getString("Host"));
-		submitButton.setText(LocalMessages.getString("HostButton"));
-		title.setText(LocalMessages.getString("GameTitle"));
-		sceneDesc.setText(LocalMessages.getString("HostFormDesc"));
-		usernameLabel.setText(LocalMessages.getString("Username"));
-		servAddrLabel.setText(LocalMessages.getString("ServerAddr"));
-		servPortLabel.setText(LocalMessages.getString("ServerPort"));
-		
 		try {
 			InetAddress inetAddress = InetAddress.getLocalHost();
 			servAddrField.setText(inetAddress.getHostAddress());
