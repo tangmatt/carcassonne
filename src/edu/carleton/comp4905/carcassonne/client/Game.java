@@ -14,6 +14,7 @@ import edu.carleton.comp4905.carcassonne.common.PlatformManager;
 import edu.carleton.comp4905.carcassonne.common.ProtoConnector;
 import edu.carleton.comp4905.carcassonne.common.Serializer;
 import edu.carleton.comp4905.carcassonne.common.Service;
+import edu.carleton.comp4905.carcassonne.common.TileManager;
 
 public class Game extends Service implements Runnable {
 	private final String playerName;
@@ -36,9 +37,11 @@ public class Game extends Service implements Runnable {
 	@Override
 	public void run() {
 		try {
+			Event event = new Event(EventType.JOIN_REQUEST, playerName);
+			event.addProperty("checksum", TileManager.getInstance().checksum());
 			connection = connector.connect(address.getHostname(), address.getPort());
 			pool.execute(connection);
-			connection.sendEvent(new Event(EventType.JOIN_REQUEST, playerName));
+			connection.sendEvent(event);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

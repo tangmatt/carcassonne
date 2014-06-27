@@ -26,4 +26,9 @@ message Event {
 	optional int32 points = 21;
 	optional int32 followers = 22;
 	optional int32 targetIndex = 23;
+	optional int32 mode = 24;
+	optional string checksum = 25;
+	optional int32 tilesLeft = 26;
+	optional int32 rows = 27;
+	optional int32 columns = 28;
 }

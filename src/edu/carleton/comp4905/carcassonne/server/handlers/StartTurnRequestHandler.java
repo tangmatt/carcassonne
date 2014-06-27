@@ -38,6 +38,7 @@ public class StartTurnRequestHandler implements EventHandler {
 		reply.addProperty("target", server.getCurrentPlayer());
 		reply.addProperty("targetIndex", server.getTurn());
 		reply.addProperty("statuses", statuses);
+		reply.addProperty("tilesLeft", controller.getDeck().size());
 		connection.broadcastEvent(reply, connections);
 	}
 }

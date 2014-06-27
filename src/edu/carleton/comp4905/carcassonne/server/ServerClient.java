@@ -2,6 +2,7 @@ package edu.carleton.comp4905.carcassonne.server;
 
 import edu.carleton.comp4905.carcassonne.common.FXMLManager;
 import edu.carleton.comp4905.carcassonne.common.LocalMessages;
+import edu.carleton.comp4905.carcassonne.common.Mode;
 import edu.carleton.comp4905.carcassonne.common.ResourceManager;
 import javafx.application.Application;
 import javafx.event.EventHandler;
@@ -21,8 +22,8 @@ public class ServerClient extends Application {
 		this.server = new Server();
 	}
 	
-	public ServerClient(final int port) {
-		this.server = new Server(port);
+	public ServerClient(final int port, final Mode mode) {
+		this.server = new Server(port, mode);
 	}
 	
 	@Override

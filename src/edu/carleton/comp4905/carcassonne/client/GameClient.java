@@ -6,7 +6,6 @@ import edu.carleton.comp4905.carcassonne.common.EventType;
 import edu.carleton.comp4905.carcassonne.common.FXMLManager;
 import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.ResourceManager;
-
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;

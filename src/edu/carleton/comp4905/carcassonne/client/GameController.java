@@ -1,6 +1,10 @@
 package edu.carleton.comp4905.carcassonne.client;
 
 import java.net.URL;
+import java.text.ChoiceFormat;
+import java.text.Format;
+import java.text.MessageFormat;
+import java.text.NumberFormat;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -39,6 +43,7 @@ public class GameController implements Initializable {
 	@FXML private GridPane gridPane;
 	@FXML private HBox previewPane;
 	@FXML private Button endTurnButton;
+	@FXML private Label deckLabel;
 	@FXML private ImageView player1, player2, player3, player4, player5;
 	@FXML private ImageView meeple1, meeple2, meeple3, meeple4, meeple5, meeple6, meeple7; // meeple = follower
 	private TileManager tileManager;
@@ -134,6 +139,31 @@ public class GameController implements Initializable {
 	 * Manages the empty tile adjacent to an existing tile if there is a match.
 	 */
 	private synchronized void showHint(final TilePreview preview, final TileContainer currTile, final int r, final int c) {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				if(isValidTilePlacement(preview, currTile, r, c) == 1) {
+					TileContainer selected = gameData.getTile(r, c);
+					selected.setSelected(true);
+					selected.setHoverTile(true);
+					selected.addMouseListener(GameController.this,
+							new TileContainerHandler(GameController.this, r, c),
+							new TileHoverHandler(GameController.this),
+							new TileExitHandler());
+				}
+			}
+		});
+	}
+	
+	/**
+	 * Returns a "1" if the specified location is a valid placement.
+	 * @param preview the preview tile
+	 * @param currTile the current tile
+	 * @param r the row
+	 * @param c the column
+	 * @return a 1 if the specified location is a valid placement
+	 */
+	private int isValidTilePlacement(final TilePreview preview, final TileContainer currTile, final int r, final int c) {
 		int tileMatches = 0, tileCount = 0;
 		
 		if(currTile.isEmpty()) {
@@ -144,7 +174,7 @@ public class GameController implements Initializable {
 			tileCount += isPlayableTile(r, c+1);
 			
 			if(tileCount == 0) // return if there are only empty tiles around the current tile
-				return; 
+				return 0;
 			
 			if(matchesTopSegment(preview, r, c))
 				tileMatches++;
@@ -156,15 +186,28 @@ public class GameController implements Initializable {
 				tileMatches++;
 			
 			if(tileMatches == tileCount) { // current tile must be matching with all the placed surrounding tiles
-				TileContainer selected = gameData.getTile(r, c);
-				selected.setSelected(true);
-				selected.setHoverTile(true);
-				selected.addMouseListener(this,
-						new TileContainerHandler(this, r, c),
-						new TileHoverHandler(this),
-						new TileExitHandler());
+				return 1;
 			}
 		}
+		
+		return 0;
+	}
+	
+	/**
+	 * Returns true if the preview tiles cannot be placed
+	 * @return a boolean
+	 */
+	public synchronized boolean isDiscardable() {
+		TilePreview[] previews = gameData.getPreviews();
+		int sum = 0;
+		for(int i=0; i<previews.length; ++i) {
+			for(int c=0; c<GameData.COLS; ++c) {
+				for(int r=0; r<GameData.ROWS; ++r) {
+					sum += isValidTilePlacement(previews[i], gameData.getTile(r, c), r, c);
+				}
+			}
+		}
+		return sum == 0;
 	}
 	
 	/**
@@ -289,7 +332,8 @@ public class GameController implements Initializable {
 				try {
 					setPreviewTiles(tileManager.getTile(tile), true);
 					stopInteraction(false);
-					//firePreviewTileEvent(true); // TODO check this in ASYNC mode
+					if(isDiscardable())
+						sendTurnRequest();
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
@@ -506,16 +550,20 @@ public class GameController implements Initializable {
 			public void run() {
 				for(int c=0; c<GameData.COLS; ++c) {
 					for(int r=0; r<GameData.ROWS; ++r) {
-						TileContainer container;
-						if(r == GameData.CENTER_ROW && c == GameData.CENTER_COL)
-							container = new TileContainer(tileManager.getStarterTile(), r, c);
-						else
-							container = new TileContainer(tileManager.getEmptyTile(), r, c);
-						addTile(container);
+						addTile(new TileContainer(tileManager.getEmptyTile(), r, c));
 					}
 				}
 			}
 		});
+	}
+	
+	/**
+	 * Adds the starting tile to the specified coordinates.
+	 * @param row the row
+	 * @param column the column
+	 */
+	public synchronized void addStartingTile(final int row, final int column) {
+		addTile(new TileContainer(tileManager.getStarterTile(), row, column));
 	}
 	
 	/**
@@ -625,7 +673,7 @@ public class GameController implements Initializable {
 				updateConnectedSegments(temp, temp.getBottomSegment(), Position.BOTTOM, name, traversed);
 			}
 		}
-		if(r+1 < 9) {
+		if(r+1 < GameData.ROWS) {
 			TileContainer temp = gameData.getTile(r+1, c);
 			if(segment == temp.getTopSegment() && !traversed.contains(temp)
 					&& (temp.getTile().getFollowerOwner(Position.TOP) == null || temp.getTile().getFollowerOwner(Position.TOP).isEmpty()
@@ -645,7 +693,7 @@ public class GameController implements Initializable {
 				updateConnectedSegments(temp, temp.getRightSegment(), Position.RIGHT, name, traversed);
 			}
 		}
-		if(c+1 < 9) {
+		if(c+1 < GameData.COLS) {
 			TileContainer temp = gameData.getTile(r, c+1);
 			if(segment == temp.getLeftSegment() && !traversed.contains(temp)
 					&& (temp.getTile().getFollowerOwner(Position.LEFT) == null || temp.getTile().getFollowerOwner(Position.LEFT).isEmpty()
@@ -680,11 +728,11 @@ public class GameController implements Initializable {
 					int count = 0;
 					if(r-1 >= 0 && !gameData.getTile(r-1, c).isHoverTile() && !gameData.getTile(r-1, c).isEmpty())
 						count++;
-					if(r+1 < 9 && !gameData.getTile(r+1, c).isHoverTile() && !gameData.getTile(r+1, c).isEmpty())
+					if(r+1 < GameData.ROWS && !gameData.getTile(r+1, c).isHoverTile() && !gameData.getTile(r+1, c).isEmpty())
 						count++;
 					if(c-1 >= 0 && !gameData.getTile(r, c-1).isHoverTile() && !gameData.getTile(r, c-1).isEmpty())
 						count++;
-					if(c+1 < 9 && !gameData.getTile(r, c+1).isHoverTile() && !gameData.getTile(r, c+1).isEmpty())
+					if(c+1 < GameData.COLS && !gameData.getTile(r, c+1).isHoverTile() && !gameData.getTile(r, c+1).isEmpty())
 						count++;
 					if(count == 4) {
 						container.getChildren().remove(container.follower);
@@ -712,16 +760,66 @@ public class GameController implements Initializable {
 	}
 	
 	/**
-	 * Handles the start of a turn.
+	 * Handles the start of a game.
+	 * @param names the player names
+	 * @param statuses the statuses
+	 * @param target the target name
+	 * @param row the row
+	 * @param column the column
+	 */
+	public synchronized void handleStartGame(final String[] names, final boolean[] statuses, final String target, final int row, final int column) {
+		updatePlayerPanel(names, statuses);
+		updateFollowerPanel();
+		addStartingTile(row, column);
+		
+		if(isPlayerTurn(target))
+			sendTurnRequest();
+	}
+	
+	/**
+	 * Updates the deck information.
+	 * @param tilesLeft the number of tiles left
+	 */
+	public synchronized void updateDeckInfo(final int tilesLeft) {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				double[] fileLimits = {0, 1, 2};
+				String[] fileStrings = {
+					LocalMessages.getString("NoTiles"),
+					LocalMessages.getString("OneTile"),
+					LocalMessages.getString("MultipleTiles")
+				};
+				
+				MessageFormat messageForm = new MessageFormat("");
+				ChoiceFormat choiceForm = new ChoiceFormat(fileLimits, fileStrings);
+				String pattern = LocalMessages.getString("DeckInfo");
+				Format[] formats = {choiceForm, null, NumberFormat.getInstance()};
+				messageForm.applyPattern(pattern);
+				messageForm.setFormats(formats);
+				
+				Object[] messageArguments = {tilesLeft, "the deck", tilesLeft};
+				String result = messageForm.format(messageArguments);
+				deckLabel.setText(result);
+			}
+		});
+	}
+	
+	/**
+	 * Handles the start of the turn
 	 * @param playerName the player name
+	 * @param tile the tile name
+	 * @param targetName the target name
 	 * @param targetIndex the target index
 	 * @param numOfPlayers the number of players
-	 * @param tile the tile name
+	 * @param tilesLeft the number of tiles in deck
 	 */
-	public synchronized void handleStartTurn(final String playerName, final String tile, final String targetName, final int targetIndex, final int numOfPlayers) {
-		// return if there is no tile
-		if(tile == null)
+	public synchronized void handleStartTurn(final String playerName, final String tile, final String targetName,
+			final int targetIndex, final int numOfPlayers, final int tilesLeft) {
+		if(tile == null) // return if there is no tile
 			return;
+		
+		updateDeckInfo(tilesLeft);
 		
 		if(client.getGame().getMode() == Mode.SYNC) {
 			showCurrentPlayerTurn(targetIndex, numOfPlayers);

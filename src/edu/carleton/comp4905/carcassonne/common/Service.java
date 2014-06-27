@@ -90,6 +90,14 @@ public abstract class Service {
 	}
 	
 	/**
+	 * Sets the gameplay mode.
+	 * @param mode the mode
+	 */
+	public void setMode(final Mode mode) {
+		this.mode = mode;
+	}
+	
+	/**
 	 * Returns the serializer method.
 	 * @return the serializer
 	 */

@@ -111,7 +111,12 @@ public class LobbyController implements Initializable {
 	 * Closes the lobby stage and game client.
 	 */
 	public void shutdown() {
-		stage.getOnCloseRequest().handle(null);
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				stage.getOnCloseRequest().handle(null);
+			}
+		});
 	}
 	
 	/**
@@ -133,7 +138,12 @@ public class LobbyController implements Initializable {
 	 * @param event a MouseEvent
 	 */
 	private void handleCloseButtonEntered(final MouseEvent event) {
-		closeButton.setOpacity(1f);
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				closeButton.setOpacity(1f);
+			}
+		});
 	}
 	
 	@FXML
@@ -142,7 +152,12 @@ public class LobbyController implements Initializable {
 	 * @param event a MouseEvent
 	 */
 	private void handleCloseButtonExited(final MouseEvent event) {
-		closeButton.setOpacity(0.6f);
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				closeButton.setOpacity(0.6f);
+			}
+		});
 	}
 	
 	@FXML
@@ -162,8 +177,13 @@ public class LobbyController implements Initializable {
 	 * @param event a MouseEvent
 	 */
 	private void handleStartButtonEntered(final MouseEvent event) {
-		startButton.setEffect(new Glow());
-		startButton.setCursor(Cursor.HAND);
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				startButton.setEffect(new Glow());
+				startButton.setCursor(Cursor.HAND);
+			}
+		});
 	}
 	
 	@FXML
@@ -172,8 +192,13 @@ public class LobbyController implements Initializable {
 	 * @param event a MouseEvent
 	 */
 	private void handleStartButtonExited(final MouseEvent event) {
-		startButton.setEffect(null);
-		startButton.setCursor(Cursor.DEFAULT);
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				startButton.setEffect(null);
+				startButton.setCursor(Cursor.DEFAULT);
+			}
+		});
 	}
 	
 	@FXML
@@ -184,7 +209,10 @@ public class LobbyController implements Initializable {
 	private void handleStartButtonPressed(final MouseEvent event) {
 		if(!event.isPrimaryButtonDown())
 			return;
-		client.getGame().getConnection().sendEvent(new Event(EventType.START_REQUEST, client.getGame().getPlayerName()));
+		Event startEvent = new Event(EventType.START_REQUEST, client.getGame().getPlayerName());
+		startEvent.addProperty("rows", GameData.ROWS);
+		startEvent.addProperty("columns", GameData.COLS);
+		client.getGame().getConnection().sendEvent(startEvent);
 	}
 	
 	/**

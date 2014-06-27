@@ -5,22 +5,31 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ResourceBundle;
 
+import edu.carleton.comp4905.carcassonne.common.Mode;
 import edu.carleton.comp4905.carcassonne.server.ServerClient;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 
 public class HostGameController extends InputController implements Initializable, ControlledScreen {
 	@FXML private BorderPane borderPane;
 	@FXML private Label title, sceneDesc, usernameLabel, servAddrLabel, servPortLabel;
+	@FXML private ToggleGroup toggleGroup;
+	@FXML private RadioButton syncButton, asyncButton;
 	@FXML private Button joinButton, hostButton, submitButton;
 	private ScreensController screensController;
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
+		syncButton.setTooltip(new Tooltip("Players take turn placing tiles"));
+		asyncButton.setTooltip(new Tooltip("Anyone can place a tile at any time"));
+		
 		try {
 			InetAddress inetAddress = InetAddress.getLocalHost();
 			servAddrField.setText(inetAddress.getHostAddress());
@@ -38,9 +47,9 @@ public class HostGameController extends InputController implements Initializable
 		if(!isPortFieldValid())
 			return;
 		try {
-			new ServerClient(Integer.parseInt(servPortField.getText())).start(new javafx.stage.Stage());
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
+			new ServerClient(Integer.parseInt(servPortField.getText()),
+					Mode.valueOf(((RadioButton)toggleGroup.getSelectedToggle()).getText()))
+			.start(new javafx.stage.Stage());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

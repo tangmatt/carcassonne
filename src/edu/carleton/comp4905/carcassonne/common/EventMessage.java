@@ -279,6 +279,61 @@ public final class EventMessage {
      * <code>optional int32 targetIndex = 23;</code>
      */
     int getTargetIndex();
+
+    // optional int32 mode = 24;
+    /**
+     * <code>optional int32 mode = 24;</code>
+     */
+    boolean hasMode();
+    /**
+     * <code>optional int32 mode = 24;</code>
+     */
+    int getMode();
+
+    // optional string checksum = 25;
+    /**
+     * <code>optional string checksum = 25;</code>
+     */
+    boolean hasChecksum();
+    /**
+     * <code>optional string checksum = 25;</code>
+     */
+    java.lang.String getChecksum();
+    /**
+     * <code>optional string checksum = 25;</code>
+     */
+    com.google.protobuf.ByteString
+        getChecksumBytes();
+
+    // optional int32 tilesLeft = 26;
+    /**
+     * <code>optional int32 tilesLeft = 26;</code>
+     */
+    boolean hasTilesLeft();
+    /**
+     * <code>optional int32 tilesLeft = 26;</code>
+     */
+    int getTilesLeft();
+
+    // optional int32 rows = 27;
+    /**
+     * <code>optional int32 rows = 27;</code>
+     */
+    boolean hasRows();
+    /**
+     * <code>optional int32 rows = 27;</code>
+     */
+    int getRows();
+
+    // optional int32 columns = 28;
+    /**
+     * <code>optional int32 columns = 28;</code>
+     */
+    boolean hasColumns();
+    /**
+     * <code>optional int32 columns = 28;</code>
+     */
+    int getColumns();
   }
   /**
    * Protobuf type {@code edu.carleton.comp4905.carcassonne.common.Event}
@@ -464,6 +519,31 @@ public final class EventMessage {
             case 184: {
               bitField0_ |= 0x00100000;
               targetIndex_ = input.readInt32();
+              break;
+            }
+            case 192: {
+              bitField0_ |= 0x00200000;
+              mode_ = input.readInt32();
+              break;
+            }
+            case 202: {
+              bitField0_ |= 0x00400000;
+              checksum_ = input.readBytes();
+              break;
+            }
+            case 208: {
+              bitField0_ |= 0x00800000;
+              tilesLeft_ = input.readInt32();
+              break;
+            }
+            case 216: {
+              bitField0_ |= 0x01000000;
+              rows_ = input.readInt32();
+              break;
+            }
+            case 224: {
+              bitField0_ |= 0x02000000;
+              columns_ = input.readInt32();
               break;
             }
           }
@@ -1092,6 +1172,124 @@ public final class EventMessage {
       return targetIndex_;
     }
 
+    // optional int32 mode = 24;
+    public static final int MODE_FIELD_NUMBER = 24;
+    private int mode_;
+    /**
+     * <code>optional int32 mode = 24;</code>
+     */
+    @Override
+	public boolean hasMode() {
+      return ((bitField0_ & 0x00200000) == 0x00200000);
+    }
+    /**
+     * <code>optional int32 mode = 24;</code>
+     */
+    @Override
+	public int getMode() {
+      return mode_;
+    }
+
+    // optional string checksum = 25;
+    public static final int CHECKSUM_FIELD_NUMBER = 25;
+    private java.lang.Object checksum_;
+    /**
+     * <code>optional string checksum = 25;</code>
+     */
+    @Override
+	public boolean hasChecksum() {
+      return ((bitField0_ & 0x00400000) == 0x00400000);
+    }
+    /**
+     * <code>optional string checksum = 25;</code>
+     */
+    @Override
+	public java.lang.String getChecksum() {
+      java.lang.Object ref = checksum_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          checksum_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string checksum = 25;</code>
+     */
+    @Override
+	public com.google.protobuf.ByteString
+        getChecksumBytes() {
+      java.lang.Object ref = checksum_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        checksum_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional int32 tilesLeft = 26;
+    public static final int TILESLEFT_FIELD_NUMBER = 26;
+    private int tilesLeft_;
+    /**
+     * <code>optional int32 tilesLeft = 26;</code>
+     */
+    @Override
+	public boolean hasTilesLeft() {
+      return ((bitField0_ & 0x00800000) == 0x00800000);
+    }
+    /**
+     * <code>optional int32 tilesLeft = 26;</code>
+     */
+    @Override
+	public int getTilesLeft() {
+      return tilesLeft_;
+    }
+
+    // optional int32 rows = 27;
+    public static final int ROWS_FIELD_NUMBER = 27;
+    private int rows_;
+    /**
+     * <code>optional int32 rows = 27;</code>
+     */
+    @Override
+	public boolean hasRows() {
+      return ((bitField0_ & 0x01000000) == 0x01000000);
+    }
+    /**
+     * <code>optional int32 rows = 27;</code>
+     */
+    @Override
+	public int getRows() {
+      return rows_;
+    }
+
+    // optional int32 columns = 28;
+    public static final int COLUMNS_FIELD_NUMBER = 28;
+    private int columns_;
+    /**
+     * <code>optional int32 columns = 28;</code>
+     */
+    @Override
+	public boolean hasColumns() {
+      return ((bitField0_ & 0x02000000) == 0x02000000);
+    }
+    /**
+     * <code>optional int32 columns = 28;</code>
+     */
+    @Override
+	public int getColumns() {
+      return columns_;
+    }
+
     private void initFields() {
       eventType_ = 0;
       playerName_ = "";
@@ -1116,6 +1314,11 @@ public final class EventMessage {
       points_ = 0;
       followers_ = 0;
       targetIndex_ = 0;
+      mode_ = 0;
+      checksum_ = "";
+      tilesLeft_ = 0;
+      rows_ = 0;
+      columns_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     @Override
@@ -1207,6 +1410,21 @@ public final class EventMessage {
       }
       if (((bitField0_ & 0x00100000) == 0x00100000)) {
         output.writeInt32(23, targetIndex_);
+      }
+      if (((bitField0_ & 0x00200000) == 0x00200000)) {
+        output.writeInt32(24, mode_);
+      }
+      if (((bitField0_ & 0x00400000) == 0x00400000)) {
+        output.writeBytes(25, getChecksumBytes());
+      }
+      if (((bitField0_ & 0x00800000) == 0x00800000)) {
+        output.writeInt32(26, tilesLeft_);
+      }
+      if (((bitField0_ & 0x01000000) == 0x01000000)) {
+        output.writeInt32(27, rows_);
+      }
+      if (((bitField0_ & 0x02000000) == 0x02000000)) {
+        output.writeInt32(28, columns_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -1316,6 +1534,26 @@ public final class EventMessage {
       if (((bitField0_ & 0x00100000) == 0x00100000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(23, targetIndex_);
+      }
+      if (((bitField0_ & 0x00200000) == 0x00200000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(24, mode_);
+      }
+      if (((bitField0_ & 0x00400000) == 0x00400000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(25, getChecksumBytes());
+      }
+      if (((bitField0_ & 0x00800000) == 0x00800000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(26, tilesLeft_);
+      }
+      if (((bitField0_ & 0x01000000) == 0x01000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(27, rows_);
+      }
+      if (((bitField0_ & 0x02000000) == 0x02000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(28, columns_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1483,6 +1721,16 @@ public final class EventMessage {
         bitField0_ = (bitField0_ & ~0x00200000);
         targetIndex_ = 0;
         bitField0_ = (bitField0_ & ~0x00400000);
+        mode_ = 0;
+        bitField0_ = (bitField0_ & ~0x00800000);
+        checksum_ = "";
+        bitField0_ = (bitField0_ & ~0x01000000);
+        tilesLeft_ = 0;
+        bitField0_ = (bitField0_ & ~0x02000000);
+        rows_ = 0;
+        bitField0_ = (bitField0_ & ~0x04000000);
+        columns_ = 0;
+        bitField0_ = (bitField0_ & ~0x08000000);
         return this;
       }
 
@@ -1611,6 +1859,26 @@ public final class EventMessage {
           to_bitField0_ |= 0x00100000;
         }
         result.targetIndex_ = targetIndex_;
+        if (((from_bitField0_ & 0x00800000) == 0x00800000)) {
+          to_bitField0_ |= 0x00200000;
+        }
+        result.mode_ = mode_;
+        if (((from_bitField0_ & 0x01000000) == 0x01000000)) {
+          to_bitField0_ |= 0x00400000;
+        }
+        result.checksum_ = checksum_;
+        if (((from_bitField0_ & 0x02000000) == 0x02000000)) {
+          to_bitField0_ |= 0x00800000;
+        }
+        result.tilesLeft_ = tilesLeft_;
+        if (((from_bitField0_ & 0x04000000) == 0x04000000)) {
+          to_bitField0_ |= 0x01000000;
+        }
+        result.rows_ = rows_;
+        if (((from_bitField0_ & 0x08000000) == 0x08000000)) {
+          to_bitField0_ |= 0x02000000;
+        }
+        result.columns_ = columns_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1720,6 +1988,23 @@ public final class EventMessage {
         }
         if (other.hasTargetIndex()) {
           setTargetIndex(other.getTargetIndex());
+        }
+        if (other.hasMode()) {
+          setMode(other.getMode());
+        }
+        if (other.hasChecksum()) {
+          bitField0_ |= 0x01000000;
+          checksum_ = other.checksum_;
+          onChanged();
+        }
+        if (other.hasTilesLeft()) {
+          setTilesLeft(other.getTilesLeft());
+        }
+        if (other.hasRows()) {
+          setRows(other.getRows());
+        }
+        if (other.hasColumns()) {
+          setColumns(other.getColumns());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -2872,6 +3157,223 @@ public final class EventMessage {
         return this;
       }
 
+      // optional int32 mode = 24;
+      private int mode_ ;
+      /**
+       * <code>optional int32 mode = 24;</code>
+       */
+      @Override
+	public boolean hasMode() {
+        return ((bitField0_ & 0x00800000) == 0x00800000);
+      }
+      /**
+       * <code>optional int32 mode = 24;</code>
+       */
+      @Override
+	public int getMode() {
+        return mode_;
+      }
+      /**
+       * <code>optional int32 mode = 24;</code>
+       */
+      public Builder setMode(int value) {
+        bitField0_ |= 0x00800000;
+        mode_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 mode = 24;</code>
+       */
+      public Builder clearMode() {
+        bitField0_ = (bitField0_ & ~0x00800000);
+        mode_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional string checksum = 25;
+      private java.lang.Object checksum_ = "";
+      /**
+       * <code>optional string checksum = 25;</code>
+       */
+      @Override
+	public boolean hasChecksum() {
+        return ((bitField0_ & 0x01000000) == 0x01000000);
+      }
+      /**
+       * <code>optional string checksum = 25;</code>
+       */
+      @Override
+	public java.lang.String getChecksum() {
+        java.lang.Object ref = checksum_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          checksum_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string checksum = 25;</code>
+       */
+      @Override
+	public com.google.protobuf.ByteString
+          getChecksumBytes() {
+        java.lang.Object ref = checksum_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          checksum_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string checksum = 25;</code>
+       */
+      public Builder setChecksum(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x01000000;
+        checksum_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string checksum = 25;</code>
+       */
+      public Builder clearChecksum() {
+        bitField0_ = (bitField0_ & ~0x01000000);
+        checksum_ = getDefaultInstance().getChecksum();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string checksum = 25;</code>
+       */
+      public Builder setChecksumBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x01000000;
+        checksum_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional int32 tilesLeft = 26;
+      private int tilesLeft_ ;
+      /**
+       * <code>optional int32 tilesLeft = 26;</code>
+       */
+      @Override
+	public boolean hasTilesLeft() {
+        return ((bitField0_ & 0x02000000) == 0x02000000);
+      }
+      /**
+       * <code>optional int32 tilesLeft = 26;</code>
+       */
+      @Override
+	public int getTilesLeft() {
+        return tilesLeft_;
+      }
+      /**
+       * <code>optional int32 tilesLeft = 26;</code>
+       */
+      public Builder setTilesLeft(int value) {
+        bitField0_ |= 0x02000000;
+        tilesLeft_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 tilesLeft = 26;</code>
+       */
+      public Builder clearTilesLeft() {
+        bitField0_ = (bitField0_ & ~0x02000000);
+        tilesLeft_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional int32 rows = 27;
+      private int rows_ ;
+      /**
+       * <code>optional int32 rows = 27;</code>
+       */
+      @Override
+	public boolean hasRows() {
+        return ((bitField0_ & 0x04000000) == 0x04000000);
+      }
+      /**
+       * <code>optional int32 rows = 27;</code>
+       */
+      @Override
+	public int getRows() {
+        return rows_;
+      }
+      /**
+       * <code>optional int32 rows = 27;</code>
+       */
+      public Builder setRows(int value) {
+        bitField0_ |= 0x04000000;
+        rows_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 rows = 27;</code>
+       */
+      public Builder clearRows() {
+        bitField0_ = (bitField0_ & ~0x04000000);
+        rows_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional int32 columns = 28;
+      private int columns_ ;
+      /**
+       * <code>optional int32 columns = 28;</code>
+       */
+      @Override
+	public boolean hasColumns() {
+        return ((bitField0_ & 0x08000000) == 0x08000000);
+      }
+      /**
+       * <code>optional int32 columns = 28;</code>
+       */
+      @Override
+	public int getColumns() {
+        return columns_;
+      }
+      /**
+       * <code>optional int32 columns = 28;</code>
+       */
+      public Builder setColumns(int value) {
+        bitField0_ |= 0x08000000;
+        columns_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 columns = 28;</code>
+       */
+      public Builder clearColumns() {
+        bitField0_ = (bitField0_ & ~0x08000000);
+        columns_ = 0;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:edu.carleton.comp4905.carcassonne.common.Event)
     }
 
@@ -2898,7 +3400,7 @@ public final class EventMessage {
   static {
     java.lang.String[] descriptorData = {
       "\n\013event.proto\022(edu.carleton.comp4905.car" +
-      "cassonne.common\"\233\003\n\005Event\022\021\n\teventType\030\001" +
+      "cassonne.common\"\355\003\n\005Event\022\021\n\teventType\030\001" +
       " \002(\005\022\022\n\nplayerName\030\002 \002(\t\022\022\n\nconnection\030\003" +
       " \001(\014\022\017\n\007address\030\004 \001(\t\022\014\n\004port\030\005 \001(\005\022\024\n\014n" +
       "umOfPlayers\030\006 \001(\005\022\017\n\007success\030\007 \001(\010\022\017\n\007me" +
@@ -2908,8 +3410,10 @@ public final class EventMessage {
       "umn\030\017 \001(\005\022\020\n\010rotation\030\020 \001(\005\022\016\n\006meeple\030\021 " +
       "\001(\005\022\020\n\010position\030\022 \001(\005\022\016\n\006shield\030\023 \001(\010\022\016\n",
       "\006target\030\024 \001(\t\022\016\n\006points\030\025 \001(\005\022\021\n\tfollowe" +
-      "rs\030\026 \001(\005\022\023\n\013targetIndex\030\027 \001(\005B\016B\014EventMe" +
-      "ssage"
+      "rs\030\026 \001(\005\022\023\n\013targetIndex\030\027 \001(\005\022\014\n\004mode\030\030 " +
+      "\001(\005\022\020\n\010checksum\030\031 \001(\t\022\021\n\ttilesLeft\030\032 \001(\005" +
+      "\022\014\n\004rows\030\033 \001(\005\022\017\n\007columns\030\034 \001(\005B\016B\014Event" +
+      "Message"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2922,7 +3426,7 @@ public final class EventMessage {
           internal_static_edu_carleton_comp4905_carcassonne_common_Event_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_edu_carleton_comp4905_carcassonne_common_Event_descriptor,
-              new java.lang.String[] { "EventType", "PlayerName", "Connection", "Address", "Port", "NumOfPlayers", "Success", "Message", "Statuses", "Names", "Finished", "GameInProgress", "Tile", "Row", "Column", "Rotation", "Meeple", "Position", "Shield", "Target", "Points", "Followers", "TargetIndex", });
+              new java.lang.String[] { "EventType", "PlayerName", "Connection", "Address", "Port", "NumOfPlayers", "Success", "Message", "Statuses", "Names", "Finished", "GameInProgress", "Tile", "Row", "Column", "Rotation", "Meeple", "Position", "Shield", "Target", "Points", "Followers", "TargetIndex", "Mode", "Checksum", "TilesLeft", "Rows", "Columns", });
           return null;
         }
       };

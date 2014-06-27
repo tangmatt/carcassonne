@@ -1,5 +1,6 @@
 package edu.carleton.comp4905.carcassonne.server.handlers;
 
+import java.util.Random;
 import java.util.concurrent.ConcurrentMap;
 
 import edu.carleton.comp4905.carcassonne.common.Address;
@@ -23,12 +24,20 @@ public class StartRequestHandler implements EventHandler {
 		controller.addMessageEntry(MessageType.INFO, "Player '" + event.getPlayerName() + "' has started the game (with " + connections.size() + " players)");
 		Boolean[] statuses = controller.getStatuses(connections);
 		String[] names = controller.getPlayerNames();
+		Random random = new Random();
+		int rows = (int)event.getProperty("rows");
+		int columns = (int)event.getProperty("columns");
+		int row = random.nextInt(rows);
+		int column = random.nextInt(columns);
 		
 		// send reply back to connected clients
 		Event reply = new Event(EventType.START_REPLY, event.getPlayerName());
 		reply.addProperty("names", names);
 		reply.addProperty("statuses", statuses);
 		reply.addProperty("target", server.getCurrentPlayer());
+		reply.addProperty("mode", server.getMode());
+		reply.addProperty("row", row);
+		reply.addProperty("column", column);
 		connection.broadcastEvent(reply, connections);
 	}
 }

@@ -17,11 +17,12 @@ public class StartTurnReplyHandler implements EventHandler {
 		String target = (String)event.getProperty("target");
 		String tile = (String)event.getProperty("tile");
 		int targetIndex = (int)event.getProperty("targetIndex");
+		int tilesLeft = (int)event.getProperty("tilesLeft");
 		Boolean[] statusesObj = (Boolean[])event.getProperty("statuses");
 		boolean[] statuses = new boolean[statusesObj.length];
 		for(int i=0; i<statusesObj.length; ++i)
 			statuses[i] = statusesObj[i].booleanValue();
 		
-		gameController.handleStartTurn(player, tile, target, targetIndex, statuses.length);
+		gameController.handleStartTurn(player, tile, target, targetIndex, statuses.length, tilesLeft);
 	}
 }

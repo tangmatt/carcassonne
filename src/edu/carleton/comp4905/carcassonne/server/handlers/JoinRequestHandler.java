@@ -9,6 +9,7 @@ import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventHandler;
 import edu.carleton.comp4905.carcassonne.common.EventType;
 import edu.carleton.comp4905.carcassonne.common.MessageType;
+import edu.carleton.comp4905.carcassonne.common.TileManager;
 import edu.carleton.comp4905.carcassonne.server.Server;
 import edu.carleton.comp4905.carcassonne.server.ServerController;
 
@@ -23,7 +24,10 @@ public class JoinRequestHandler implements EventHandler {
 		ServerController controller = server.getController();
 		ConcurrentMap<Address, Connection> connections = server.getConnections();
 		List<String> players = server.getPlayers();
+		TileManager tileManager = TileManager.getInstance();
 
+		String checksum = (String)event.getProperty("checksum");
+		
 		// send reply back to sending client if game is in progress or player name already taken
 		if(server.isGameInProgress()) {
 			Event reply = new Event(EventType.JOIN_REPLY, event.getPlayerName());
@@ -44,6 +48,13 @@ public class JoinRequestHandler implements EventHandler {
 			reply.addProperty("numOfPlayers", connections.size());
 			reply.addProperty("success", false);
 			reply.addProperty("message", "Lobby has reached the player limit.");
+			connection.sendEvent(reply);
+			return;
+		} else if(!checksum.equals(tileManager.checksum())) {
+			Event reply = new Event(EventType.JOIN_REPLY, event.getPlayerName());
+			reply.addProperty("numOfPlayers", connections.size());
+			reply.addProperty("success", false);
+			reply.addProperty("message", "Tile configuration may have been modified.");
 			connection.sendEvent(reply);
 			return;
 		}

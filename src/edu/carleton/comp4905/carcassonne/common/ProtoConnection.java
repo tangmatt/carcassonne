@@ -105,6 +105,16 @@ public class ProtoConnection extends Connection {
 			event.addProperty("points", eventMessage.getPoints());
 		if(eventMessage.hasTargetIndex())
 			event.addProperty("targetIndex", eventMessage.getTargetIndex());
+		if(eventMessage.hasMode())
+			event.addProperty("mode", Mode.values()[eventMessage.getMode()]);
+		if(eventMessage.hasChecksum())
+			event.addProperty("checksum", eventMessage.getChecksum());
+		if(eventMessage.hasTilesLeft())
+			event.addProperty("tilesLeft", eventMessage.getTilesLeft());
+		if(eventMessage.hasRows())
+			event.addProperty("rows", eventMessage.getRows());
+		if(eventMessage.hasColumns())
+			event.addProperty("columns", eventMessage.getColumns());
 		
 		return event;
 	}
@@ -159,6 +169,16 @@ public class ProtoConnection extends Connection {
 			builder.setPoints((int)event.getProperty("points"));
 		if(event.getProperty("targetIndex") != null)
 			builder.setTargetIndex((int)event.getProperty("targetIndex"));
+		if(event.getProperty("mode") != null)
+			builder.setMode(((Mode)event.getProperty("mode")).ordinal());
+		if(event.getProperty("checksum") != null)
+			builder.setChecksum((String)event.getProperty("checksum"));
+		if(event.getProperty("tilesLeft") != null)
+			builder.setTilesLeft((int)event.getProperty("tilesLeft"));
+		if(event.getProperty("rows") != null)
+			builder.setRows((int)event.getProperty("rows"));
+		if(event.getProperty("columns") != null)
+			builder.setColumns((int)event.getProperty("columns"));
 		
 		return builder.build();
 	}

@@ -67,7 +67,12 @@ public class DialogController implements Initializable {
 	 * @param event a MouseEvent
 	 */
 	private void handleCloseButtonEntered(final MouseEvent event) {
-		closeButton.setOpacity(1f);
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				closeButton.setOpacity(1f);
+			}
+		});
 	}
 	
 	@FXML
@@ -76,7 +81,12 @@ public class DialogController implements Initializable {
 	 * @param event a MouseEvent
 	 */
 	private void handleCloseButtonExited(final MouseEvent event) {
-		closeButton.setOpacity(0.6f);
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				closeButton.setOpacity(0.6f);
+			}
+		});
 	}
 	
 	@FXML
@@ -96,8 +106,13 @@ public class DialogController implements Initializable {
 	 * @param event a MouseEvent
 	 */
 	private void handleOkButtonEntered(final MouseEvent event) {
-		okButton.setEffect(new Glow());
-		okButton.setCursor(Cursor.HAND);
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				okButton.setEffect(new Glow());
+				okButton.setCursor(Cursor.HAND);
+			}
+		});
 	}
 	
 	@FXML
@@ -106,8 +121,13 @@ public class DialogController implements Initializable {
 	 * @param event a MouseEvent
 	 */
 	private void handleOkButtonExited(final MouseEvent event) {
-		okButton.setEffect(null);
-		okButton.setCursor(Cursor.DEFAULT);
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				okButton.setEffect(null);
+				okButton.setCursor(Cursor.DEFAULT);
+			}
+		});
 	}
 	
 	@FXML
@@ -129,7 +149,12 @@ public class DialogController implements Initializable {
 	 */
 	public void initData(final Stage stage, final String title, final String message) {
 		this.stage = stage;
-		titleLabel.setText(title);
-		messageLabel.setText(message);
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				titleLabel.setText(title);
+				messageLabel.setText(message);
+			}
+		});
 	}
 }

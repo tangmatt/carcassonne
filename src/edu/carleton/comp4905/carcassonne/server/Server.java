@@ -32,17 +32,18 @@ public class Server extends Service implements Runnable {
 	public static int PORT = 5000;
 	
 	public Server() {
-		this(PORT);
+		this(PORT, Mode.SYNC);
 	}
 	
-	public Server(final int port) {
+	public Server(final int port, final Mode mode) {
 		super();
 		PORT = port;
-		connections = new ConcurrentHashMap<Address, Connection>();
-		running = false;
-		gameInProgress = false;
-		turn = (mode == Mode.SYNC) ? 0 : -1;
-		players = new ArrayList<String>();
+		this.connections = new ConcurrentHashMap<Address, Connection>();
+		this.running = false;
+		this.gameInProgress = false;
+		this.turn = (mode == Mode.SYNC) ? 0 : -1;
+		this.players = new ArrayList<String>();
+		this.mode = mode;
 	}
 	
 	/**
@@ -94,6 +95,7 @@ public class Server extends Service implements Runnable {
 			else if(serializer == Serializer.GOOGLE_PROTOBUF)
 				acceptor = new ProtoAcceptor(this, listener);
 			controller.addMessageEntry(MessageType.INFO, "Server listening on port " + PORT);
+			controller.addMessageEntry(MessageType.INFO, "Game mode is " + mode);
 			running = true;
 			while(running) {
 				try {

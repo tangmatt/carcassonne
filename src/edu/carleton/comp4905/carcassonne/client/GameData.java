@@ -10,10 +10,8 @@ import edu.carleton.comp4905.carcassonne.common.TileManager;
 import javafx.scene.image.ImageView;
 
 public class GameData {
-	public static final int ROWS = 9;
+	public static final int ROWS = 8;
 	public static final int COLS = 9;
-	public static final int CENTER_ROW = Math.floorDiv(ROWS, 2);
-	public static final int CENTER_COL = Math.floorDiv(COLS, 2);
 	public static final int TOTAL_FOLLOWERS = 7;
 	
 	private final TileContainer[][] tiles;
