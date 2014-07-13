@@ -1,5 +1,6 @@
 package edu.carleton.comp4905.carcassonne.client;
 
+import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -32,18 +33,18 @@ public abstract class InputController {
 	 * Checks whether the user name text field is empty.
 	 * @return a boolean
 	 */
-	protected boolean isNameFieldEmpty() {
+	protected boolean isNameFieldValid() {
 		// Check if the username field has any input
 		if(usernameField.getText().isEmpty()) {
 			// Show the missing field message
-			messagePrompt.setText("Enter your username.");
-			FadeTransition fadeTransition = new FadeTransition(Duration.millis(2500), messagePrompt);
-			fadeTransition.setFromValue(1.0);
-			fadeTransition.setToValue(0.0);
-			fadeTransition.play();
-			return true;
+			showMessage(LocalMessages.getString("EnterUsername"));
+			return false;
+		} else if(usernameField.getText().length() > 9) {
+			// Username is too long
+			showMessage(LocalMessages.getString("LongUsername"));
+			return false;
 		}
-		return false;
+		return true;
 	}
 	
 	/**
@@ -54,11 +55,7 @@ public abstract class InputController {
 		// Check if the server address field has any input
 		if(servAddrField.getText().isEmpty()) {
 			// Show the missing field message
-			messagePrompt.setText("Enter the server address.");
-			FadeTransition fadeTransition = new FadeTransition(Duration.millis(2500), messagePrompt);
-			fadeTransition.setFromValue(1.0);
-			fadeTransition.setToValue(0.0);
-			fadeTransition.play();
+			showMessage(LocalMessages.getString("EnterServerAddr"));
 			return true;
 		}
 		return false;
@@ -71,7 +68,7 @@ public abstract class InputController {
 	protected boolean isPortFieldValid() {
 		// Check if the server port field has any input
 		if(servPortField.getText().isEmpty()) {
-			showMessage("Enter the server port.");
+			showMessage(LocalMessages.getString("EnterServerPort"));
 			return false;
 		}
 		
@@ -79,7 +76,7 @@ public abstract class InputController {
 			// Detect if server port is an integer
 			Integer.parseInt(servPortField.getText());
 		} catch(NumberFormatException e) {
-			showMessage("Invalid server port.");
+			showMessage(LocalMessages.getString("InvalidServerPort"));
 			return false;
 		}
 		

@@ -10,7 +10,7 @@
 
 <BorderPane fx:id="rootPane" prefHeight="-1.0" prefWidth="-1.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="edu.carleton.comp4905.carcassonne.client.GameController">
   <bottom>
-    <FlowPane prefHeight="-1.0" prefWidth="-1.0" style="-fx-background-color: #2B579A;" BorderPane.alignment="CENTER_LEFT">
+    <FlowPane alignment="CENTER" prefHeight="-1.0" prefWidth="-1.0" style="-fx-background-color: #2B579A;" BorderPane.alignment="CENTER_LEFT">
       <children>
         <Label fx:id="deckLabel" alignment="CENTER" text="" textFill="WHITE" />
       </children>
@@ -20,7 +20,7 @@
     </FlowPane>
   </bottom>
   <center>
-    <GridPane fx:id="gridPane" alignment="CENTER" gridLinesVisible="false" hgap="3.0" maxHeight="-1.0" maxWidth="-1.0" minHeight="-1.0" minWidth="-1.0" prefHeight="536.0" prefWidth="600.0" style="" vgap="3.0" BorderPane.alignment="CENTER">
+    <GridPane fx:id="gridPane" alignment="CENTER" gridLinesVisible="false" hgap="3.0" maxHeight="-1.0" maxWidth="-1.0" minHeight="-1.0" minWidth="-1.0" prefHeight="533.0" prefWidth="600.0" style="" vgap="3.0" BorderPane.alignment="CENTER">
       <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />

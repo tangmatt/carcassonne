@@ -1,5 +1,6 @@
 package edu.carleton.comp4905.carcassonne.common;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentMap;
@@ -9,14 +10,38 @@ public abstract class Connection implements Runnable, Serializable {
 	private static final long serialVersionUID = 1L;
 	protected final Service service;
 	protected final Socket peer;
-	protected final boolean running;
+	protected static boolean running;
 	protected final LinkedBlockingQueue<Event> buffer;
 	
 	public Connection(final Service service, final Socket peer) {
 		this.service = service;
 		this.peer = peer;
-		this.running = false;
+		running = false;
 		this.buffer = new LinkedBlockingQueue<Event>();
+	}
+	
+	protected class Consumer implements Runnable {
+		private final Connection connection;
+
+		public Consumer(final Connection connection) {
+			this.connection = connection;
+		}
+		
+		@Override
+		public void run() {
+			try {
+				while(running) {
+					Event event = buffer.take();
+					event.addProperty("connection", connection);
+					event.addProperty("address", peer.getInetAddress().getHostAddress());
+					event.addProperty("port", peer.getPort());
+					if(event != null)
+						service.getReactor().dispatch(event);
+				}
+			} catch (Exception e) {
+				running = false;
+			}
+		}
 	}
 	
 	/**
@@ -46,7 +71,15 @@ public abstract class Connection implements Runnable, Serializable {
 	/**
 	 * Closes the socket and other relations.
 	 */
-	public abstract void close();
+	public void close() {
+		try {
+			running = false;
+			peer.close();
+			service.getPool().shutdownNow();
+		} catch (IOException e) {
+			// do nothing
+		}
+	}
 	
 	/**
 	 * Sends an event.

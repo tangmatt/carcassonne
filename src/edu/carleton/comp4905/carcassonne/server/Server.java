@@ -153,6 +153,15 @@ public class Server extends Service implements Runnable {
 	}
 	
 	/**
+	 * Returns true if the given player name is the current player. (used for SYNC mode; ASYNC mode not applicable)
+	 * @param player the player
+	 * @return a boolean
+	 */
+	public boolean isCurrentPlayer(final String player) {
+		return turn >= 0 && turn <= (players.size()-1) && player.equalsIgnoreCase(players.get(turn));
+	}
+	
+	/**
 	 * Increments the turn counter.
 	 */
 	public void setNextPlayer() {
@@ -161,19 +170,16 @@ public class Server extends Service implements Runnable {
 	
 	@Override
 	public void shutdown() {
-		super.shutdown();
 		running = false;
-		
 		for(Connection connection : connections.values())
 			connection.close();
-		
 		try {
 			if(listener != null)
 				listener.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
 		controller.addMessageEntry(MessageType.INFO, "Server is now offline");
+		pool.shutdownNow();
 	}
 }

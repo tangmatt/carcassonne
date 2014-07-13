@@ -6,21 +6,19 @@ import java.text.Format;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.PopOver.ArrowLocation;
 
-import edu.carleton.comp4905.carcassonne.client.handlers.PlayerViewHandler;
 import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventType;
 import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.Mode;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
+import edu.carleton.comp4905.carcassonne.common.Player;
 import edu.carleton.comp4905.carcassonne.common.Position;
 import edu.carleton.comp4905.carcassonne.common.ResourceManager;
 import edu.carleton.comp4905.carcassonne.common.TileManager;
@@ -46,6 +44,8 @@ public class GameController implements Initializable {
 	@FXML private Label deckLabel;
 	@FXML private ImageView player1, player2, player3, player4, player5;
 	@FXML private ImageView meeple1, meeple2, meeple3, meeple4, meeple5, meeple6, meeple7; // meeple = follower
+	private ImageView[] playerViews;
+	private PopOver popOver;
 	private TileManager tileManager;
 	private GameData gameData;
 	private ScoreData scoreData;
@@ -61,9 +61,9 @@ public class GameController implements Initializable {
 		scoreData = new ScoreData();
 		tileManager = TileManager.getInstance();
 		
-		ImageView[] playerViews = new ImageView[] { player1, player2, player3, player4, player5 };
+		playerViews = new ImageView[] { player1, player2, player3, player4, player5 };
 		ImageView[] followerViews = new ImageView[] { meeple1, meeple2, meeple3, meeple4, meeple5, meeple6, meeple7 };
-		gameData.addPlayerViews(playerViews, createPopOver());
+		popOver = createPopOver();
 		gameData.addFollowerViews(followerViews);
 		
 		createGameBoard();
@@ -297,7 +297,7 @@ public class GameController implements Initializable {
 	/**
 	 * Sends the turn request to the server.
 	 */
-	public synchronized void sendTurnRequest() {
+	public void sendTurnRequest() {
 		Connection connection = client.getGame().getConnection();
 		Event event = new Event(EventType.START_TURN_REQUEST, client.getGame().getPlayerName());
 		connection.sendEvent(event);
@@ -305,19 +305,58 @@ public class GameController implements Initializable {
 	
 	/**
 	 * Sends the end game request to the server.
+	 * @param title the title
+	 * @param message the message
 	 */
-	public synchronized void sendEndGameRequest() {
+	public void sendEndGameRequest(final String title, final String message) {
 		Connection connection = client.getGame().getConnection();
 		Event event = new Event(EventType.END_GAME_REQUEST, client.getGame().getPlayerName());
+		event.addProperty("messageTitle", title);
+		event.addProperty("message", message);
 		connection.sendEvent(event);
 	}
 	
 	/**
 	 * Sends the end turn request to the server.
 	 */
-	public synchronized void sendEndTurnRequest() {
+	public void sendEndTurnRequest() {
 		Connection connection = client.getGame().getConnection();
 		Event event = new Event(EventType.END_TURN_REQUEST, client.getGame().getPlayerName());
+		connection.sendEvent(event);
+	}
+	
+	/**
+	 * Sends the quit request to the server.
+	 */
+	public void sendQuitRequest() {
+		Connection connection = client.getGame().getConnection();
+		Event event = new Event(EventType.QUIT_REQUEST, client.getGame().getPlayerName());
+		connection.sendEvent(event);
+	}
+	
+	/**
+	 * Sends the update score request to the server.
+	 * @param name the player name
+	 * @param points the points earned
+	 */
+	public void sendScoreUpdateRequest(final String name, final int points) {
+		Connection connection = client.getGame().getConnection();
+		Event event = new Event(EventType.SCORE_UPDATE_REQUEST, client.getGame().getPlayerName());
+		event.addProperty("target", name);
+		event.addProperty("points", points);
+		connection.sendEvent(event);
+	}
+	
+	/**
+	 * Sends the update follower request to the server.
+	 * @param name the player name
+	 * @param followers the follower amount
+	 */
+	public void sendFollowerUpdateRequest(final String name, final int followers) {
+		Connection connection = client.getGame().getConnection();
+		Event event = new Event(EventType.FOLLOWER_UPDATE_REQUEST, client.getGame().getPlayerName());
+		event.addProperty("target", name);
+		event.addProperty("followers", followers);
 		connection.sendEvent(event);
 	}
 	
@@ -528,14 +567,10 @@ public class GameController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				Map<ImageView, PopOver> map = gameData.getPlayerViews();
-				Iterator<ImageView> it = map.keySet().iterator();
-				int i = 0;
-				while(it.hasNext()) {
-					ImageView view = it.next();
+				for(int i=0; i<playerViews.length; ++i) {
 					if(i >= numOfPlayers)
 						break;
-					view.setImage(ResourceManager.getImageFromResources((i++ == index) ? "current.png" : "joined.png"));
+					playerViews[i].setImage(ResourceManager.getImageFromResources((i == index) ? "current.png" : "joined.png"));
 				}
 			}
 		});
@@ -571,29 +606,30 @@ public class GameController implements Initializable {
 	 * @param names an array of Strings
 	 * @param statuses an array of booleans
 	 */
-	public synchronized void updatePlayerPanel(final String[] names, final boolean[] statuses) {
+	public synchronized void updatePlayerPanel(final String[] names, final Player.Status[] statuses) {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				Map<ImageView, PopOver> players = gameData.getPlayerViews();
-				int i=0;
-				for(ImageView imageView : players.keySet()) {
+				for(int i=0; i<names.length; ++i) {
 					if(i >= statuses.length) // only loop through the number of connected players
 						break;
-					
-					PopOver popOver = players.get(imageView);
 					
 					// create node to place into PopOver content
 					Label nameLabel = new Label(names[i]);
 					nameLabel.setPadding(new Insets(5, 5, 2, 5));
-					Label scoreLabel = new Label("Score: " + Integer.toString(scoreData.getPlayerScore(names[i])));
+					Label scoreLabel = new Label("Score: " + scoreData.getPlayerScore(names[i]));
 					scoreLabel.setPadding(new Insets(2, 5, 5, 5));
 					
 					// update player icons according to connection status
-					Image image = ResourceManager.getImageFromResources(statuses[i] ? "joined.png" : "disconnected.png");
-					imageView.setImage(image);
-					imageView.addEventHandler(MouseEvent.MOUSE_ENTERED, new PlayerViewHandler(imageView, popOver, nameLabel, scoreLabel));
-					i++;
+					Image image = null;
+					if(statuses[i] == Player.Status.CONNECTED)
+						image = ResourceManager.getImageFromResources("joined.png");
+					else if(statuses[i] == Player.Status.DISCONNECTED)
+						image = ResourceManager.getImageFromResources("disconnected.png");
+					else if(statuses[i] == Player.Status.PLAYING)
+						image = ResourceManager.getImageFromResources("current.png");
+					playerViews[i].setImage(image);
+					playerViews[i].addEventHandler(MouseEvent.MOUSE_ENTERED, new PlayerViewHandler(playerViews[i], popOver, nameLabel, scoreLabel));
 				}
 			}
 		});
@@ -608,8 +644,7 @@ public class GameController implements Initializable {
 			public void run() {
 				ImageView[] followers = gameData.getFollowerViews();
 				for(int i=followers.length-1; i>=0; --i) {
-					if(i < (followers.length - gameData.getNumOfFollowers()))
-						followers[i].setOpacity(0.2f);
+					followers[i].setOpacity((i < (followers.length - gameData.getNumOfFollowers())) ? 0.2f : 0.6f);
 					Image image = ResourceManager.getImageFromResources("meeple" + gameData.getIndex() + ".png");
 					followers[i].setImage(image);
 				}
@@ -707,43 +742,46 @@ public class GameController implements Initializable {
 	
 	/**
 	 * Updates the game board regarding the completed segments.
+	 * @param player the player who requested the event
 	 */
-	public synchronized void updateGameBoard() {
-		PlatformManager.run(new Runnable() {
-			@Override
-			public void run() {
-				updateCloister();
-			}
-		});
+	public void updateGameBoard(final String player) {
+		updateCloister(player);
 	}
 	
 	/**
 	 * Checks for completed cloisters and handles accordingly.
+	 * @param player the player who requested the event
 	 */
-	private void updateCloister() {
-		for(int c=0; c<GameData.COLS; ++c) {
-			for(int r=0; r<GameData.ROWS; ++r) {
-				TileContainer container = gameData.getTile(r, c);
-				if(container.getTile().getSegment(Position.CENTER) == Segment.CLOISTER && container.getFollowerPosition() != null) {
-					int count = 0;
-					if(r-1 >= 0 && !gameData.getTile(r-1, c).isHoverTile() && !gameData.getTile(r-1, c).isEmpty())
-						count++;
-					if(r+1 < GameData.ROWS && !gameData.getTile(r+1, c).isHoverTile() && !gameData.getTile(r+1, c).isEmpty())
-						count++;
-					if(c-1 >= 0 && !gameData.getTile(r, c-1).isHoverTile() && !gameData.getTile(r, c-1).isEmpty())
-						count++;
-					if(c+1 < GameData.COLS && !gameData.getTile(r, c+1).isHoverTile() && !gameData.getTile(r, c+1).isEmpty())
-						count++;
-					if(count == 4) {
-						container.getChildren().remove(container.follower);
-						//addPlayerScore(container.getTile().getFollowerOwner(Position.CENTER), 9);
-						// TODO display score
-						//updatePlayerData(container.getTile().getFollowerOwner(Position.CENTER), 9);
-						updateFollowerPanel();
+	private void updateCloister(final String player) {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				for(int c=0; c<GameData.COLS; ++c) {
+					for(int r=0; r<GameData.ROWS; ++r) {
+						TileContainer container = gameData.getTile(r, c);
+						if(container.getTile().getSegment(Position.CENTER) == Segment.CLOISTER && container.getFollowerPosition() != null) {
+							int count = 0;
+							if(r-1 >= 0 && !gameData.getTile(r-1, c).isHoverTile() && !gameData.getTile(r-1, c).isEmpty())
+								count++;
+							if(r+1 < GameData.ROWS && !gameData.getTile(r+1, c).isHoverTile() && !gameData.getTile(r+1, c).isEmpty())
+								count++;
+							if(c-1 >= 0 && !gameData.getTile(r, c-1).isHoverTile() && !gameData.getTile(r, c-1).isEmpty())
+								count++;
+							if(c+1 < GameData.COLS && !gameData.getTile(r, c+1).isHoverTile() && !gameData.getTile(r, c+1).isEmpty())
+								count++;
+							if(count == 4) {
+								container.getChildren().remove(container.follower);
+								if(client.getGame().getPlayerName().equalsIgnoreCase(player)) {
+									sendScoreUpdateRequest(container.getTile().getFollowerOwner(Position.CENTER), ScoreData.CLOISTER_POINTS);
+									sendFollowerUpdateRequest(container.getTile().getFollowerOwner(Position.CENTER), 1);
+								}
+								container.getTile().removeSegment(Position.CENTER);
+							}
+						}
 					}
 				}
 			}
-		}
+		});
 	}
 	
 	/**
@@ -753,7 +791,7 @@ public class GameController implements Initializable {
 	 */
 	public synchronized void updatePlayerData(final String name, final int points) {
 		Connection connection = client.getGame().getConnection();
-		Event event = new Event(EventType.PLAYER_UPDATE_REQUEST, client.getGame().getPlayerName());
+		Event event = new Event(EventType.SCORE_UPDATE_REQUEST, client.getGame().getPlayerName());
 		event.addProperty("target", name);
 		event.addProperty("points", points);
 		connection.sendEvent(event);
@@ -767,7 +805,8 @@ public class GameController implements Initializable {
 	 * @param row the row
 	 * @param column the column
 	 */
-	public synchronized void handleStartGame(final String[] names, final boolean[] statuses, final String target, final int row, final int column) {
+	public synchronized void handleStartGame(final String[] names, final Player.Status[] statuses, 
+			final String target, final int row, final int column) {
 		updatePlayerPanel(names, statuses);
 		updateFollowerPanel();
 		addStartingTile(row, column);
@@ -838,13 +877,16 @@ public class GameController implements Initializable {
 	 * @param success true if deck is not empty
 	 * @param playerName the player name
 	 * @param targetName the target name
+	 * @param title the title
+	 * @param message the message
 	 */
-	public synchronized void handleEndTurn(final boolean success, final String playerName, final String targetName) {
+	public synchronized void handleEndTurn(final boolean success, final String playerName, final String targetName,
+			final String title, final String message) {
 		if(client.getGame().getPlayerName().equalsIgnoreCase(playerName))
 			removePreviewTiles();
 		
 		if(!success) {
-			sendEndGameRequest();
+			sendEndGameRequest(title, message);
 			return;
 		}
 		
@@ -881,6 +923,14 @@ public class GameController implements Initializable {
 	}
 	
 	/**
+	 * Returns the score data.
+	 * @return the score data
+	 */
+	public synchronized ScoreData getScoreData() {
+		return scoreData;
+	}
+	
+	/**
 	 * Returns the pane containing the preview tiles. 
 	 * @return a HBox
 	 */
@@ -910,14 +960,6 @@ public class GameController implements Initializable {
 	 */
 	public synchronized GameData getGameData() {
 		return gameData;
-	}
-	
-	/**
-	 * Returns the ScoreData object.
-	 * @return a ScoreData
-	 */
-	public synchronized ScoreData getScoreData() {
-		return scoreData;
 	}
 	
 	/**

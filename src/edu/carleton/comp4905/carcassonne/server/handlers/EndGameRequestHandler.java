@@ -15,14 +15,18 @@ public class EndGameRequestHandler implements EventHandler {
 		Server server = (Server)connection.getService();
 		ServerController controller = server.getController();
 
-		controller.addMessageEntry(MessageType.INFO, "There are no more tiles in the deck.");
+		String title = (String)event.getProperty("messageTitle");
+		String message = (String)event.getProperty("message");
+		
+		controller.addMessageEntry(MessageType.INFO, title + ": " + message);
 		server.getReactor().removeHandler(EventType.QUIT_REQUEST);
 
 		// send reply back to connected client
 		Event reply = new Event(EventType.END_GAME_REPLY, event.getPlayerName());
-		reply.addProperty("message", "There are no more tiles in the deck.");
+		reply.addProperty("messageTitle", title);
+		reply.addProperty("message", message);
 		connection.sendEvent(reply);
 		
-		controller.closeApplication();
+		controller.closeServerApplication();
 	}
 }

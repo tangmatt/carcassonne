@@ -215,6 +215,15 @@ public class TileContainer extends AbstractTile {
 	public boolean isHoverTile() {
 		return isHoverTile;
 	}
+	
+	/**
+	 * Returns true if container is empty.
+	 * @return a boolean
+	 */
+	@Override
+	public boolean isEmpty() {
+		return super.isEmpty() || isHoverTile();
+	}
 
 	@Override
 	public void setSelected(final boolean state) {

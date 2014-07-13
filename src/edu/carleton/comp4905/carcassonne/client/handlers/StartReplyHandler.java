@@ -7,6 +7,7 @@ import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventHandler;
 import edu.carleton.comp4905.carcassonne.common.Mode;
+import edu.carleton.comp4905.carcassonne.common.Player;
 
 public class StartReplyHandler implements EventHandler {
 	@Override
@@ -21,10 +22,7 @@ public class StartReplyHandler implements EventHandler {
 		Mode mode = (Mode)event.getProperty("mode");
 		int row = (int)event.getProperty("row");
 		int column = (int)event.getProperty("column");
-		Boolean[] statusesObj = (Boolean[])event.getProperty("statuses");
-		boolean[] statuses = new boolean[statusesObj.length];
-		for(int i=0; i<statusesObj.length; ++i)
-			statuses[i] = statusesObj[i].booleanValue();
+		Player.Status[] statuses = (Player.Status[])event.getProperty("statuses");
 		
 		int index;
 		for(index = 0; index<names.length; ++index) {
@@ -36,7 +34,7 @@ public class StartReplyHandler implements EventHandler {
 		
 		lobbyController.close();
 		game.setMode(mode);
+		gameController.getScoreData().setPlayerScore(game.getPlayerName(), 0);
 		gameController.handleStartGame(names, statuses, target, row, column);
-		
 	}
 }

@@ -8,6 +8,7 @@ import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventHandler;
 import edu.carleton.comp4905.carcassonne.common.EventType;
+import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.MessageType;
 import edu.carleton.comp4905.carcassonne.common.Player;
 import edu.carleton.comp4905.carcassonne.common.Player.Status;
@@ -36,14 +37,14 @@ public class QuitRequestHandler implements EventHandler {
 			controller.handleGameFinish();
 		
 		String[] names = controller.getPlayerNames();
-		String message = null;
-		Boolean[] statuses = controller.getStatuses(connections);
-		boolean gameOver = (getNumOfPlayersConnected(statuses) == 1) && server.isGameInProgress();
+		String title = null, message = null;
+		Player.Status[] statuses = controller.getStatuses(connections);
+		boolean gameOver = (controller.getNumberOfPlayersConnected() == 1) && server.isGameInProgress();
 
 		if(gameOver) {
 			Player player = controller.getRemainingPlayer();
-			message = player.getName() + " (" + player.getAddress() + ":" + player.getPort() + ") is the winner!";
-			controller.addMessageEntry(MessageType.INFO, message);
+			title = LocalMessages.getString("LastPlayerRemainsTitle");
+			message = player.getName() + " is the winner!";
 		} else if(!server.isGameInProgress()) {
 			controller.removePlayer(event.getPlayerName(), address, portAsString, Status.DISCONNECTED);
 		}
@@ -56,24 +57,11 @@ public class QuitRequestHandler implements EventHandler {
 		reply.addProperty("finished", gameOver);
 		reply.addProperty("message", message);
 		reply.addProperty("gameInProgress", server.isGameInProgress());
+		reply.addProperty("messageTitle", title);
+		reply.addProperty("message", message);
 		connection.broadcastEvent(reply, connections);
 		
 		if(gameOver)
-			controller.closeApplication();
-	}
-	
-	/**
-	 * Returns the number of players connected
-	 * @param statuses the statuses
-	 * @return the number of players connected
-	 */
-	private int getNumOfPlayersConnected(final Boolean[] statuses) {
-		int total = 0;
-		for(Boolean status : statuses) {
-			if(status.booleanValue()) {
-				total++;
-			}
-		}
-		return total;
+			controller.closeServerApplication();
 	}
 }

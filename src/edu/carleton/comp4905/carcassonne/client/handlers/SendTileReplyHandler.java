@@ -25,6 +25,13 @@ public class SendTileReplyHandler implements EventHandler {
 		Position position = (Position)event.getProperty("position");
 		boolean shield = (boolean)event.getProperty("shield");
 		
+		if(game.getPlayerName().equalsIgnoreCase(player) && position != null) {
+			if(gameController.getGameData().getNumOfFollowers() <= 0)
+				return;
+			gameController.getGameData().decreaseNumOfFollowers();
+			gameController.updateFollowerPanel();
+		}
+		
 		gameController.refreshGameTiles();
 		TileContainer container = new TileContainer(tileManager.getTile(tile), row, column);
 		container.getTile().setShield(shield);
@@ -34,9 +41,9 @@ public class SendTileReplyHandler implements EventHandler {
 			gameController.getGameData().getTilesWithFollowers().put(container, player);
 			gameController.updateConnectedSegments(container, position, container.getSegment(position), player);
 		}
-		
+
 		gameController.addTile(container);
 		gameController.updateFollowers();
-		gameController.updateGameBoard();
+		gameController.updateGameBoard(player);
 	}
 }

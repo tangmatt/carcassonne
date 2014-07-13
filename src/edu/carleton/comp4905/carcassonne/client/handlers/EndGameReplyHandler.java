@@ -6,7 +6,6 @@ import edu.carleton.comp4905.carcassonne.client.MessageDialog;
 import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventHandler;
-import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
 
 public class EndGameReplyHandler implements EventHandler {
@@ -15,6 +14,8 @@ public class EndGameReplyHandler implements EventHandler {
 		Connection connection = (Connection)event.getProperty("connection");
 		Game game = (Game)connection.getService();
 		GameController gameController = game.getGameController();
+		
+		String messageTitle = (String)event.getProperty("messageTitle");
 		String message = (String)event.getProperty("message");
 		
 		gameController.blurGame(true);
@@ -23,7 +24,7 @@ public class EndGameReplyHandler implements EventHandler {
 			public void run() {
 				new MessageDialog(gameController.getGridPane().getScene().getWindow(),
 						gameController.getGameClient(),
-						LocalMessages.getString("GameOverTitle"),
+						messageTitle,
 						message,
 						true)
 				.show();

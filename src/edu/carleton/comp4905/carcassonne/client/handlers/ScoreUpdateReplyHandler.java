@@ -5,21 +5,21 @@ import edu.carleton.comp4905.carcassonne.client.GameController;
 import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventHandler;
+import edu.carleton.comp4905.carcassonne.common.Player;
 
-public class EndTurnReplyHandler implements EventHandler {
+public class ScoreUpdateReplyHandler implements EventHandler {
 	@Override
 	public void handleEvent(final Event event) {
 		Connection connection = (Connection)event.getProperty("connection");
 		Game game = (Game)connection.getService();
 		GameController gameController = game.getGameController();
 		
-		String player = event.getPlayerName();
-		
-		boolean success = (boolean)event.getProperty("success");
 		String target = (String)event.getProperty("target");
-		String title = (String)event.getProperty("messageTitle");
-		String message = (String)event.getProperty("message");
-
-		gameController.handleEndTurn(success, player, target, title, message);
+		int score = (int)event.getProperty("points");
+		Player.Status[] statuses = (Player.Status[])event.getProperty("statuses");
+		String[] names = (String[])event.getProperty("names");
+		
+		gameController.getScoreData().setPlayerScore(target, score);
+		gameController.updatePlayerPanel(names, statuses);
 	}
 }

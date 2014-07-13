@@ -13,16 +13,16 @@ public class GameData {
 	public static final int ROWS = 8;
 	public static final int COLS = 9;
 	public static final int TOTAL_FOLLOWERS = 7;
+	public static final int TOTAL_PLAYERS = 5;
 	
 	private final TileContainer[][] tiles;
 	private final TilePreview[] previews;
 	private GameTile selected;
 	
 	private final Map<TileContainer, String> tilesWithFollowers;
-	
-	private Map<ImageView, PopOver> players;
-	
-	private ImageView[] followers;
+	private final Map<ImageView, PopOver> popOverMap;
+
+	private ImageView[] followers, players;
 	private int index;
 	private int numOfFollowers;
 	
@@ -30,15 +30,14 @@ public class GameData {
 		tiles = new TileContainer[COLS][ROWS];
 		previews = new TilePreview[TileManager.TOTAL_ROTATED_VIEWS];
 		tilesWithFollowers = new HashMap<TileContainer, String>();
-		players = new LinkedHashMap<ImageView, PopOver>();
+		popOverMap = new LinkedHashMap<ImageView, PopOver>();
+		players = new ImageView[TOTAL_PLAYERS];
 		followers = new ImageView[TOTAL_FOLLOWERS];
 		numOfFollowers = TOTAL_FOLLOWERS;
 	}
 	
 	/**
 	 * Sets the tile to the specified row and column.
-	 * @param r a row (integer)
-	 * @param c a column (integer)
 	 * @param tile a TileContainer
 	 */
 	public void setTile(final TileContainer tile) {
@@ -68,9 +67,9 @@ public class GameData {
 	 * @param imageView an array of ImageViews
 	 * @param popOver a PopOver
 	 */
-	public void addPlayerViews(final ImageView[] imageView, final PopOver popOver) {
+	public void addPopOvers(final ImageView[] imageView, final PopOver popOver) {
 		for(int i=0; i<imageView.length; ++i)
-			players.put(imageView[i], popOver);
+			popOverMap.put(imageView[i], popOver);
 	}
 	
 	/**
@@ -107,19 +106,27 @@ public class GameData {
 	}
 	
 	/**
-	 * Returns the images representing the players that are mapped to pop overs.
+	 * Returns a map of image views mapped to their pop overs.
 	 * @return a Map<ImageView, PopOver>
 	 */
-	public Map<ImageView, PopOver> getPlayerViews() {
-		return players;
+	public Map<ImageView, PopOver> getPopOverViews() {
+		return popOverMap;
 	}
 	
 	/**
 	 * Returns the images representing the followers.
-	 * @return a Map<ImageView, PopOver>
+	 * @return an array of follower views
 	 */
 	public ImageView[] getFollowerViews() {
 		return followers;
+	}
+	
+	/**
+	 * Returns the images representing the players.
+	 * @return an array of player views
+	 */
+	public ImageView[] getPlayerViews() {
+		return players;
 	}
 	
 	/**

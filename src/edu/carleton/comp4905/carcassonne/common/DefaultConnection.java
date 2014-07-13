@@ -8,27 +8,9 @@ import java.util.concurrent.ConcurrentMap;
 
 public class DefaultConnection extends Connection {
 	private static final long serialVersionUID = 1L;
-	private boolean running;
 
 	public DefaultConnection(final Service service, final Socket peer) throws IOException {
 		super(service, peer);
-		this.running = false;
-	}
-
-	@Override
-	public Socket getPeer() {
-		return peer;
-	}
-
-	@Override
-	public void close() {
-		try {
-			running = false;
-			service.getPool().shutdown();
-			peer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
@@ -65,30 +47,6 @@ public class DefaultConnection extends Connection {
 				} catch (Exception e) {
 					running = false;
 				}
-			}
-		}
-	}
-
-	private class Consumer implements Runnable {
-		private final DefaultConnection connection;
-
-		public Consumer(final DefaultConnection connection) {
-			this.connection = connection;
-		}
-		
-		@Override
-		public void run() {
-			try {
-				while(running) {
-					Event event = buffer.take();
-					event.addProperty("connection", connection);
-					event.addProperty("address", peer.getInetAddress().getHostAddress());
-					event.addProperty("port", peer.getPort());
-					if(event != null)
-						service.getReactor().dispatch(event);
-				}
-			} catch (Exception e) {
-				running = false;
 			}
 		}
 	}

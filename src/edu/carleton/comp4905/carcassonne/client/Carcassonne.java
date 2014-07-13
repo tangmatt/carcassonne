@@ -27,7 +27,7 @@ public class Carcassonne extends Application {
 		ScreensController mainContainer = new ScreensController(primaryStage);
 		mainContainer.loadScreen(Carcassonne.JOIN_SCREEN, Carcassonne.JOIN_SCREEN_FXML);
 		mainContainer.loadScreen(Carcassonne.HOST_SCREEN, Carcassonne.HOST_SCREEN_FXML);
-		mainContainer.setScreen(Carcassonne.HOST_SCREEN);
+		mainContainer.setScreen(Carcassonne.JOIN_SCREEN);
 		
 		Group root = new Group();
 		root.getChildren().addAll(mainContainer);

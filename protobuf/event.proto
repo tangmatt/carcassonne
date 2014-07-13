@@ -11,7 +11,7 @@ message Event {
 	optional int32 numOfPlayers = 6;
 	optional bool success = 7;
 	optional string message = 8;
-	repeated bool statuses = 9;
+	repeated int32 statuses = 9;
 	repeated string names = 10;
 	optional bool finished = 11;
 	optional bool gameInProgress = 12;
@@ -31,4 +31,5 @@ message Event {
 	optional int32 tilesLeft = 26;
 	optional int32 rows = 27;
 	optional int32 columns = 28;
+	optional string messageTitle = 29;
 }

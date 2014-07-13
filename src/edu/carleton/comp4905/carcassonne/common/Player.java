@@ -1,8 +1,11 @@
 package edu.carleton.comp4905.carcassonne.common;
 
 public class Player {
+	/**
+	 * Playing - player's current turn in SYNC mode (ASYNC mode not applicable)
+	 */
 	public static enum Status {
-		CONNECTED, DISCONNECTED
+		CONNECTED, DISCONNECTED, PLAYING
 	}
 	
 	private final String name;
@@ -91,6 +94,14 @@ public class Player {
 	 */
 	public boolean hasTile() {
 		return hasTile;
+	}
+	
+	/**
+	 * Returns the player's score.
+	 * @return an integer
+	 */
+	public int getScore() {
+		return score;
 	}
 	
 	/**

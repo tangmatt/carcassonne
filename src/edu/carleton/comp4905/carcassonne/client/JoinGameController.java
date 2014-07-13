@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import edu.carleton.comp4905.carcassonne.common.Address;
+import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -28,7 +29,7 @@ public class JoinGameController extends InputController implements Initializable
 	 * @param event an ActionEvent
 	 */
 	private void handleSubmit(final ActionEvent event) {
-		if(isNameFieldEmpty() || isAddrFieldEmpty() || !isPortFieldValid())
+		if(!isNameFieldValid() || isAddrFieldEmpty() || !isPortFieldValid())
 			return;
 		try {
 			Address address = new Address(servAddrField.getText(), Integer.parseInt(servPortField.getText()));
@@ -36,7 +37,7 @@ public class JoinGameController extends InputController implements Initializable
 			stage.close();
 		} catch (Exception e) {
 			e.printStackTrace();
-			showMessage("Could not connect to server.");
+			showMessage(LocalMessages.getString("CouldNotConnect"));
 		}
 	}
 	

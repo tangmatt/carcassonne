@@ -8,6 +8,7 @@ import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventHandler;
 import edu.carleton.comp4905.carcassonne.common.EventType;
+import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.MessageType;
 import edu.carleton.comp4905.carcassonne.common.TileManager;
 import edu.carleton.comp4905.carcassonne.server.Server;
@@ -33,28 +34,28 @@ public class JoinRequestHandler implements EventHandler {
 			Event reply = new Event(EventType.JOIN_REPLY, event.getPlayerName());
 			reply.addProperty("numOfPlayers", connections.size());
 			reply.addProperty("success", false);
-			reply.addProperty("message", "Game has already started.");
+			reply.addProperty("message", LocalMessages.getString("GameAlreadyStarted"));
 			connection.sendEvent(reply);
 			return;
 		} else if(controller.playerExists(event.getPlayerName())) {
 			Event reply = new Event(EventType.JOIN_REPLY, event.getPlayerName());
 			reply.addProperty("numOfPlayers", connections.size());
 			reply.addProperty("success", false);
-			reply.addProperty("message", "Player name already exists.");
+			reply.addProperty("message", LocalMessages.getString("PlayerAlreadyExists"));
 			connection.sendEvent(reply);
 			return;
 		} else if(connections.size() >= 5) {
 			Event reply = new Event(EventType.JOIN_REPLY, event.getPlayerName());
 			reply.addProperty("numOfPlayers", connections.size());
 			reply.addProperty("success", false);
-			reply.addProperty("message", "Lobby has reached the player limit.");
+			reply.addProperty("message", LocalMessages.getString("PlayerLimitReached"));
 			connection.sendEvent(reply);
 			return;
 		} else if(!checksum.equals(tileManager.checksum())) {
 			Event reply = new Event(EventType.JOIN_REPLY, event.getPlayerName());
 			reply.addProperty("numOfPlayers", connections.size());
 			reply.addProperty("success", false);
-			reply.addProperty("message", "Tile configuration may have been modified.");
+			reply.addProperty("message", LocalMessages.getString("ModifiedTileConfig"));
 			connection.sendEvent(reply);
 			return;
 		}

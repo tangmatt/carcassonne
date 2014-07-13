@@ -332,6 +332,15 @@ public class GameTile extends ImageView {
 	}
 	
 	/**
+	 * Removes the segment information at specified position.
+	 * @param position the position
+	 */
+	public void removeSegment(final Position position) {
+		segments.remove(position);
+		positions.remove(position);		
+	}
+	
+	/**
 	 * Sets whether there is a shield on this tile.
 	 * @param state the state
 	 */

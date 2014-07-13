@@ -96,6 +96,5 @@ public class Game extends Service implements Runnable {
 	public void shutdown() {
 		if(connection != null)
 			connection.close();
-		super.shutdown();
 	}
 }

@@ -3,14 +3,13 @@ package edu.carleton.comp4905.carcassonne.common;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 import edu.carleton.comp4905.carcassonne.client.Game;
 import edu.carleton.comp4905.carcassonne.server.Server;
 
 public abstract class Service {
+	protected Mode mode;
 	protected final Reactor reactor;
 	protected Serializer serializer;
-	protected Mode mode;
 	protected String properties;
 	protected final ExecutorService pool;
 	public static final String FILENAME = "config/app.properties";
@@ -108,9 +107,7 @@ public abstract class Service {
 	/**
 	 * Shuts down the service.
 	 */
-	public void shutdown() {
-		pool.shutdownNow();
-	}
+	public abstract void shutdown();
 	
 	/**
 	 * Creates an instance of an EventHandler.

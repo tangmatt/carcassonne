@@ -20,9 +20,9 @@ public class TileHoverHandler implements EventHandler<MouseEvent> {
 		GameTile selectedTile = controller.getGameData().getCopyOfSelectedPreviewTile();
 		int index = controller.getGameData().getIndex();
 		Map<Position, String> positions = selectedTile.getPositions();
-		String playerName = controller.getGameClient().getGame().getPlayerName();
+		/*String playerName = controller.getGameClient().getGame().getPlayerName();
 		int r = container.r, c = container.c;
-		GameData gameData = controller.getGameData();
+		GameData gameData = controller.getGameData();*/
 		
 		selectedTile.setOpacity(0.6f);
 		container.addTile(selectedTile);

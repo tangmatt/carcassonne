@@ -8,6 +8,7 @@ import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventHandler;
 import edu.carleton.comp4905.carcassonne.common.EventType;
 import edu.carleton.comp4905.carcassonne.common.MessageType;
+import edu.carleton.comp4905.carcassonne.common.Player;
 import edu.carleton.comp4905.carcassonne.server.Server;
 import edu.carleton.comp4905.carcassonne.server.ServerController;
 
@@ -19,7 +20,7 @@ public class StartTurnRequestHandler implements EventHandler {
 		ServerController controller = server.getController();
 		ConcurrentMap<Address, Connection> connections = server.getConnections();
 		
-		Boolean[] statuses = controller.getStatuses(connections);
+		Player.Status[] statuses = controller.getStatuses(connections);
 		String tile = null;
 		
 		if(!controller.getDeck().isEmpty()) {

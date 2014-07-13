@@ -25,16 +25,16 @@ public class TileContainerHandler implements EventHandler<MouseEvent> {
 		Connection connection = controller.getGameClient().getGame().getConnection();
 		GameTile selectedTile = controller.getGameData().getCopyOfSelectedPreviewTile();
 		Position position = container.getFollowerPosition();
-		container.setHoverTile(false);
 		
 		if(!event.isPrimaryButtonDown())
 			return;
 		
+		if(!container.isEmpty())
+			return;
+
 		if(position != null) {
 			if(controller.getGameData().getNumOfFollowers() <= 0)
 				return;
-			controller.getGameData().decreaseNumOfFollowers();
-			controller.updateFollowerPanel();
 		}
 		
 		// send tile placement event to server
@@ -48,6 +48,7 @@ public class TileContainerHandler implements EventHandler<MouseEvent> {
 		gameEvent.addProperty("shield", container.getTile().hasShield());
 		connection.sendEvent(gameEvent);
 		
+		container.setHoverTile(false);
 		controller.endTurn();
 	}
 }

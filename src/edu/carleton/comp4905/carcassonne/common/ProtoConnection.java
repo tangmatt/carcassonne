@@ -7,27 +7,9 @@ import java.util.concurrent.ConcurrentMap;
 
 public class ProtoConnection extends Connection {
 	private static final long serialVersionUID = 1L;
-	private boolean running;
 
 	public ProtoConnection(final Service service, final Socket peer) throws IOException {
 		super(service, peer);
-		this.running = false;
-	}
-	
-	@Override
-	public Socket getPeer() {
-		return peer;
-	}
-	
-	@Override
-	public void close() {
-		try {
-			running = false;
-			service.getPool().shutdown();
-			peer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	@Override
@@ -75,7 +57,10 @@ public class ProtoConnection extends Connection {
 			event.addProperty("message", eventMessage.getMessage());
 		if(eventMessage.getStatusesList() != null){
 			Object[] objArray = eventMessage.getStatusesList().toArray();
-			event.addProperty("statuses", Arrays.copyOf(objArray, objArray.length, Boolean[].class));
+			Player.Status[] statuses = new Player.Status[objArray.length];
+			for(int i=0; i<statuses.length; ++i)
+				statuses[i] = Player.Status.values()[(int)objArray[i]];
+			event.addProperty("statuses", statuses);
 		}
 		if(eventMessage.getNamesList() != null) {
 			Object[] objArray = eventMessage.getNamesList().toArray();
@@ -115,6 +100,10 @@ public class ProtoConnection extends Connection {
 			event.addProperty("rows", eventMessage.getRows());
 		if(eventMessage.hasColumns())
 			event.addProperty("columns", eventMessage.getColumns());
+		if(eventMessage.hasMessageTitle())
+			event.addProperty("messageTitle", eventMessage.getMessageTitle());
+		if(eventMessage.hasFollowers())
+			event.addProperty("followers", eventMessage.getFollowers());
 		
 		return event;
 	}
@@ -136,9 +125,9 @@ public class ProtoConnection extends Connection {
 		if(event.getProperty("message") != null)
 			builder.setMessage((String)event.getProperty("message"));
 		if(event.getProperty("statuses") != null) {
-			Boolean[] statuses = (Boolean[])event.getProperty("statuses");
+			Player.Status[] statuses = (Player.Status[])event.getProperty("statuses");
 			for(int i=0; i<statuses.length; ++i)
-				builder.addStatuses(statuses[i]);	
+				builder.addStatuses(statuses[i].ordinal());	
 		}
 		if(event.getProperty("names") != null) {
 			String[] names = (String[])event.getProperty("names");
@@ -179,6 +168,10 @@ public class ProtoConnection extends Connection {
 			builder.setRows((int)event.getProperty("rows"));
 		if(event.getProperty("columns") != null)
 			builder.setColumns((int)event.getProperty("columns"));
+		if(event.getProperty("messageTitle") != null)
+			builder.setMessageTitle((String)event.getProperty("messageTitle"));
+		if(event.getProperty("followers") != null)
+			builder.setFollowers((int)event.getProperty("followers"));
 		
 		return builder.build();
 	}

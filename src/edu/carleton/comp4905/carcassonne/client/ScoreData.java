@@ -5,31 +5,22 @@ import java.util.Map;
 
 public class ScoreData {
 	private Map<String, Integer> players;
+	public final static int CLOISTER_POINTS = 9;
 	
 	public ScoreData() {
 		players = new HashMap<String, Integer>();
 	}
 	
 	/**
-	 * Adds specified score points to the player.
+	 * Sets specified score points to the player.
 	 * @param name the player name
 	 * @param score the score points
 	 */
-	public void addPlayerScore(final String name, final int score) {
+	public void setPlayerScore(final String name, final int score) {
 		if(players.get(name) == null)
 			players.put(name, 0);
 		else
-			players.put(name, players.get(name) + score);
-	}
-	
-	/**
-	 * Deducts specified score points from the player.
-	 * @param name the player name
-	 * @param points the score points
-	 */
-	public void deductPlayerScore(final String name, final int points) {
-		int difference = players.get(name) - points;
-		players.put(name, (difference < 0) ? 0 : difference);
+			players.put(name, score);
 	}
 	
 	/**
@@ -39,7 +30,7 @@ public class ScoreData {
 	 */
 	public int getPlayerScore(final String name) {
 		if(players.get(name) == null)
-			addPlayerScore(name, 0);
+			setPlayerScore(name, 0);
 		return players.get(name);
 	}
 	

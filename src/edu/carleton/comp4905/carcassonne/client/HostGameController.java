@@ -5,6 +5,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ResourceBundle;
 
+import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.Mode;
 import edu.carleton.comp4905.carcassonne.server.ServerClient;
 import javafx.event.ActionEvent;
@@ -27,8 +28,8 @@ public class HostGameController extends InputController implements Initializable
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
-		syncButton.setTooltip(new Tooltip("Players take turn placing tiles"));
-		asyncButton.setTooltip(new Tooltip("Anyone can place a tile at any time"));
+		syncButton.setTooltip(new Tooltip(LocalMessages.getString("SyncTip")));
+		asyncButton.setTooltip(new Tooltip(LocalMessages.getString("AsyncTip")));
 		
 		try {
 			InetAddress inetAddress = InetAddress.getLocalHost();

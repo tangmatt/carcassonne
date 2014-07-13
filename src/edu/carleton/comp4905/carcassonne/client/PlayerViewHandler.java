@@ -1,4 +1,4 @@
-package edu.carleton.comp4905.carcassonne.client.handlers;
+package edu.carleton.comp4905.carcassonne.client;
 
 import org.controlsfx.control.PopOver;
 

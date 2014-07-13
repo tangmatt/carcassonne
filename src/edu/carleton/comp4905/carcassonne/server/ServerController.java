@@ -1,7 +1,13 @@
 package edu.carleton.comp4905.carcassonne.server;
 
 import java.net.URL;
+import java.text.ChoiceFormat;
+import java.text.Format;
+import java.text.MessageFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -158,12 +164,21 @@ public class ServerController implements Initializable {
 	
 	/**
 	 * Returns the players' status.
-	 * @return an array of booleans
+	 * @return an array of statuses
 	 */
-	public synchronized Boolean[] getStatuses(final Map<Address, Connection> connections) {
-		Boolean[] statuses = new Boolean[playerData.size()];
-		for(int i=0; i<statuses.length; ++i)
-			statuses[i] = playerData.get(i).isConnected();
+	public synchronized Player.Status[] getStatuses(final Map<Address, Connection> connections) {
+		Player.Status[] statuses = new Player.Status[playerData.size()];
+		for(int i=0; i<statuses.length; ++i) {
+			Player player = playerData.get(i);
+			if(player.isConnected()) {
+				if(getServerClient().getServer().isCurrentPlayer(player.getName()))
+					statuses[i] = Player.Status.PLAYING;
+				else
+					statuses[i] = Player.Status.CONNECTED;
+			} else {
+				statuses[i] = Player.Status.DISCONNECTED;
+			}
+		}
 		return statuses;
 	}
 	
@@ -176,6 +191,19 @@ public class ServerController implements Initializable {
 		for(int i=0; i<names.length; ++i)
 			names[i] = playerData.get(i).getName();
 		return names;
+	}
+	
+	/**
+	 * Returns the number of players connected
+	 * @return the number of players connected
+	 */
+	public synchronized int getNumberOfPlayersConnected() {
+		int total = 0;
+		for(Player player : playerData) {
+			if(player.isConnected())
+				total++;
+		}
+		return total;
 	}
 	
 	/**
@@ -264,6 +292,7 @@ public class ServerController implements Initializable {
 		for(Player player : playerData) {
 			if(player.getName().equalsIgnoreCase(name)) {
 				player.addPoints(points);
+				break;
 			}
 		}
 	}
@@ -283,9 +312,69 @@ public class ServerController implements Initializable {
 	}
 	
 	/**
+	 * Returns a list of winner(s).
+	 * @return list of winner(s)
+	 */
+	public synchronized List<String> getWinners() {
+		int highest = Integer.MIN_VALUE;
+		List<String> winners = new ArrayList<String>();
+		// get highest number of points
+		for(Player player : playerData) {
+			if(player.getScore() > highest)
+				highest = player.getScore();
+		}
+		// check for players with the same high score
+		for(Player player : playerData) {
+			if(player.getScore() == highest)
+				winners.add(player.getName());
+		}
+		return winners;
+	}
+	
+	/**
+	 * Returns a message announcing the winner(s).
+	 * @return a message
+	 */
+	public synchronized String getWinnerMessage() {
+		double[] fileLimits = {1, 2};
+		String[] fileStrings = {
+			LocalMessages.getString("OneWinner"),
+			LocalMessages.getString("MultipleWinners")
+		};
+		
+		MessageFormat messageForm = new MessageFormat("");
+		ChoiceFormat choiceForm = new ChoiceFormat(fileLimits, fileStrings);
+		String pattern = LocalMessages.getString("WinnerInfo");
+		Format[] formats = {choiceForm, null, NumberFormat.getInstance()};
+		messageForm.applyPattern(pattern);
+		messageForm.setFormats(formats);
+		
+		List<String> winners = getWinners();
+		String parsed = winners.toString().substring(1,  winners.toString().length());
+		parsed = parsed.substring(0, parsed.length()-1);
+		Object[] messageArguments = {winners.size(), parsed};
+		String result = messageForm.format(messageArguments);
+		return result;
+	}
+	
+	/**
+	 * Returns the player's score.
+	 * @param name the player name
+	 * @return a score
+	 */
+	public synchronized int getPlayerScore(final String name) {
+		for(Player player : playerData) {
+			if(player.getName().equalsIgnoreCase(name)) {
+				return player.getScore();
+			}
+		}
+		return -1;
+	}
+	
+	/**
 	 * Closes the server application.
 	 */
-	public synchronized void closeApplication() {
+	public synchronized void closeServerApplication() {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {

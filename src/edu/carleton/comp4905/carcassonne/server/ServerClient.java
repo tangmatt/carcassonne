@@ -63,6 +63,14 @@ public class ServerClient extends Application {
 	}
 	
 	/**
+	 * Returns the server.
+	 * @return the server
+	 */
+	public Server getServer() {
+		return server;
+	}
+	
+	/**
 	 * Returns the primary stage.
 	 * @return a Stage
 	 */

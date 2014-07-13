@@ -1,6 +1,5 @@
 package edu.carleton.comp4905.carcassonne.server.handlers;
 
-import java.util.Random;
 import java.util.concurrent.ConcurrentMap;
 
 import edu.carleton.comp4905.carcassonne.common.Address;
@@ -8,12 +7,11 @@ import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventHandler;
 import edu.carleton.comp4905.carcassonne.common.EventType;
-import edu.carleton.comp4905.carcassonne.common.MessageType;
 import edu.carleton.comp4905.carcassonne.common.Player;
 import edu.carleton.comp4905.carcassonne.server.Server;
 import edu.carleton.comp4905.carcassonne.server.ServerController;
 
-public class StartRequestHandler implements EventHandler {
+public class ScoreUpdateRequestHandler implements EventHandler {
 	@Override
 	public void handleEvent(final Event event) {
 		Connection connection = (Connection)event.getProperty("connection");
@@ -21,26 +19,19 @@ public class StartRequestHandler implements EventHandler {
 		ServerController controller = server.getController();
 		ConcurrentMap<Address, Connection> connections = server.getConnections();
 		
-		server.gameInProgress(true);
-		controller.addMessageEntry(MessageType.INFO, "Player '" + event.getPlayerName() + "' has started the game (with " + connections.size() + " players)");
+		String target = (String)event.getProperty("target");
+		int points = (int)event.getProperty("points");
 		Player.Status[] statuses = controller.getStatuses(connections);
 		String[] names = controller.getPlayerNames();
-		Random random = new Random();
-		int rows = (int)event.getProperty("rows");
-		int columns = (int)event.getProperty("columns");
-		int row = random.nextInt(rows);
-		int column = random.nextInt(columns);
-		int points = controller.getPlayerScore(event.getPlayerName());
+		
+		controller.addPlayerScore(target, points);
 		
 		// send reply back to connected clients
-		Event reply = new Event(EventType.START_REPLY, event.getPlayerName());
+		Event reply = new Event(EventType.SCORE_UPDATE_REPLY, event.getPlayerName());
 		reply.addProperty("names", names);
 		reply.addProperty("statuses", statuses);
-		reply.addProperty("target", server.getCurrentPlayer());
-		reply.addProperty("mode", server.getMode());
-		reply.addProperty("row", row);
-		reply.addProperty("column", column);
-		reply.addProperty("points", points);
+		reply.addProperty("target", target);
+		reply.addProperty("points", controller.getPlayerScore(target));
 		connection.broadcastEvent(reply, connections);
 	}
 }
