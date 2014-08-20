@@ -368,7 +368,8 @@ public final class EventMessage {
       return defaultInstance;
     }
 
-    public Event getDefaultInstanceForType() {
+    @Override
+	public Event getDefaultInstanceForType() {
       return defaultInstance;
     }
 
@@ -588,7 +589,8 @@ public final class EventMessage {
       return edu.carleton.comp4905.carcassonne.common.EventMessage.internal_static_edu_carleton_comp4905_carcassonne_common_Event_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    @Override
+	protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return edu.carleton.comp4905.carcassonne.common.EventMessage.internal_static_edu_carleton_comp4905_carcassonne_common_Event_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
@@ -597,7 +599,8 @@ public final class EventMessage {
 
     public static com.google.protobuf.Parser<Event> PARSER =
         new com.google.protobuf.AbstractParser<Event>() {
-      public Event parsePartialFrom(
+      @Override
+	public Event parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
@@ -617,13 +620,15 @@ public final class EventMessage {
     /**
      * <code>required int32 eventType = 1;</code>
      */
-    public boolean hasEventType() {
+    @Override
+	public boolean hasEventType() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
      * <code>required int32 eventType = 1;</code>
      */
-    public int getEventType() {
+    @Override
+	public int getEventType() {
       return eventType_;
     }
 
@@ -633,13 +638,15 @@ public final class EventMessage {
     /**
      * <code>required string playerName = 2;</code>
      */
-    public boolean hasPlayerName() {
+    @Override
+	public boolean hasPlayerName() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
      * <code>required string playerName = 2;</code>
      */
-    public java.lang.String getPlayerName() {
+    @Override
+	public java.lang.String getPlayerName() {
       java.lang.Object ref = playerName_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
@@ -656,7 +663,8 @@ public final class EventMessage {
     /**
      * <code>required string playerName = 2;</code>
      */
-    public com.google.protobuf.ByteString
+    @Override
+	public com.google.protobuf.ByteString
         getPlayerNameBytes() {
       java.lang.Object ref = playerName_;
       if (ref instanceof java.lang.String) {
@@ -676,13 +684,15 @@ public final class EventMessage {
     /**
      * <code>optional bytes connection = 3;</code>
      */
-    public boolean hasConnection() {
+    @Override
+	public boolean hasConnection() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
      * <code>optional bytes connection = 3;</code>
      */
-    public com.google.protobuf.ByteString getConnection() {
+    @Override
+	public com.google.protobuf.ByteString getConnection() {
       return connection_;
     }
 
@@ -692,13 +702,15 @@ public final class EventMessage {
     /**
      * <code>optional string address = 4;</code>
      */
-    public boolean hasAddress() {
+    @Override
+	public boolean hasAddress() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
      * <code>optional string address = 4;</code>
      */
-    public java.lang.String getAddress() {
+    @Override
+	public java.lang.String getAddress() {
       java.lang.Object ref = address_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
@@ -715,7 +727,8 @@ public final class EventMessage {
     /**
      * <code>optional string address = 4;</code>
      */
-    public com.google.protobuf.ByteString
+    @Override
+	public com.google.protobuf.ByteString
         getAddressBytes() {
       java.lang.Object ref = address_;
       if (ref instanceof java.lang.String) {
@@ -735,13 +748,15 @@ public final class EventMessage {
     /**
      * <code>optional int32 port = 5;</code>
      */
-    public boolean hasPort() {
+    @Override
+	public boolean hasPort() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
      * <code>optional int32 port = 5;</code>
      */
-    public int getPort() {
+    @Override
+	public int getPort() {
       return port_;
     }
 
@@ -751,13 +766,15 @@ public final class EventMessage {
     /**
      * <code>optional int32 numOfPlayers = 6;</code>
      */
-    public boolean hasNumOfPlayers() {
+    @Override
+	public boolean hasNumOfPlayers() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
      * <code>optional int32 numOfPlayers = 6;</code>
      */
-    public int getNumOfPlayers() {
+    @Override
+	public int getNumOfPlayers() {
       return numOfPlayers_;
     }
 
@@ -767,13 +784,15 @@ public final class EventMessage {
     /**
      * <code>optional bool success = 7;</code>
      */
-    public boolean hasSuccess() {
+    @Override
+	public boolean hasSuccess() {
       return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
      * <code>optional bool success = 7;</code>
      */
-    public boolean getSuccess() {
+    @Override
+	public boolean getSuccess() {
       return success_;
     }
 
@@ -783,13 +802,15 @@ public final class EventMessage {
     /**
      * <code>optional string message = 8;</code>
      */
-    public boolean hasMessage() {
+    @Override
+	public boolean hasMessage() {
       return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
      * <code>optional string message = 8;</code>
      */
-    public java.lang.String getMessage() {
+    @Override
+	public java.lang.String getMessage() {
       java.lang.Object ref = message_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
@@ -806,7 +827,8 @@ public final class EventMessage {
     /**
      * <code>optional string message = 8;</code>
      */
-    public com.google.protobuf.ByteString
+    @Override
+	public com.google.protobuf.ByteString
         getMessageBytes() {
       java.lang.Object ref = message_;
       if (ref instanceof java.lang.String) {
@@ -826,20 +848,23 @@ public final class EventMessage {
     /**
      * <code>repeated int32 statuses = 9;</code>
      */
-    public java.util.List<java.lang.Integer>
+    @Override
+	public java.util.List<java.lang.Integer>
         getStatusesList() {
       return statuses_;
     }
     /**
      * <code>repeated int32 statuses = 9;</code>
      */
-    public int getStatusesCount() {
+    @Override
+	public int getStatusesCount() {
       return statuses_.size();
     }
     /**
      * <code>repeated int32 statuses = 9;</code>
      */
-    public int getStatuses(int index) {
+    @Override
+	public int getStatuses(int index) {
       return statuses_.get(index);
     }
 
@@ -849,26 +874,30 @@ public final class EventMessage {
     /**
      * <code>repeated string names = 10;</code>
      */
-    public java.util.List<java.lang.String>
+    @Override
+	public java.util.List<java.lang.String>
         getNamesList() {
       return names_;
     }
     /**
      * <code>repeated string names = 10;</code>
      */
-    public int getNamesCount() {
+    @Override
+	public int getNamesCount() {
       return names_.size();
     }
     /**
      * <code>repeated string names = 10;</code>
      */
-    public java.lang.String getNames(int index) {
+    @Override
+	public java.lang.String getNames(int index) {
       return names_.get(index);
     }
     /**
      * <code>repeated string names = 10;</code>
      */
-    public com.google.protobuf.ByteString
+    @Override
+	public com.google.protobuf.ByteString
         getNamesBytes(int index) {
       return names_.getByteString(index);
     }
@@ -879,13 +908,15 @@ public final class EventMessage {
     /**
      * <code>optional bool finished = 11;</code>
      */
-    public boolean hasFinished() {
+    @Override
+	public boolean hasFinished() {
       return ((bitField0_ & 0x00000100) == 0x00000100);
     }
     /**
      * <code>optional bool finished = 11;</code>
      */
-    public boolean getFinished() {
+    @Override
+	public boolean getFinished() {
       return finished_;
     }
 
@@ -895,13 +926,15 @@ public final class EventMessage {
     /**
      * <code>optional bool gameInProgress = 12;</code>
      */
-    public boolean hasGameInProgress() {
+    @Override
+	public boolean hasGameInProgress() {
       return ((bitField0_ & 0x00000200) == 0x00000200);
     }
     /**
      * <code>optional bool gameInProgress = 12;</code>
      */
-    public boolean getGameInProgress() {
+    @Override
+	public boolean getGameInProgress() {
       return gameInProgress_;
     }
 
@@ -911,13 +944,15 @@ public final class EventMessage {
     /**
      * <code>optional string tile = 13;</code>
      */
-    public boolean hasTile() {
+    @Override
+	public boolean hasTile() {
       return ((bitField0_ & 0x00000400) == 0x00000400);
     }
     /**
      * <code>optional string tile = 13;</code>
      */
-    public java.lang.String getTile() {
+    @Override
+	public java.lang.String getTile() {
       java.lang.Object ref = tile_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
@@ -934,7 +969,8 @@ public final class EventMessage {
     /**
      * <code>optional string tile = 13;</code>
      */
-    public com.google.protobuf.ByteString
+    @Override
+	public com.google.protobuf.ByteString
         getTileBytes() {
       java.lang.Object ref = tile_;
       if (ref instanceof java.lang.String) {
@@ -954,13 +990,15 @@ public final class EventMessage {
     /**
      * <code>optional int32 row = 14;</code>
      */
-    public boolean hasRow() {
+    @Override
+	public boolean hasRow() {
       return ((bitField0_ & 0x00000800) == 0x00000800);
     }
     /**
      * <code>optional int32 row = 14;</code>
      */
-    public int getRow() {
+    @Override
+	public int getRow() {
       return row_;
     }
 
@@ -970,13 +1008,15 @@ public final class EventMessage {
     /**
      * <code>optional int32 column = 15;</code>
      */
-    public boolean hasColumn() {
+    @Override
+	public boolean hasColumn() {
       return ((bitField0_ & 0x00001000) == 0x00001000);
     }
     /**
      * <code>optional int32 column = 15;</code>
      */
-    public int getColumn() {
+    @Override
+	public int getColumn() {
       return column_;
     }
 
@@ -986,13 +1026,15 @@ public final class EventMessage {
     /**
      * <code>optional int32 rotation = 16;</code>
      */
-    public boolean hasRotation() {
+    @Override
+	public boolean hasRotation() {
       return ((bitField0_ & 0x00002000) == 0x00002000);
     }
     /**
      * <code>optional int32 rotation = 16;</code>
      */
-    public int getRotation() {
+    @Override
+	public int getRotation() {
       return rotation_;
     }
 
@@ -1002,13 +1044,15 @@ public final class EventMessage {
     /**
      * <code>optional int32 meeple = 17;</code>
      */
-    public boolean hasMeeple() {
+    @Override
+	public boolean hasMeeple() {
       return ((bitField0_ & 0x00004000) == 0x00004000);
     }
     /**
      * <code>optional int32 meeple = 17;</code>
      */
-    public int getMeeple() {
+    @Override
+	public int getMeeple() {
       return meeple_;
     }
 
@@ -1018,13 +1062,15 @@ public final class EventMessage {
     /**
      * <code>optional int32 position = 18;</code>
      */
-    public boolean hasPosition() {
+    @Override
+	public boolean hasPosition() {
       return ((bitField0_ & 0x00008000) == 0x00008000);
     }
     /**
      * <code>optional int32 position = 18;</code>
      */
-    public int getPosition() {
+    @Override
+	public int getPosition() {
       return position_;
     }
 
@@ -1034,13 +1080,15 @@ public final class EventMessage {
     /**
      * <code>optional bool shield = 19;</code>
      */
-    public boolean hasShield() {
+    @Override
+	public boolean hasShield() {
       return ((bitField0_ & 0x00010000) == 0x00010000);
     }
     /**
      * <code>optional bool shield = 19;</code>
      */
-    public boolean getShield() {
+    @Override
+	public boolean getShield() {
       return shield_;
     }
 
@@ -1050,13 +1098,15 @@ public final class EventMessage {
     /**
      * <code>optional string target = 20;</code>
      */
-    public boolean hasTarget() {
+    @Override
+	public boolean hasTarget() {
       return ((bitField0_ & 0x00020000) == 0x00020000);
     }
     /**
      * <code>optional string target = 20;</code>
      */
-    public java.lang.String getTarget() {
+    @Override
+	public java.lang.String getTarget() {
       java.lang.Object ref = target_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
@@ -1073,7 +1123,8 @@ public final class EventMessage {
     /**
      * <code>optional string target = 20;</code>
      */
-    public com.google.protobuf.ByteString
+    @Override
+	public com.google.protobuf.ByteString
         getTargetBytes() {
       java.lang.Object ref = target_;
       if (ref instanceof java.lang.String) {
@@ -1093,13 +1144,15 @@ public final class EventMessage {
     /**
      * <code>optional int32 points = 21;</code>
      */
-    public boolean hasPoints() {
+    @Override
+	public boolean hasPoints() {
       return ((bitField0_ & 0x00040000) == 0x00040000);
     }
     /**
      * <code>optional int32 points = 21;</code>
      */
-    public int getPoints() {
+    @Override
+	public int getPoints() {
       return points_;
     }
 
@@ -1109,13 +1162,15 @@ public final class EventMessage {
     /**
      * <code>optional int32 followers = 22;</code>
      */
-    public boolean hasFollowers() {
+    @Override
+	public boolean hasFollowers() {
       return ((bitField0_ & 0x00080000) == 0x00080000);
     }
     /**
      * <code>optional int32 followers = 22;</code>
      */
-    public int getFollowers() {
+    @Override
+	public int getFollowers() {
       return followers_;
     }
 
@@ -1125,13 +1180,15 @@ public final class EventMessage {
     /**
      * <code>optional int32 targetIndex = 23;</code>
      */
-    public boolean hasTargetIndex() {
+    @Override
+	public boolean hasTargetIndex() {
       return ((bitField0_ & 0x00100000) == 0x00100000);
     }
     /**
      * <code>optional int32 targetIndex = 23;</code>
      */
-    public int getTargetIndex() {
+    @Override
+	public int getTargetIndex() {
       return targetIndex_;
     }
 
@@ -1141,13 +1198,15 @@ public final class EventMessage {
     /**
      * <code>optional int32 mode = 24;</code>
      */
-    public boolean hasMode() {
+    @Override
+	public boolean hasMode() {
       return ((bitField0_ & 0x00200000) == 0x00200000);
     }
     /**
      * <code>optional int32 mode = 24;</code>
      */
-    public int getMode() {
+    @Override
+	public int getMode() {
       return mode_;
     }
 
@@ -1157,13 +1216,15 @@ public final class EventMessage {
     /**
      * <code>optional string checksum = 25;</code>
      */
-    public boolean hasChecksum() {
+    @Override
+	public boolean hasChecksum() {
       return ((bitField0_ & 0x00400000) == 0x00400000);
     }
     /**
      * <code>optional string checksum = 25;</code>
      */
-    public java.lang.String getChecksum() {
+    @Override
+	public java.lang.String getChecksum() {
       java.lang.Object ref = checksum_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
@@ -1180,7 +1241,8 @@ public final class EventMessage {
     /**
      * <code>optional string checksum = 25;</code>
      */
-    public com.google.protobuf.ByteString
+    @Override
+	public com.google.protobuf.ByteString
         getChecksumBytes() {
       java.lang.Object ref = checksum_;
       if (ref instanceof java.lang.String) {
@@ -1200,13 +1262,15 @@ public final class EventMessage {
     /**
      * <code>optional int32 tilesLeft = 26;</code>
      */
-    public boolean hasTilesLeft() {
+    @Override
+	public boolean hasTilesLeft() {
       return ((bitField0_ & 0x00800000) == 0x00800000);
     }
     /**
      * <code>optional int32 tilesLeft = 26;</code>
      */
-    public int getTilesLeft() {
+    @Override
+	public int getTilesLeft() {
       return tilesLeft_;
     }
 
@@ -1216,13 +1280,15 @@ public final class EventMessage {
     /**
      * <code>optional int32 rows = 27;</code>
      */
-    public boolean hasRows() {
+    @Override
+	public boolean hasRows() {
       return ((bitField0_ & 0x01000000) == 0x01000000);
     }
     /**
      * <code>optional int32 rows = 27;</code>
      */
-    public int getRows() {
+    @Override
+	public int getRows() {
       return rows_;
     }
 
@@ -1232,13 +1298,15 @@ public final class EventMessage {
     /**
      * <code>optional int32 columns = 28;</code>
      */
-    public boolean hasColumns() {
+    @Override
+	public boolean hasColumns() {
       return ((bitField0_ & 0x02000000) == 0x02000000);
     }
     /**
      * <code>optional int32 columns = 28;</code>
      */
-    public int getColumns() {
+    @Override
+	public int getColumns() {
       return columns_;
     }
 
@@ -1248,13 +1316,15 @@ public final class EventMessage {
     /**
      * <code>optional string messageTitle = 29;</code>
      */
-    public boolean hasMessageTitle() {
+    @Override
+	public boolean hasMessageTitle() {
       return ((bitField0_ & 0x04000000) == 0x04000000);
     }
     /**
      * <code>optional string messageTitle = 29;</code>
      */
-    public java.lang.String getMessageTitle() {
+    @Override
+	public java.lang.String getMessageTitle() {
       java.lang.Object ref = messageTitle_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
@@ -1271,7 +1341,8 @@ public final class EventMessage {
     /**
      * <code>optional string messageTitle = 29;</code>
      */
-    public com.google.protobuf.ByteString
+    @Override
+	public com.google.protobuf.ByteString
         getMessageTitleBytes() {
       java.lang.Object ref = messageTitle_;
       if (ref instanceof java.lang.String) {
@@ -1317,7 +1388,8 @@ public final class EventMessage {
       messageTitle_ = "";
     }
     private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
+    @Override
+	public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
@@ -1333,7 +1405,8 @@ public final class EventMessage {
       return true;
     }
 
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
+    @Override
+	public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -1427,7 +1500,8 @@ public final class EventMessage {
     }
 
     private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
+    @Override
+	public int getSerializedSize() {
       int size = memoizedSerializedSize;
       if (size != -1) return size;
 
@@ -1624,11 +1698,13 @@ public final class EventMessage {
     }
 
     public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
+    @Override
+	public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder(edu.carleton.comp4905.carcassonne.common.EventMessage.Event prototype) {
       return newBuilder().mergeFrom(prototype);
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    @Override
+	public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -1647,7 +1723,8 @@ public final class EventMessage {
         return edu.carleton.comp4905.carcassonne.common.EventMessage.internal_static_edu_carleton_comp4905_carcassonne_common_Event_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      @Override
+	protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return edu.carleton.comp4905.carcassonne.common.EventMessage.internal_static_edu_carleton_comp4905_carcassonne_common_Event_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -1672,7 +1749,8 @@ public final class EventMessage {
         return new Builder();
       }
 
-      public Builder clear() {
+      @Override
+	public Builder clear() {
         super.clear();
         eventType_ = 0;
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -1735,20 +1813,24 @@ public final class EventMessage {
         return this;
       }
 
-      public Builder clone() {
+      @Override
+	public Builder clone() {
         return create().mergeFrom(buildPartial());
       }
 
-      public com.google.protobuf.Descriptors.Descriptor
+      @Override
+	public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return edu.carleton.comp4905.carcassonne.common.EventMessage.internal_static_edu_carleton_comp4905_carcassonne_common_Event_descriptor;
       }
 
-      public edu.carleton.comp4905.carcassonne.common.EventMessage.Event getDefaultInstanceForType() {
+      @Override
+	public edu.carleton.comp4905.carcassonne.common.EventMessage.Event getDefaultInstanceForType() {
         return edu.carleton.comp4905.carcassonne.common.EventMessage.Event.getDefaultInstance();
       }
 
-      public edu.carleton.comp4905.carcassonne.common.EventMessage.Event build() {
+      @Override
+	public edu.carleton.comp4905.carcassonne.common.EventMessage.Event build() {
         edu.carleton.comp4905.carcassonne.common.EventMessage.Event result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
@@ -1756,7 +1838,8 @@ public final class EventMessage {
         return result;
       }
 
-      public edu.carleton.comp4905.carcassonne.common.EventMessage.Event buildPartial() {
+      @Override
+	public edu.carleton.comp4905.carcassonne.common.EventMessage.Event buildPartial() {
         edu.carleton.comp4905.carcassonne.common.EventMessage.Event result = new edu.carleton.comp4905.carcassonne.common.EventMessage.Event(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
@@ -1884,7 +1967,8 @@ public final class EventMessage {
         return result;
       }
 
-      public Builder mergeFrom(com.google.protobuf.Message other) {
+      @Override
+	public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof edu.carleton.comp4905.carcassonne.common.EventMessage.Event) {
           return mergeFrom((edu.carleton.comp4905.carcassonne.common.EventMessage.Event)other);
         } else {
@@ -2014,7 +2098,8 @@ public final class EventMessage {
         return this;
       }
 
-      public final boolean isInitialized() {
+      @Override
+	public final boolean isInitialized() {
         if (!hasEventType()) {
           
           return false;
@@ -2026,7 +2111,8 @@ public final class EventMessage {
         return true;
       }
 
-      public Builder mergeFrom(
+      @Override
+	public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
@@ -2050,13 +2136,15 @@ public final class EventMessage {
       /**
        * <code>required int32 eventType = 1;</code>
        */
-      public boolean hasEventType() {
+      @Override
+	public boolean hasEventType() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
        * <code>required int32 eventType = 1;</code>
        */
-      public int getEventType() {
+      @Override
+	public int getEventType() {
         return eventType_;
       }
       /**
@@ -2083,13 +2171,15 @@ public final class EventMessage {
       /**
        * <code>required string playerName = 2;</code>
        */
-      public boolean hasPlayerName() {
+      @Override
+	public boolean hasPlayerName() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
        * <code>required string playerName = 2;</code>
        */
-      public java.lang.String getPlayerName() {
+      @Override
+	public java.lang.String getPlayerName() {
         java.lang.Object ref = playerName_;
         if (!(ref instanceof java.lang.String)) {
           java.lang.String s = ((com.google.protobuf.ByteString) ref)
@@ -2103,7 +2193,8 @@ public final class EventMessage {
       /**
        * <code>required string playerName = 2;</code>
        */
-      public com.google.protobuf.ByteString
+      @Override
+	public com.google.protobuf.ByteString
           getPlayerNameBytes() {
         java.lang.Object ref = playerName_;
         if (ref instanceof String) {
@@ -2157,13 +2248,15 @@ public final class EventMessage {
       /**
        * <code>optional bytes connection = 3;</code>
        */
-      public boolean hasConnection() {
+      @Override
+	public boolean hasConnection() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
        * <code>optional bytes connection = 3;</code>
        */
-      public com.google.protobuf.ByteString getConnection() {
+      @Override
+	public com.google.protobuf.ByteString getConnection() {
         return connection_;
       }
       /**
@@ -2193,13 +2286,15 @@ public final class EventMessage {
       /**
        * <code>optional string address = 4;</code>
        */
-      public boolean hasAddress() {
+      @Override
+	public boolean hasAddress() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
        * <code>optional string address = 4;</code>
        */
-      public java.lang.String getAddress() {
+      @Override
+	public java.lang.String getAddress() {
         java.lang.Object ref = address_;
         if (!(ref instanceof java.lang.String)) {
           java.lang.String s = ((com.google.protobuf.ByteString) ref)
@@ -2213,7 +2308,8 @@ public final class EventMessage {
       /**
        * <code>optional string address = 4;</code>
        */
-      public com.google.protobuf.ByteString
+      @Override
+	public com.google.protobuf.ByteString
           getAddressBytes() {
         java.lang.Object ref = address_;
         if (ref instanceof String) {
@@ -2267,13 +2363,15 @@ public final class EventMessage {
       /**
        * <code>optional int32 port = 5;</code>
        */
-      public boolean hasPort() {
+      @Override
+	public boolean hasPort() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
        * <code>optional int32 port = 5;</code>
        */
-      public int getPort() {
+      @Override
+	public int getPort() {
         return port_;
       }
       /**
@@ -2300,13 +2398,15 @@ public final class EventMessage {
       /**
        * <code>optional int32 numOfPlayers = 6;</code>
        */
-      public boolean hasNumOfPlayers() {
+      @Override
+	public boolean hasNumOfPlayers() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
        * <code>optional int32 numOfPlayers = 6;</code>
        */
-      public int getNumOfPlayers() {
+      @Override
+	public int getNumOfPlayers() {
         return numOfPlayers_;
       }
       /**
@@ -2333,13 +2433,15 @@ public final class EventMessage {
       /**
        * <code>optional bool success = 7;</code>
        */
-      public boolean hasSuccess() {
+      @Override
+	public boolean hasSuccess() {
         return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
        * <code>optional bool success = 7;</code>
        */
-      public boolean getSuccess() {
+      @Override
+	public boolean getSuccess() {
         return success_;
       }
       /**
@@ -2366,13 +2468,15 @@ public final class EventMessage {
       /**
        * <code>optional string message = 8;</code>
        */
-      public boolean hasMessage() {
+      @Override
+	public boolean hasMessage() {
         return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       /**
        * <code>optional string message = 8;</code>
        */
-      public java.lang.String getMessage() {
+      @Override
+	public java.lang.String getMessage() {
         java.lang.Object ref = message_;
         if (!(ref instanceof java.lang.String)) {
           java.lang.String s = ((com.google.protobuf.ByteString) ref)
@@ -2386,7 +2490,8 @@ public final class EventMessage {
       /**
        * <code>optional string message = 8;</code>
        */
-      public com.google.protobuf.ByteString
+      @Override
+	public com.google.protobuf.ByteString
           getMessageBytes() {
         java.lang.Object ref = message_;
         if (ref instanceof String) {
@@ -2446,20 +2551,23 @@ public final class EventMessage {
       /**
        * <code>repeated int32 statuses = 9;</code>
        */
-      public java.util.List<java.lang.Integer>
+      @Override
+	public java.util.List<java.lang.Integer>
           getStatusesList() {
         return java.util.Collections.unmodifiableList(statuses_);
       }
       /**
        * <code>repeated int32 statuses = 9;</code>
        */
-      public int getStatusesCount() {
+      @Override
+	public int getStatusesCount() {
         return statuses_.size();
       }
       /**
        * <code>repeated int32 statuses = 9;</code>
        */
-      public int getStatuses(int index) {
+      @Override
+	public int getStatuses(int index) {
         return statuses_.get(index);
       }
       /**
@@ -2512,26 +2620,30 @@ public final class EventMessage {
       /**
        * <code>repeated string names = 10;</code>
        */
-      public java.util.List<java.lang.String>
+      @Override
+	public java.util.List<java.lang.String>
           getNamesList() {
         return java.util.Collections.unmodifiableList(names_);
       }
       /**
        * <code>repeated string names = 10;</code>
        */
-      public int getNamesCount() {
+      @Override
+	public int getNamesCount() {
         return names_.size();
       }
       /**
        * <code>repeated string names = 10;</code>
        */
-      public java.lang.String getNames(int index) {
+      @Override
+	public java.lang.String getNames(int index) {
         return names_.get(index);
       }
       /**
        * <code>repeated string names = 10;</code>
        */
-      public com.google.protobuf.ByteString
+      @Override
+	public com.google.protobuf.ByteString
           getNamesBytes(int index) {
         return names_.getByteString(index);
       }
@@ -2599,13 +2711,15 @@ public final class EventMessage {
       /**
        * <code>optional bool finished = 11;</code>
        */
-      public boolean hasFinished() {
+      @Override
+	public boolean hasFinished() {
         return ((bitField0_ & 0x00000400) == 0x00000400);
       }
       /**
        * <code>optional bool finished = 11;</code>
        */
-      public boolean getFinished() {
+      @Override
+	public boolean getFinished() {
         return finished_;
       }
       /**
@@ -2632,13 +2746,15 @@ public final class EventMessage {
       /**
        * <code>optional bool gameInProgress = 12;</code>
        */
-      public boolean hasGameInProgress() {
+      @Override
+	public boolean hasGameInProgress() {
         return ((bitField0_ & 0x00000800) == 0x00000800);
       }
       /**
        * <code>optional bool gameInProgress = 12;</code>
        */
-      public boolean getGameInProgress() {
+      @Override
+	public boolean getGameInProgress() {
         return gameInProgress_;
       }
       /**
@@ -2665,13 +2781,15 @@ public final class EventMessage {
       /**
        * <code>optional string tile = 13;</code>
        */
-      public boolean hasTile() {
+      @Override
+	public boolean hasTile() {
         return ((bitField0_ & 0x00001000) == 0x00001000);
       }
       /**
        * <code>optional string tile = 13;</code>
        */
-      public java.lang.String getTile() {
+      @Override
+	public java.lang.String getTile() {
         java.lang.Object ref = tile_;
         if (!(ref instanceof java.lang.String)) {
           java.lang.String s = ((com.google.protobuf.ByteString) ref)
@@ -2685,7 +2803,8 @@ public final class EventMessage {
       /**
        * <code>optional string tile = 13;</code>
        */
-      public com.google.protobuf.ByteString
+      @Override
+	public com.google.protobuf.ByteString
           getTileBytes() {
         java.lang.Object ref = tile_;
         if (ref instanceof String) {
@@ -2739,13 +2858,15 @@ public final class EventMessage {
       /**
        * <code>optional int32 row = 14;</code>
        */
-      public boolean hasRow() {
+      @Override
+	public boolean hasRow() {
         return ((bitField0_ & 0x00002000) == 0x00002000);
       }
       /**
        * <code>optional int32 row = 14;</code>
        */
-      public int getRow() {
+      @Override
+	public int getRow() {
         return row_;
       }
       /**
@@ -2772,13 +2893,15 @@ public final class EventMessage {
       /**
        * <code>optional int32 column = 15;</code>
        */
-      public boolean hasColumn() {
+      @Override
+	public boolean hasColumn() {
         return ((bitField0_ & 0x00004000) == 0x00004000);
       }
       /**
        * <code>optional int32 column = 15;</code>
        */
-      public int getColumn() {
+      @Override
+	public int getColumn() {
         return column_;
       }
       /**
@@ -2805,13 +2928,15 @@ public final class EventMessage {
       /**
        * <code>optional int32 rotation = 16;</code>
        */
-      public boolean hasRotation() {
+      @Override
+	public boolean hasRotation() {
         return ((bitField0_ & 0x00008000) == 0x00008000);
       }
       /**
        * <code>optional int32 rotation = 16;</code>
        */
-      public int getRotation() {
+      @Override
+	public int getRotation() {
         return rotation_;
       }
       /**
@@ -2838,13 +2963,15 @@ public final class EventMessage {
       /**
        * <code>optional int32 meeple = 17;</code>
        */
-      public boolean hasMeeple() {
+      @Override
+	public boolean hasMeeple() {
         return ((bitField0_ & 0x00010000) == 0x00010000);
       }
       /**
        * <code>optional int32 meeple = 17;</code>
        */
-      public int getMeeple() {
+      @Override
+	public int getMeeple() {
         return meeple_;
       }
       /**
@@ -2871,13 +2998,15 @@ public final class EventMessage {
       /**
        * <code>optional int32 position = 18;</code>
        */
-      public boolean hasPosition() {
+      @Override
+	public boolean hasPosition() {
         return ((bitField0_ & 0x00020000) == 0x00020000);
       }
       /**
        * <code>optional int32 position = 18;</code>
        */
-      public int getPosition() {
+      @Override
+	public int getPosition() {
         return position_;
       }
       /**
@@ -2904,13 +3033,15 @@ public final class EventMessage {
       /**
        * <code>optional bool shield = 19;</code>
        */
-      public boolean hasShield() {
+      @Override
+	public boolean hasShield() {
         return ((bitField0_ & 0x00040000) == 0x00040000);
       }
       /**
        * <code>optional bool shield = 19;</code>
        */
-      public boolean getShield() {
+      @Override
+	public boolean getShield() {
         return shield_;
       }
       /**
@@ -2937,13 +3068,15 @@ public final class EventMessage {
       /**
        * <code>optional string target = 20;</code>
        */
-      public boolean hasTarget() {
+      @Override
+	public boolean hasTarget() {
         return ((bitField0_ & 0x00080000) == 0x00080000);
       }
       /**
        * <code>optional string target = 20;</code>
        */
-      public java.lang.String getTarget() {
+      @Override
+	public java.lang.String getTarget() {
         java.lang.Object ref = target_;
         if (!(ref instanceof java.lang.String)) {
           java.lang.String s = ((com.google.protobuf.ByteString) ref)
@@ -2957,7 +3090,8 @@ public final class EventMessage {
       /**
        * <code>optional string target = 20;</code>
        */
-      public com.google.protobuf.ByteString
+      @Override
+	public com.google.protobuf.ByteString
           getTargetBytes() {
         java.lang.Object ref = target_;
         if (ref instanceof String) {
@@ -3011,13 +3145,15 @@ public final class EventMessage {
       /**
        * <code>optional int32 points = 21;</code>
        */
-      public boolean hasPoints() {
+      @Override
+	public boolean hasPoints() {
         return ((bitField0_ & 0x00100000) == 0x00100000);
       }
       /**
        * <code>optional int32 points = 21;</code>
        */
-      public int getPoints() {
+      @Override
+	public int getPoints() {
         return points_;
       }
       /**
@@ -3044,13 +3180,15 @@ public final class EventMessage {
       /**
        * <code>optional int32 followers = 22;</code>
        */
-      public boolean hasFollowers() {
+      @Override
+	public boolean hasFollowers() {
         return ((bitField0_ & 0x00200000) == 0x00200000);
       }
       /**
        * <code>optional int32 followers = 22;</code>
        */
-      public int getFollowers() {
+      @Override
+	public int getFollowers() {
         return followers_;
       }
       /**
@@ -3077,13 +3215,15 @@ public final class EventMessage {
       /**
        * <code>optional int32 targetIndex = 23;</code>
        */
-      public boolean hasTargetIndex() {
+      @Override
+	public boolean hasTargetIndex() {
         return ((bitField0_ & 0x00400000) == 0x00400000);
       }
       /**
        * <code>optional int32 targetIndex = 23;</code>
        */
-      public int getTargetIndex() {
+      @Override
+	public int getTargetIndex() {
         return targetIndex_;
       }
       /**
@@ -3110,13 +3250,15 @@ public final class EventMessage {
       /**
        * <code>optional int32 mode = 24;</code>
        */
-      public boolean hasMode() {
+      @Override
+	public boolean hasMode() {
         return ((bitField0_ & 0x00800000) == 0x00800000);
       }
       /**
        * <code>optional int32 mode = 24;</code>
        */
-      public int getMode() {
+      @Override
+	public int getMode() {
         return mode_;
       }
       /**
@@ -3143,13 +3285,15 @@ public final class EventMessage {
       /**
        * <code>optional string checksum = 25;</code>
        */
-      public boolean hasChecksum() {
+      @Override
+	public boolean hasChecksum() {
         return ((bitField0_ & 0x01000000) == 0x01000000);
       }
       /**
        * <code>optional string checksum = 25;</code>
        */
-      public java.lang.String getChecksum() {
+      @Override
+	public java.lang.String getChecksum() {
         java.lang.Object ref = checksum_;
         if (!(ref instanceof java.lang.String)) {
           java.lang.String s = ((com.google.protobuf.ByteString) ref)
@@ -3163,7 +3307,8 @@ public final class EventMessage {
       /**
        * <code>optional string checksum = 25;</code>
        */
-      public com.google.protobuf.ByteString
+      @Override
+	public com.google.protobuf.ByteString
           getChecksumBytes() {
         java.lang.Object ref = checksum_;
         if (ref instanceof String) {
@@ -3217,13 +3362,15 @@ public final class EventMessage {
       /**
        * <code>optional int32 tilesLeft = 26;</code>
        */
-      public boolean hasTilesLeft() {
+      @Override
+	public boolean hasTilesLeft() {
         return ((bitField0_ & 0x02000000) == 0x02000000);
       }
       /**
        * <code>optional int32 tilesLeft = 26;</code>
        */
-      public int getTilesLeft() {
+      @Override
+	public int getTilesLeft() {
         return tilesLeft_;
       }
       /**
@@ -3250,13 +3397,15 @@ public final class EventMessage {
       /**
        * <code>optional int32 rows = 27;</code>
        */
-      public boolean hasRows() {
+      @Override
+	public boolean hasRows() {
         return ((bitField0_ & 0x04000000) == 0x04000000);
       }
       /**
        * <code>optional int32 rows = 27;</code>
        */
-      public int getRows() {
+      @Override
+	public int getRows() {
         return rows_;
       }
       /**
@@ -3283,13 +3432,15 @@ public final class EventMessage {
       /**
        * <code>optional int32 columns = 28;</code>
        */
-      public boolean hasColumns() {
+      @Override
+	public boolean hasColumns() {
         return ((bitField0_ & 0x08000000) == 0x08000000);
       }
       /**
        * <code>optional int32 columns = 28;</code>
        */
-      public int getColumns() {
+      @Override
+	public int getColumns() {
         return columns_;
       }
       /**
@@ -3316,13 +3467,15 @@ public final class EventMessage {
       /**
        * <code>optional string messageTitle = 29;</code>
        */
-      public boolean hasMessageTitle() {
+      @Override
+	public boolean hasMessageTitle() {
         return ((bitField0_ & 0x10000000) == 0x10000000);
       }
       /**
        * <code>optional string messageTitle = 29;</code>
        */
-      public java.lang.String getMessageTitle() {
+      @Override
+	public java.lang.String getMessageTitle() {
         java.lang.Object ref = messageTitle_;
         if (!(ref instanceof java.lang.String)) {
           java.lang.String s = ((com.google.protobuf.ByteString) ref)
@@ -3336,7 +3489,8 @@ public final class EventMessage {
       /**
        * <code>optional string messageTitle = 29;</code>
        */
-      public com.google.protobuf.ByteString
+      @Override
+	public com.google.protobuf.ByteString
           getMessageTitleBytes() {
         java.lang.Object ref = messageTitle_;
         if (ref instanceof String) {
@@ -3428,7 +3582,8 @@ public final class EventMessage {
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-        public com.google.protobuf.ExtensionRegistry assignDescriptors(
+        @Override
+		public com.google.protobuf.ExtensionRegistry assignDescriptors(
             com.google.protobuf.Descriptors.FileDescriptor root) {
           descriptor = root;
           internal_static_edu_carleton_comp4905_carcassonne_common_Event_descriptor =

@@ -10,7 +10,8 @@ public class DefaultConnector extends Connector {
 	}
 
 	@Override
-	public Connection connect(final String host, final int port) throws UnknownHostException, IOException {
+	public Connection connect(final String host, final int port)
+			throws UnknownHostException, IOException {
 		Socket socket = new Socket(host, port);
 		return new DefaultConnection(service, socket);
 	}

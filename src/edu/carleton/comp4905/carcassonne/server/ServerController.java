@@ -148,18 +148,14 @@ public class ServerController implements Initializable {
 	 * @param port an Integer
 	 */
 	public synchronized void removeConnection(final Map<Address, Connection> connections, final String address, final int port) {
-		PlatformManager.run(new Runnable() {
-			@Override
-			public void run() {
-				Iterator<Map.Entry<Address, Connection>> it = connections.entrySet().iterator();
-				while(it.hasNext()) {
-					Map.Entry<Address, Connection> pairs = it.next();
-					Address temp = pairs.getKey();
-					if(temp.equals(new Address(address, port)))
-						it.remove();
-				}
+		Iterator<Map.Entry<Address, Connection>> it = connections.entrySet().iterator();
+		while(it.hasNext()) {
+			Map.Entry<Address, Connection> pairs = it.next();
+			Address temp = pairs.getKey();
+			if(temp.equals(new Address(address, port))) {
+				it.remove();
 			}
-		});
+		}
 	}
 	
 	/**

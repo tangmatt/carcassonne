@@ -1,8 +1,6 @@
 package edu.carleton.comp4905.carcassonne.client;
 
 import edu.carleton.comp4905.carcassonne.common.Connection;
-import edu.carleton.comp4905.carcassonne.common.Event;
-import edu.carleton.comp4905.carcassonne.common.EventType;
 import edu.carleton.comp4905.carcassonne.common.Position;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
@@ -21,7 +19,6 @@ public class TileContainerHandler implements EventHandler<MouseEvent> {
 	@Override
 	public void handle(final MouseEvent event) {
 		TileContainer container = (TileContainer) event.getSource();
-		Game game = controller.getGameClient().getGame();
 		Connection connection = controller.getGameClient().getGame().getConnection();
 		GameTile selectedTile = controller.getGameData().getCopyOfSelectedPreviewTile();
 		Position position = container.getFollowerPosition();
@@ -37,18 +34,6 @@ public class TileContainerHandler implements EventHandler<MouseEvent> {
 				return;
 		}
 		
-		// send tile placement event to server
-		Event gameEvent = new Event(EventType.SEND_TILE_REQUEST, game.getPlayerName());
-		gameEvent.addProperty("tile", selectedTile.getName());
-		gameEvent.addProperty("rotation", ((Double)selectedTile.getRotate()).intValue());
-		gameEvent.addProperty("row", row);
-		gameEvent.addProperty("column", column);
-		gameEvent.addProperty("meeple", controller.getGameData().getIndex());
-		gameEvent.addProperty("position", container.getFollowerPosition());
-		gameEvent.addProperty("shield", container.getTile().hasShield());
-		connection.sendEvent(gameEvent);
-		
-		container.setHoverTile(false);
-		controller.endTurn();
+		controller.handleTileSelect(selectedTile, container, connection, row, column);
 	}
 }

@@ -1,0 +1,7 @@
+Applications will not terminate on close (a thread may still be running, but I could not figure out which one).
+For now, simply terminate them all after running. Using an IDE to compile and run would be the simplest choice rather than using the .jar file.
+A temporary fix for the issue was made but it affected the network communication so requests did not make it through.
+I had to sacrifice the termination of applications in order to let the game run properly.
+
+How to change the serialization method?
+- Go to app.properties and under SERIALIZER, type the preferred method (JAVA_SERIALIZE or GOOGLE_PROTOBUF)

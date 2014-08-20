@@ -265,11 +265,11 @@ public class GameTile extends ImageView {
 	}
 	
 	/**
-	 * Returns the owner of the follower at specified position.
+	 * Returns the owner at specified position.
 	 * @param position the position
 	 * @return the player who placed the follower
 	 */
-	public String getFollowerOwner(final Position position) {
+	public String getPositionOwner(final Position position) {
 		return position == null ? null : positions.get(position);
 	}
 	

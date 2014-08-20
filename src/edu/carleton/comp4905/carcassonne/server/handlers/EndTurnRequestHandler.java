@@ -22,10 +22,13 @@ public class EndTurnRequestHandler implements EventHandler {
 		
 		String title = null, message = null;
 		
-		if(server.getMode() == Mode.SYNC)
+		if(server.getMode() == Mode.SYNC) {
+			if(!server.getCurrentPlayer().equalsIgnoreCase(event.getPlayerName()))
+				return;
 			server.setNextPlayer();
-		controller.updatePlayerHand(event.getPlayerName(), false);
+		}
 		
+		controller.updatePlayerHand(event.getPlayerName(), false);
 		boolean success = !(controller.allPlayersHaveNoTile() && controller.getDeck().isEmpty());
 		if(!success) {
 			title = LocalMessages.getString("EmptyDeckTitle");
@@ -38,6 +41,7 @@ public class EndTurnRequestHandler implements EventHandler {
 		reply.addProperty("target", server.getCurrentPlayer());
 		reply.addProperty("messageTitle", title);
 		reply.addProperty("message", message);
+		reply.addProperty("finished", server.getCurrentPlayer().equalsIgnoreCase(event.getPlayerName()));
 		connection.broadcastEvent(reply, connections);
 	}
 }

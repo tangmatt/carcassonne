@@ -3,10 +3,10 @@ package edu.carleton.comp4905.carcassonne.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
 import edu.carleton.comp4905.carcassonne.common.Acceptor;
 import edu.carleton.comp4905.carcassonne.common.Address;
 import edu.carleton.comp4905.carcassonne.common.Connection;
@@ -26,8 +26,9 @@ public class Server extends Service implements Runnable {
 	private ServerController controller;
 	private boolean running;
 	private boolean gameInProgress;
+	private final LinkedList<String> queue;
 	private final List<String> players;
-	private int turn;
+	private String currPlayer;
 	
 	public static int PORT = 5000;
 	
@@ -41,7 +42,7 @@ public class Server extends Service implements Runnable {
 		this.connections = new ConcurrentHashMap<Address, Connection>();
 		this.running = false;
 		this.gameInProgress = false;
-		this.turn = (mode == Mode.SYNC) ? 0 : -1;
+		this.queue = new LinkedList<String>();
 		this.players = new ArrayList<String>();
 		this.mode = mode;
 	}
@@ -74,8 +75,13 @@ public class Server extends Service implements Runnable {
 	 * Returns the current turn index.
 	 * @return the turn index
 	 */
-	public int getTurn() {
-		return turn;
+	public int getTurn(final String[] names) {
+		for(int i=0; i<names.length; ++i){
+			if(names[i].equalsIgnoreCase(getCurrentPlayer())) {
+				return i;
+			}
+		}
+		return -1;
 	}
 	
 	/**
@@ -135,11 +141,11 @@ public class Server extends Service implements Runnable {
 	}
 	
 	/**
-	 * Returns the list of player order.
-	 * @return the list of players
+	 * Returns the queue of player order.
+	 * @return the queue of players
 	 */
-	public List<String> getPlayers() {
-		return players;
+	public LinkedList<String> getPlayers() {
+		return queue;
 	}
 	
 	/**
@@ -147,9 +153,7 @@ public class Server extends Service implements Runnable {
 	 * @return the player name
 	 */
 	public String getCurrentPlayer() {
-		if(turn < 0)
-			return null;
-		return players.get(turn);
+		return currPlayer = queue.getFirst();
 	}
 	
 	/**
@@ -158,14 +162,36 @@ public class Server extends Service implements Runnable {
 	 * @return a boolean
 	 */
 	public boolean isCurrentPlayer(final String player) {
-		return turn >= 0 && turn <= (players.size()-1) && player.equalsIgnoreCase(players.get(turn));
+		return player.equalsIgnoreCase(currPlayer);
 	}
 	
 	/**
-	 * Increments the turn counter.
+	 * Sets the next player.
 	 */
 	public void setNextPlayer() {
-		turn = (turn + 1) % players.size();
+		String temp = queue.getFirst();
+		if(!currPlayer.equalsIgnoreCase(temp))
+			return;
+		String name = queue.removeFirst();
+		queue.addLast(name);
+	}
+	
+	/**
+	 * Adds the player.
+	 * @param name the player name
+	 */
+	public void addPlayer(final String name) {
+		players.add(name);
+		queue.addLast(name);
+	}
+	
+	/**
+	 * Removes the player.
+	 * @param name the player name
+	 */
+	public void removePlayer(final String name) {
+		players.remove(name);
+		queue.remove(name);
 	}
 	
 	@Override

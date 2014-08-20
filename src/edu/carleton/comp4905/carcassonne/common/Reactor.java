@@ -36,7 +36,8 @@ public class Reactor {
 	 */
 	public void dispatch(final Event event) {
 		if(event != null) {
-			EventHandler handler = handlers.get(event.getEventType()) != null ? handlers.get(event.getEventType()) : handlers.get(EventType.UNKNOWN);
+			EventHandler handler = handlers.get(event.getEventType()) != null ?
+					handlers.get(event.getEventType()) : handlers.get(EventType.UNKNOWN);
 			if(handler != null)
 				handler.handleEvent(event);
 		}

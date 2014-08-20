@@ -10,5 +10,6 @@ public abstract class Connector {
 		this.service = service;
 	}
 	
-	public abstract Connection connect(String host, int port) throws UnknownHostException, IOException;
+	public abstract Connection connect(String host, int port)
+			throws UnknownHostException, IOException;
 }

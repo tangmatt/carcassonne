@@ -88,6 +88,13 @@ public class TileContainer extends AbstractTile {
 		return follower;
 	}
 	
+	/**
+	 * Adds mouse listeners to this tile.
+	 * @param controller the game controller
+	 * @param pressHandler the mouse press event handler
+	 * @param hoverHandler the mouse over event handler
+	 * @param exitHandler the mouse exit event handler
+	 */
 	public void addMouseListener(final GameController controller,
 			final EventHandler<MouseEvent> pressHandler, final EventHandler<MouseEvent> hoverHandler, final EventHandler<MouseEvent> exitHandler) {
 		removeMouseListener();
@@ -168,12 +175,12 @@ public class TileContainer extends AbstractTile {
 	}
 	
 	/**
-	 * Returns the name of the follower placer.
+	 * Returns the name of the owner who owns the position.
 	 * @param position the position
-	 * @return the name of the follower placer
+	 * @return the name of the owner who owns the position
 	 */
-	public String getFollowerOwner(final Position position) {
-		return tile.getFollowerOwner(position);
+	public String getPositionOwner(final Position position) {
+		return tile.getPositionOwner(position);
 	}
 	
 	/**
@@ -198,6 +205,14 @@ public class TileContainer extends AbstractTile {
 	 */
 	public int getColumn() {
 		return c;
+	}
+	
+	/**
+	 * Returns the follower's segment.
+	 * @return the follower segment
+	 */
+	public Segment getFollowerSegment() {
+		return tile.getSegment(getFollowerPosition());
 	}
 	
 	/**

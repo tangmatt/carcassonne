@@ -35,6 +35,6 @@ public class StartReplyHandler implements EventHandler {
 		lobbyController.close();
 		game.setMode(mode);
 		gameController.getScoreData().setPlayerScore(game.getPlayerName(), 0);
-		gameController.handleStartGame(names, statuses, target, row, column);
+		gameController.handleStartGame(names, statuses, target, row, column, mode);
 	}
 }

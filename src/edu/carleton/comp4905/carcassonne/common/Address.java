@@ -33,4 +33,9 @@ public class Address {
 	public boolean equals(final Address addr) {
 		return host.equals(addr.getHostname()) && port == addr.getPort();
 	}
+	
+	@Override
+	public String toString() {
+		return "Host: " + host + ", Port: " + port;
+	}
 }

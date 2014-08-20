@@ -3,7 +3,6 @@ package edu.carleton.comp4905.carcassonne.client;
 import edu.carleton.comp4905.carcassonne.common.Address;
 import edu.carleton.comp4905.carcassonne.common.FXMLManager;
 import edu.carleton.comp4905.carcassonne.common.LocalMessages;
-import edu.carleton.comp4905.carcassonne.common.PlatformManager;
 import edu.carleton.comp4905.carcassonne.common.ResourceManager;
 import javafx.application.Application;
 import javafx.event.EventHandler;
@@ -52,12 +51,7 @@ public class GameClient extends Application {
 				// give enough time for the request to send to server
 				try { Thread.sleep(10); } catch (InterruptedException e) {}
 				game.shutdown();
-				PlatformManager.run(new Runnable() {
-					@Override
-					public void run() {
-						primaryStage.close();
-					}
-				});
+				primaryStage.close();
 			}
 		});
 		

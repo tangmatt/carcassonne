@@ -25,6 +25,7 @@ import edu.carleton.comp4905.carcassonne.common.TileManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.GaussianBlur;
@@ -43,7 +44,7 @@ public class GameController implements Initializable {
 	@FXML private Button endTurnButton;
 	@FXML private Label deckLabel;
 	@FXML private ImageView player1, player2, player3, player4, player5;
-	@FXML private ImageView meeple1, meeple2, meeple3, meeple4, meeple5, meeple6, meeple7; // meeple = follower
+	@FXML private ImageView meeple1, meeple2, meeple3, meeple4, meeple5, meeple6, meeple7; // meeple a.k.a follower
 	private ImageView[] playerViews;
 	private PopOver popOver;
 	private TileManager tileManager;
@@ -368,14 +369,10 @@ public class GameController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				try {
-					setPreviewTiles(tileManager.getTile(tile), true);
-					stopInteraction(false);
-					if(isDiscardable())
-						sendTurnRequest();
-				} catch(Exception e) {
-					e.printStackTrace();
-				}
+				setPreviewTiles(tileManager.getTile(tile), true);
+				stopInteraction(false);
+				if(isDiscardable())
+					sendTurnRequest();
 			}
 		});
 	}
@@ -384,7 +381,6 @@ public class GameController implements Initializable {
 	 * Handles the end of the turn for current client.
 	 */
 	public synchronized void endTurn() {
-		sendEndTurnRequest();
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -392,6 +388,26 @@ public class GameController implements Initializable {
 				stopInteraction(true);
 			}
 		});
+		sendEndTurnRequest();
+	}
+	
+	/**
+	 * Handles tile selection.
+	 */
+	public synchronized void handleTileSelect(final GameTile selectedTile, final TileContainer container, 
+			final Connection connection, final int row, final int column) {
+		// send tile placement event to server
+		Event gameEvent = new Event(EventType.SEND_TILE_REQUEST, client.getGame().getPlayerName());
+		gameEvent.addProperty("tile", selectedTile.getName());
+		gameEvent.addProperty("rotation", ((Double)selectedTile.getRotate()).intValue());
+		gameEvent.addProperty("row", row);
+		gameEvent.addProperty("column", column);
+		gameEvent.addProperty("meeple", gameData.getIndex());
+		gameEvent.addProperty("position", container.getFollowerPosition());
+		gameEvent.addProperty("shield", container.getTile().hasShield());
+		connection.sendEvent(gameEvent);
+		container.setHoverTile(false);
+		endTurn();
 	}
 	
 	/**
@@ -554,7 +570,7 @@ public class GameController implements Initializable {
 			public void run() {
 				blurGame(true);
 				lobbyDialog.show();
-			}		
+			}
 		});
 	}
 	
@@ -605,8 +621,9 @@ public class GameController implements Initializable {
 	 * Shows the panel with players information.
 	 * @param names an array of Strings
 	 * @param statuses an array of booleans
+	 * @param mode the mode
 	 */
-	public synchronized void updatePlayerPanel(final String[] names, final Player.Status[] statuses) {
+	public synchronized void updatePlayerPanel(final String[] names, final Player.Status[] statuses, final Mode mode) {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -626,8 +643,12 @@ public class GameController implements Initializable {
 						image = ResourceManager.getImageFromResources("joined.png");
 					else if(statuses[i] == Player.Status.DISCONNECTED)
 						image = ResourceManager.getImageFromResources("disconnected.png");
-					else if(statuses[i] == Player.Status.PLAYING)
-						image = ResourceManager.getImageFromResources("current.png");
+					else if(statuses[i] == Player.Status.PLAYING) {
+						if(mode == Mode.SYNC)
+							image = ResourceManager.getImageFromResources("current.png");
+						else
+							image = ResourceManager.getImageFromResources("joined.png");
+					}
 					playerViews[i].setImage(image);
 					playerViews[i].addEventHandler(MouseEvent.MOUSE_ENTERED, new PlayerViewHandler(playerViews[i], popOver, nameLabel, scoreLabel));
 				}
@@ -661,7 +682,7 @@ public class GameController implements Initializable {
 			public void run() {
 				for(TileContainer container : gameData.getTilesWithFollowers().keySet()) {
 					String playerName = gameData.getTilesWithFollowers().get(container);
-					updateConnectedSegments(container, container.getFollowerPosition(), container.getSegment(container.getFollowerPosition()), playerName);
+					updateConnectedSegments(container, container.getFollowerPosition(), playerName);
 				}
 			}
 		});
@@ -671,17 +692,16 @@ public class GameController implements Initializable {
 	 * Updates the connected segments with the player name if they have a follower connected to the segment.
 	 * @param container the container
 	 * @param position the position
-	 * @param segment the segment
 	 * @param name the name
 	 */
-	public synchronized void updateConnectedSegments(final TileContainer container, final Position position, final Segment segment, final String name) {
+	public synchronized void updateConnectedSegments(final TileContainer container, final Position position, final String name) {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
 				Set<TileContainer> traversed = new HashSet<TileContainer>();
 				container.getTile().updateSegmentOwners(position, name);
 				traversed.add(container);
-				updateConnectedSegments(container, segment, position, name, traversed);
+				updateConnectedSegments(container, container.getSegment(position), position, name, traversed);
 			}
 		});
 	}
@@ -696,63 +716,75 @@ public class GameController implements Initializable {
 	 */
 	private void updateConnectedSegments(final TileContainer container, final Segment segment,
 			final Position position, final String name, final Set<TileContainer> traversed) {
-		int r = container.r, c = container.c;
+		final int r = container.r, c = container.c;
 
 		if(r-1 >= 0) {
 			TileContainer temp = gameData.getTile(r-1, c);
 			if(segment == temp.getBottomSegment() && !traversed.contains(temp)
-					&& (temp.getTile().getFollowerOwner(Position.BOTTOM) == null || temp.getTile().getFollowerOwner(Position.BOTTOM).isEmpty()
-					|| temp.getTile().getFollowerOwner(Position.BOTTOM).equals(name))) {
+					&& (temp.getTile().getPositionOwner(Position.BOTTOM) == null || temp.getTile().getPositionOwner(Position.BOTTOM).isEmpty()
+					|| temp.getTile().getPositionOwner(Position.BOTTOM).equals(name))) {
 				temp.getTile().updateSegmentOwners(Position.BOTTOM, name);
 				traversed.add(temp);
+				//container.showFollower(Position.TOP, 3);
 				updateConnectedSegments(temp, temp.getBottomSegment(), Position.BOTTOM, name, traversed);
 			}
 		}
 		if(r+1 < GameData.ROWS) {
 			TileContainer temp = gameData.getTile(r+1, c);
 			if(segment == temp.getTopSegment() && !traversed.contains(temp)
-					&& (temp.getTile().getFollowerOwner(Position.TOP) == null || temp.getTile().getFollowerOwner(Position.TOP).isEmpty()
-					|| temp.getTile().getFollowerOwner(Position.TOP).equals(name))) {
+					&& (temp.getTile().getPositionOwner(Position.TOP) == null || temp.getTile().getPositionOwner(Position.TOP).isEmpty()
+					|| temp.getTile().getPositionOwner(Position.TOP).equals(name))) {
 				temp.getTile().updateSegmentOwners(Position.TOP, name);
 				traversed.add(temp);
+				//container.showFollower(Position.BOTTOM, 3);
 				updateConnectedSegments(temp, temp.getTopSegment(), Position.TOP, name, traversed);
 			}
 		}
 		if(c-1 >= 0) {
 			TileContainer temp = gameData.getTile(r, c-1);
 			if(segment == temp.getRightSegment() && !traversed.contains(temp)
-					&& (temp.getTile().getFollowerOwner(Position.RIGHT) == null || temp.getTile().getFollowerOwner(Position.RIGHT).isEmpty()
-					|| temp.getTile().getFollowerOwner(Position.RIGHT).equals(name))) {
+					&& (temp.getTile().getPositionOwner(Position.RIGHT) == null || temp.getTile().getPositionOwner(Position.RIGHT).isEmpty()
+					|| temp.getTile().getPositionOwner(Position.RIGHT).equals(name))) {
 				temp.getTile().updateSegmentOwners(Position.RIGHT, name);
 				traversed.add(temp);
+				//container.showFollower(Position.LEFT, 3);
 				updateConnectedSegments(temp, temp.getRightSegment(), Position.RIGHT, name, traversed);
 			}
 		}
 		if(c+1 < GameData.COLS) {
 			TileContainer temp = gameData.getTile(r, c+1);
 			if(segment == temp.getLeftSegment() && !traversed.contains(temp)
-					&& (temp.getTile().getFollowerOwner(Position.LEFT) == null || temp.getTile().getFollowerOwner(Position.LEFT).isEmpty()
-					|| temp.getTile().getFollowerOwner(Position.LEFT).equals(name))) {
+					&& (temp.getTile().getPositionOwner(Position.LEFT) == null || temp.getTile().getPositionOwner(Position.LEFT).isEmpty()
+					|| temp.getTile().getPositionOwner(Position.LEFT).equals(name))) {
 				temp.getTile().updateSegmentOwners(Position.LEFT, name);
 				traversed.add(temp);
+				//container.showFollower(Position.RIGHT, 3);
 				updateConnectedSegments(temp, temp.getLeftSegment(), Position.LEFT, name, traversed);
 			}
 		}
 	}
 	
 	/**
-	 * Updates the game board regarding the completed segments.
-	 * @param player the player who requested the event
+	 * Handles the final scoring of the game.
 	 */
-	public void updateGameBoard(final String player) {
-		updateCloister(player);
+	public synchronized void handleFinalScoring() {
+		
 	}
 	
 	/**
-	 * Checks for completed cloisters and handles accordingly.
+	 * Updates the game board regarding the completed segments.
 	 * @param player the player who requested the event
 	 */
-	private void updateCloister(final String player) {
+	public synchronized void handleCompleteSegments(final String player) {
+		handleCompleteCloister(player);
+		//handleCompleteRoad(player);
+	}
+	
+	/**
+	 * Checks for completed cloisters then handles accordingly.
+	 * @param player the player who requested the event
+	 */
+	private void handleCompleteCloister(final String player) {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
@@ -772,8 +804,8 @@ public class GameController implements Initializable {
 							if(count == 4) {
 								container.getChildren().remove(container.follower);
 								if(client.getGame().getPlayerName().equalsIgnoreCase(player)) {
-									sendScoreUpdateRequest(container.getTile().getFollowerOwner(Position.CENTER), ScoreData.CLOISTER_POINTS);
-									sendFollowerUpdateRequest(container.getTile().getFollowerOwner(Position.CENTER), 1);
+									sendScoreUpdateRequest(container.getTile().getPositionOwner(Position.CENTER), ScoreData.CLOISTER_POINTS);
+									sendFollowerUpdateRequest(container.getTile().getPositionOwner(Position.CENTER), 1);
 								}
 								container.getTile().removeSegment(Position.CENTER);
 							}
@@ -804,10 +836,11 @@ public class GameController implements Initializable {
 	 * @param target the target name
 	 * @param row the row
 	 * @param column the column
+	 * @param mode the mode
 	 */
 	public synchronized void handleStartGame(final String[] names, final Player.Status[] statuses, 
-			final String target, final int row, final int column) {
-		updatePlayerPanel(names, statuses);
+			final String target, final int row, final int column, final Mode mode) {
+		updatePlayerPanel(names, statuses, mode);
 		updateFollowerPanel();
 		addStartingTile(row, column);
 		
@@ -879,23 +912,48 @@ public class GameController implements Initializable {
 	 * @param targetName the target name
 	 * @param title the title
 	 * @param message the message
+	 * @param isPlayerTurn flag to see if it is player's turn
 	 */
 	public synchronized void handleEndTurn(final boolean success, final String playerName, final String targetName,
-			final String title, final String message) {
+			final String title, final String message, final boolean isPlayerTurn) {
 		if(client.getGame().getPlayerName().equalsIgnoreCase(playerName))
 			removePreviewTiles();
-		
 		if(!success) {
 			sendEndGameRequest(title, message);
 			return;
 		}
-		
 		if(client.getGame().getMode() == Mode.SYNC) {
-			if(success && client.getGame().getPlayerName().equalsIgnoreCase(targetName))
+			if(success && client.getGame().getPlayerName().equalsIgnoreCase(targetName)) {
 				sendTurnRequest();
+			}
 		} else if(client.getGame().getMode() == Mode.ASYNC) {
-			if(success && client.getGame().getPlayerName().equalsIgnoreCase(playerName))
+			if(success && client.getGame().getPlayerName().equalsIgnoreCase(playerName)) {
 				sendTurnRequest();
+			}
+		}
+	}
+	
+	/**
+	 * Handles the quit event.
+	 */
+	public synchronized void handleQuitEvent(final boolean gameInProgress, final boolean finished, final String title,
+			final String message, final String playerName, final String[] names, final Player.Status[] statuses,
+			final int numOfPlayers, final Mode mode) {
+		if(gameInProgress) {
+			updatePlayerPanel(names, statuses, mode);
+			if(finished && message != null) {
+				if(playerName.equals(client.getGame().getPlayerName())) {
+					client.getStage().getOnCloseRequest().handle(null);
+				} else {
+					sendEndGameRequest(title, message);
+				}
+			} else if(client.getGame().getMode() == Mode.SYNC && client.getGame().getPlayerName().equalsIgnoreCase(playerName)) {
+				sendEndTurnRequest();
+			}
+		}
+		else {
+			getLobbyController().updatePlayerIcons(numOfPlayers);
+			getLobbyController().handleStartAvailability(numOfPlayers);
 		}
 	}
 	

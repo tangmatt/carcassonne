@@ -39,7 +39,7 @@ public class ServerClient extends Application {
 		
 		primaryStage.setScene(new Scene(anchorPane));
 		primaryStage.show();
-		
+
 		// handles the event for closing the window
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override

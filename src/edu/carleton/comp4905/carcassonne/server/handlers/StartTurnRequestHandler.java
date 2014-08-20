@@ -32,12 +32,12 @@ public class StartTurnRequestHandler implements EventHandler {
 		
 		controller.addMessageEntry(MessageType.INFO, "Player " + event.getPlayerName() + " drew tile: " + tile
 				+ " (" + controller.getDeck().size() + " tiles left in deck)");
-		
+
 		// send reply back to connected client
 		Event reply = new Event(EventType.START_TURN_REPLY, event.getPlayerName());
 		reply.addProperty("tile", tile);
 		reply.addProperty("target", server.getCurrentPlayer());
-		reply.addProperty("targetIndex", server.getTurn());
+		reply.addProperty("targetIndex", server.getTurn(controller.getPlayerNames()));
 		reply.addProperty("statuses", statuses);
 		reply.addProperty("tilesLeft", controller.getDeck().size());
 		connection.broadcastEvent(reply, connections);

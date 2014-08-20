@@ -39,11 +39,11 @@ public class SendTileReplyHandler implements EventHandler {
 			container.addFollower(position, meeple, player);
 			container.setFollower(position, player);
 			gameController.getGameData().getTilesWithFollowers().put(container, player);
-			gameController.updateConnectedSegments(container, position, container.getSegment(position), player);
+			gameController.updateConnectedSegments(container, position, player);
 		}
 
 		gameController.addTile(container);
 		gameController.updateFollowers();
-		gameController.updateGameBoard(player);
+		gameController.handleCompleteSegments(player);
 	}
 }

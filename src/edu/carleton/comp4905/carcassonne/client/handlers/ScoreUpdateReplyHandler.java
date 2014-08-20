@@ -5,6 +5,7 @@ import edu.carleton.comp4905.carcassonne.client.GameController;
 import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventHandler;
+import edu.carleton.comp4905.carcassonne.common.Mode;
 import edu.carleton.comp4905.carcassonne.common.Player;
 
 public class ScoreUpdateReplyHandler implements EventHandler {
@@ -18,8 +19,9 @@ public class ScoreUpdateReplyHandler implements EventHandler {
 		int score = (int)event.getProperty("points");
 		Player.Status[] statuses = (Player.Status[])event.getProperty("statuses");
 		String[] names = (String[])event.getProperty("names");
+		Mode mode = (Mode)event.getProperty("mode");
 		
 		gameController.getScoreData().setPlayerScore(target, score);
-		gameController.updatePlayerPanel(names, statuses);
+		gameController.updatePlayerPanel(names, statuses, mode);
 	}
 }
