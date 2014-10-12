@@ -210,8 +210,6 @@ public class LobbyController implements Initializable {
 		if(!event.isPrimaryButtonDown())
 			return;
 		Event startEvent = new Event(EventType.START_REQUEST, client.getGame().getPlayerName());
-		startEvent.addProperty("rows", GameData.ROWS);
-		startEvent.addProperty("columns", GameData.COLS);
 		client.getGame().getConnection().sendEvent(startEvent);
 	}
 	

@@ -10,12 +10,15 @@ import edu.carleton.comp4905.carcassonne.common.TileManager;
 import javafx.scene.image.ImageView;
 
 public class GameData {
-	public static final int ROWS = 8;
-	public static final int COLS = 9;
+	public static int ROWS;
+	public static int COLS;
 	public static final int TOTAL_FOLLOWERS = 7;
 	public static final int TOTAL_PLAYERS = 5;
+	public static final int TILE_SIZE = 64;
+	public static final int GAP_SIZE = 2;
+	public static final int OFFSET = 30;
 	
-	private final TileContainer[][] tiles;
+	private TileContainer[][] tiles;
 	private final TilePreview[] previews;
 	private GameTile selected;
 	
@@ -27,7 +30,6 @@ public class GameData {
 	private int numOfFollowers;
 	
 	public GameData() {
-		tiles = new TileContainer[COLS][ROWS];
 		previews = new TilePreview[TileManager.TOTAL_ROTATED_VIEWS];
 		tilesWithFollowers = new HashMap<TileContainer, String>();
 		popOverMap = new LinkedHashMap<ImageView, PopOver>();
@@ -37,11 +39,20 @@ public class GameData {
 	}
 	
 	/**
+	 * Initializes the tiles data storage.
+	 */
+	public void init() {
+		tiles = new TileContainer[ROWS][COLS];
+	}
+	
+	/**
 	 * Sets the tile to the specified row and column.
 	 * @param tile a TileContainer
+	 * @param r the row
+	 * @param c the column
 	 */
-	public void setTile(final TileContainer tile) {
-		tiles[tile.c][tile.r] = tile;
+	public void setTile(final TileContainer tile, final int r, final int c) {
+		tiles[r][c] = tile;
 	}
 	
 	/**
@@ -51,7 +62,13 @@ public class GameData {
 	 * @return TileContainer
 	 */
 	public TileContainer getTile(final int r, final int c) {
-		return tiles[c][r];
+		TileContainer tile = null;
+		try {
+			tile = tiles[r][c];
+		} catch(ArrayIndexOutOfBoundsException e) {
+			// do nothing
+		}
+		return tile;
 	}
 	
 	/**
@@ -173,5 +190,115 @@ public class GameData {
 	 */
 	public Map<TileContainer, String> getTilesWithFollowers() {
 		return tilesWithFollowers;
+	}
+	
+	/**
+	 * Returns the row index of the specified tile.
+	 * @param container the tile container
+	 * @return the row
+	 */
+	public synchronized int getRowIndex(final TileContainer container) {
+		for(int r=0; r<GameData.ROWS; ++r) {
+			for(int c=0; c<GameData.COLS; ++c) {
+				if(getTile(r, c).equals(container)) {
+					return r;
+				}
+			}
+		}
+		return -1;
+	}
+	
+	/**
+	 * Returns the column index of the specified tile.
+	 * @param container the tile container
+	 * @return the column
+	 */
+	public synchronized int getColumnIndex(final TileContainer container) {
+		for(int r=0; r<GameData.ROWS; ++r) {
+			for(int c=0; c<GameData.COLS; ++c) {
+				if(getTile(r, c).equals(container)) {
+					return c;
+				}
+			}
+		}
+		return -1;
+	}
+	
+	/**
+	 * Expands the current tile map with an empty column to the right.
+	 */
+	public void expandRightColumn() {
+		TileContainer[][] newTiles = new TileContainer[ROWS][++COLS];
+		for(int r=0; r<ROWS; ++r) {
+			for(int c=0; c<COLS; ++c) {
+				try {
+					newTiles[r][c] = tiles[r][c];
+				} catch(ArrayIndexOutOfBoundsException e) {
+					newTiles[r][c] = new TileContainer(TileManager.getInstance().getEmptyTile());
+				}
+			}
+		}
+		tiles = newTiles;
+	}
+	
+	/**
+	 * Expands the current tile map with an empty row to the bottom.
+	 */
+	public void expandBottomRow() {
+		TileContainer[][] newTiles = new TileContainer[++ROWS][COLS];
+		for(int r=0; r<ROWS; ++r) {
+			for(int c=0; c<COLS; ++c) {
+				try {
+					newTiles[r][c] = tiles[r][c];
+				} catch(ArrayIndexOutOfBoundsException e) {
+					newTiles[r][c] = new TileContainer(TileManager.getInstance().getEmptyTile());
+				}
+			}
+		}
+		tiles = newTiles;
+	}
+	
+	/**
+	 * Expands the current tile map with an empty column to the left.
+	 */
+	public void expandLeftColumn() {
+		TileContainer[][] newTiles = new TileContainer[ROWS][++COLS];
+		for(int r=0; r<ROWS; ++r) {
+			for(int c=0; c<COLS; ++c) {
+				newTiles[r][c] = new TileContainer(TileManager.getInstance().getEmptyTile());
+			}
+		}
+		for(int r=0; r<ROWS; ++r) {
+			for(int c=0; c<COLS; ++c) {
+				try {
+					newTiles[r][c+1] = tiles[r][c];
+				} catch(ArrayIndexOutOfBoundsException e) {
+					newTiles[r][c] = new TileContainer(TileManager.getInstance().getEmptyTile());
+				}
+			}
+		}
+		tiles = newTiles;
+	}
+	
+	/**
+	 * Expands the current tile map with an empty row to the top.
+	 */
+	public void expandTopRow() {
+		TileContainer[][] newTiles = new TileContainer[++ROWS][COLS];
+		for(int r=0; r<ROWS; ++r) {
+			for(int c=0; c<COLS; ++c) {
+				newTiles[r][c] = new TileContainer(TileManager.getInstance().getEmptyTile());
+			}
+		}
+		for(int r=0; r<ROWS; ++r) {
+			for(int c=0; c<COLS; ++c) {
+				try {
+					newTiles[r+1][c] = tiles[r][c];
+				} catch(ArrayIndexOutOfBoundsException e) {
+					newTiles[r][c] = new TileContainer(TileManager.getInstance().getEmptyTile());
+				}
+			}
+		}
+		tiles = newTiles;
 	}
 }

@@ -30,6 +30,8 @@ public class Server extends Service implements Runnable {
 	private final List<String> players;
 	private String currPlayer;
 	
+	public final static int INITIAL_ROWS = 8;
+	public final static int INITIAL_COLS = 9;
 	public static int PORT = 5000;
 	
 	public Server() {

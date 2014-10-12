@@ -33,7 +33,7 @@ public class SendTileReplyHandler implements EventHandler {
 		}
 		
 		gameController.refreshGameTiles();
-		TileContainer container = new TileContainer(tileManager.getTile(tile), row, column);
+		TileContainer container = new TileContainer(tileManager.getTile(tile));
 		container.getTile().setShield(shield);
 		if(position != null) {
 			container.addFollower(position, meeple, player);
@@ -42,7 +42,7 @@ public class SendTileReplyHandler implements EventHandler {
 			gameController.updateConnectedSegments(container, position, player);
 		}
 
-		gameController.addTile(container);
+		gameController.addTile(container, row, column);
 		gameController.updateFollowers();
 		gameController.handleCompleteSegments(player);
 	}

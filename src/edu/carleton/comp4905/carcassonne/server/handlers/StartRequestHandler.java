@@ -26,8 +26,8 @@ public class StartRequestHandler implements EventHandler {
 		Player.Status[] statuses = controller.getStatuses(connections);
 		String[] names = controller.getPlayerNames();
 		Random random = new Random();
-		int rows = (int)event.getProperty("rows");
-		int columns = (int)event.getProperty("columns");
+		int rows = Server.INITIAL_ROWS;
+		int columns = Server.INITIAL_COLS;
 		int row = random.nextInt(rows);
 		int column = random.nextInt(columns);
 		int points = controller.getPlayerScore(event.getPlayerName());
@@ -38,6 +38,8 @@ public class StartRequestHandler implements EventHandler {
 		reply.addProperty("statuses", statuses);
 		reply.addProperty("target", server.getCurrentPlayer());
 		reply.addProperty("mode", server.getMode());
+		reply.addProperty("rows", rows);
+		reply.addProperty("columns", columns);
 		reply.addProperty("row", row);
 		reply.addProperty("column", column);
 		reply.addProperty("points", points);

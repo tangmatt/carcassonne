@@ -36,7 +36,6 @@ public class JoinGameController extends InputController implements Initializable
 			new GameClient(usernameField.getText(), address).start(new javafx.stage.Stage());
 			stage.close();
 		} catch (Exception e) {
-			e.printStackTrace();
 			showMessage(LocalMessages.getString("CouldNotConnect"));
 		}
 	}

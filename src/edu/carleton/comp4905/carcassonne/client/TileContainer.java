@@ -12,14 +12,11 @@ public class TileContainer extends AbstractTile {
 		    + "-fx-border-style: dashed;";
 	protected EventHandler<MouseEvent> hoverHandler, exitHandler;
 	protected Position selectedFollower;
-	protected int r, c;
 	protected Follower follower;
 	private boolean isHoverTile;
 	
-	public TileContainer(final GameTile tile, final int r, final int c) {
+	public TileContainer(final GameTile tile) {
 		super(tile);
-		this.r = r;
-		this.c = c;
 		this.isHoverTile = false;
 	}
 	
@@ -192,22 +189,6 @@ public class TileContainer extends AbstractTile {
 	}
 	
 	/**
-	 * Returns the row index.
-	 * @return the row
-	 */
-	public int getRow() {
-		return r;
-	}
-	
-	/**
-	 * Returns the column index.
-	 * @return the column
-	 */
-	public int getColumn() {
-		return c;
-	}
-	
-	/**
 	 * Returns the follower's segment.
 	 * @return the follower segment
 	 */
@@ -249,5 +230,10 @@ public class TileContainer extends AbstractTile {
 			setCursor(Cursor.DEFAULT);
 			setStyle(defaultStyle);
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return tile.getName();
 	}
 }

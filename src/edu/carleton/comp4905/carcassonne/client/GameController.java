@@ -25,9 +25,9 @@ import edu.carleton.comp4905.carcassonne.common.TileManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -39,6 +39,7 @@ import javafx.scene.layout.HBox;
 
 public class GameController implements Initializable {
 	@FXML private BorderPane rootPane;
+	@FXML private ScrollPane scrollPane;
 	@FXML private GridPane gridPane;
 	@FXML private HBox previewPane;
 	@FXML private Button endTurnButton;
@@ -67,23 +68,86 @@ public class GameController implements Initializable {
 		popOver = createPopOver();
 		gameData.addFollowerViews(followerViews);
 		
-		createGameBoard();
 		createLobby();
+	}
+	
+	/**
+	 * Initializes the game data and board.
+	 */
+	public synchronized void initGame() {
+		getGameData().init();
+		updateGridHeight();
+		updateGridWidth();
+		createGameBoard();
 		removePreviewTiles();
 	}
 	
 	/**
-	 * Adds a TileContainer object to specified row and column of layout.
+	 * Adds a TileContainer object to specified row and column of layout and updates the game data.
 	 * @param container a TileContainer
+	 * @param row the row
+	 * @param column the column
 	 */
-	public synchronized void addTile(final TileContainer container) {
+	public synchronized void putTile(final TileContainer container, final int row, final int column) {
+		gameData.setTile(container, row, column);
+		gridPane.add(container, column, row);
+	}
+	
+	/**
+	 * Adds tile to view then handles if boundaries have been triggered (for expansion).
+	 * @param container a TileContainer
+	 * @param row the row
+	 * @param column the column
+	 */
+	public synchronized void addTile(final TileContainer container, final int row, final int column) {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				gameData.setTile(container);
-				gridPane.add(container, container.c, container.r);
+				putTile(container, row, column);
+				if(!container.isEmpty()) {
+					if(gameData.getColumnIndex(container) == GameData.COLS-1) {
+						gameData.expandRightColumn();
+						for(int r=0; r<GameData.ROWS; ++r) {
+							TileContainer temp = new TileContainer(tileManager.getEmptyTile());
+							putTile(temp, r, gameData.getColumnIndex(container)+1);
+						}
+						updateGridWidth();
+					}
+					if(gameData.getRowIndex(container) == GameData.ROWS-1) {
+						gameData.expandBottomRow();
+						for(int c=0; c<GameData.COLS; ++c) {
+							TileContainer temp = new TileContainer(tileManager.getEmptyTile());
+							putTile(temp, gameData.getRowIndex(container)+1, c);
+						}
+						updateGridHeight();
+					}
+					if(gameData.getColumnIndex(container) == 0) {
+						gridPane.getChildren().clear();
+						gameData.expandLeftColumn();
+						updateGameBoard();
+						updateGridWidth();
+					}
+					if(gameData.getRowIndex(container) == 0) {
+						gridPane.getChildren().clear();
+						gameData.expandTopRow();
+						updateGameBoard();
+						updateGridHeight();
+					}
+				}
 			}
 		});
+	}
+	
+	/**
+	 * Updates the game board in regards to the data stored.
+	 */
+	public synchronized void updateGameBoard() {
+		for(int r=0; r<GameData.ROWS; ++r) {
+			for(int c=0; c<GameData.COLS; ++c) {
+				TileContainer tile = gameData.getTile(r, c);
+				putTile(tile, r, c);
+			}
+		}
 	}
 	
 	/**
@@ -127,8 +191,8 @@ public class GameController implements Initializable {
 			@Override
 			public void run() {
 				refresh();
-				for(int c=0; c<GameData.COLS; ++c) {
-					for(int r=0; r<GameData.ROWS; ++r) {
+				for(int r=0; r<GameData.ROWS; ++r) {
+					for(int c=0; c<GameData.COLS; ++c) {
 						showHint(preview, gameData.getTile(r, c), r, c);
 					}
 				}
@@ -166,7 +230,6 @@ public class GameController implements Initializable {
 	 */
 	private int isValidTilePlacement(final TilePreview preview, final TileContainer currTile, final int r, final int c) {
 		int tileMatches = 0, tileCount = 0;
-		
 		if(currTile.isEmpty()) {
 			// count non-empty tiles
 			tileCount += isPlayableTile(r+1, c);
@@ -176,7 +239,7 @@ public class GameController implements Initializable {
 			
 			if(tileCount == 0) // return if there are only empty tiles around the current tile
 				return 0;
-			
+
 			if(matchesTopSegment(preview, r, c))
 				tileMatches++;
 			if(matchesRightSegment(preview, r, c))
@@ -185,7 +248,7 @@ public class GameController implements Initializable {
 				tileMatches++;
 			if(matchesLeftSegment(preview, r, c))
 				tileMatches++;
-			
+
 			if(tileMatches == tileCount) { // current tile must be matching with all the placed surrounding tiles
 				return 1;
 			}
@@ -202,8 +265,8 @@ public class GameController implements Initializable {
 		TilePreview[] previews = gameData.getPreviews();
 		int sum = 0;
 		for(int i=0; i<previews.length; ++i) {
-			for(int c=0; c<GameData.COLS; ++c) {
-				for(int r=0; r<GameData.ROWS; ++r) {
+			for(int r=0; r<GameData.ROWS; ++r) {
+				for(int c=0; c<GameData.COLS; ++c) {
 					sum += isValidTilePlacement(previews[i], gameData.getTile(r, c), r, c);
 				}
 			}
@@ -220,8 +283,8 @@ public class GameController implements Initializable {
 	private int isPlayableTile(final int r, final int c) {
 		int count = 0;
 		try {
-			count = (gameData.getTile(r, c).isEmpty() || gameData.getTile(r, c) == null) ? 0 : 1;
-		} catch(ArrayIndexOutOfBoundsException e) {
+			count = (gameData.getTile(r, c) == null || gameData.getTile(r, c).isEmpty()) ? 0 : 1;
+		} catch(Exception e) {
 			// do nothing
 		}
 		return count;
@@ -238,7 +301,7 @@ public class GameController implements Initializable {
 		boolean match = false;
 		try {
 			match = preview.matchesBottomSegment(gameData.getTile(r+1, c).getTopSegment());
-		} catch(ArrayIndexOutOfBoundsException e) {
+		} catch(Exception e) {
 			// do nothing
 		}
 		return match;
@@ -255,7 +318,7 @@ public class GameController implements Initializable {
 		boolean match = false;
 		try {
 			match = preview.matchesTopSegment(gameData.getTile(r-1, c).getBottomSegment());
-		} catch(ArrayIndexOutOfBoundsException e) {
+		} catch(Exception e) {
 			// do nothing
 		}
 		return match;
@@ -272,7 +335,7 @@ public class GameController implements Initializable {
 		boolean match = false;
 		try {
 			match = preview.matchesLeftSegment(gameData.getTile(r, c-1).getRightSegment());
-		} catch(ArrayIndexOutOfBoundsException e) {
+		} catch(Exception e) {
 			// do nothing
 		}
 		return match;
@@ -289,7 +352,7 @@ public class GameController implements Initializable {
 		boolean match = false;
 		try {
 			match = preview.matchesRightSegment(gameData.getTile(r, c+1).getLeftSegment());
-		} catch(ArrayIndexOutOfBoundsException e) {
+		} catch(Exception e) {
 			// do nothing
 		}
 		return match;
@@ -419,8 +482,8 @@ public class GameController implements Initializable {
 			public void run() {
 				for(TilePreview preview : gameData.getPreviews())
 					preview.setSelected(false);
-				for(int c=0; c<GameData.COLS; ++c) {
-					for(int r=0; r<GameData.ROWS; ++r) {
+				for(int r=0; r<GameData.ROWS; ++r) {
+					for(int c=0; c<GameData.COLS; ++c) {
 						gameData.getTile(r, c).setSelected(false);
 						gameData.getTile(r, c).removeMouseListener();
 					}
@@ -486,7 +549,7 @@ public class GameController implements Initializable {
 			@Override
 			public void run() {
 				for(TilePreview preview : gameData.getPreviews())
-				preview.setSelected(false);
+					preview.setSelected(false);
 			}
 		});
 	}
@@ -498,8 +561,8 @@ public class GameController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				for(int c=0; c<GameData.COLS; ++c) {
-					for(int r=0; r<GameData.ROWS; ++r) {
+				for(int r=0; r<GameData.ROWS; ++r) {
+					for(int c=0; c<GameData.COLS; ++c) {
 						TileContainer container = gameData.getTile(r, c);
 						container.setEffect(null);
 						container.setSelected(false);
@@ -599,9 +662,9 @@ public class GameController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				for(int c=0; c<GameData.COLS; ++c) {
-					for(int r=0; r<GameData.ROWS; ++r) {
-						addTile(new TileContainer(tileManager.getEmptyTile(), r, c));
+				for(int r=0; r<GameData.ROWS; ++r) {
+					for(int c=0; c<GameData.COLS; ++c) {
+						addTile(new TileContainer(tileManager.getEmptyTile()), r, c);
 					}
 				}
 			}
@@ -614,7 +677,7 @@ public class GameController implements Initializable {
 	 * @param column the column
 	 */
 	public synchronized void addStartingTile(final int row, final int column) {
-		addTile(new TileContainer(tileManager.getStarterTile(), row, column));
+		addTile(new TileContainer(tileManager.getStarterTile()), row, column);
 	}
 	
 	/**
@@ -716,11 +779,11 @@ public class GameController implements Initializable {
 	 */
 	private void updateConnectedSegments(final TileContainer container, final Segment segment,
 			final Position position, final String name, final Set<TileContainer> traversed) {
-		final int r = container.r, c = container.c;
+		final int r = gameData.getRowIndex(container), c = gameData.getColumnIndex(container);
 
 		if(r-1 >= 0) {
 			TileContainer temp = gameData.getTile(r-1, c);
-			if(segment == temp.getBottomSegment() && !traversed.contains(temp)
+			if(temp != null && segment == temp.getBottomSegment() && !traversed.contains(temp)
 					&& (temp.getTile().getPositionOwner(Position.BOTTOM) == null || temp.getTile().getPositionOwner(Position.BOTTOM).isEmpty()
 					|| temp.getTile().getPositionOwner(Position.BOTTOM).equals(name))) {
 				temp.getTile().updateSegmentOwners(Position.BOTTOM, name);
@@ -731,7 +794,7 @@ public class GameController implements Initializable {
 		}
 		if(r+1 < GameData.ROWS) {
 			TileContainer temp = gameData.getTile(r+1, c);
-			if(segment == temp.getTopSegment() && !traversed.contains(temp)
+			if(temp != null && segment == temp.getTopSegment() && !traversed.contains(temp)
 					&& (temp.getTile().getPositionOwner(Position.TOP) == null || temp.getTile().getPositionOwner(Position.TOP).isEmpty()
 					|| temp.getTile().getPositionOwner(Position.TOP).equals(name))) {
 				temp.getTile().updateSegmentOwners(Position.TOP, name);
@@ -742,7 +805,7 @@ public class GameController implements Initializable {
 		}
 		if(c-1 >= 0) {
 			TileContainer temp = gameData.getTile(r, c-1);
-			if(segment == temp.getRightSegment() && !traversed.contains(temp)
+			if(temp != null && segment == temp.getRightSegment() && !traversed.contains(temp)
 					&& (temp.getTile().getPositionOwner(Position.RIGHT) == null || temp.getTile().getPositionOwner(Position.RIGHT).isEmpty()
 					|| temp.getTile().getPositionOwner(Position.RIGHT).equals(name))) {
 				temp.getTile().updateSegmentOwners(Position.RIGHT, name);
@@ -753,7 +816,7 @@ public class GameController implements Initializable {
 		}
 		if(c+1 < GameData.COLS) {
 			TileContainer temp = gameData.getTile(r, c+1);
-			if(segment == temp.getLeftSegment() && !traversed.contains(temp)
+			if(temp != null && segment == temp.getLeftSegment() && !traversed.contains(temp)
 					&& (temp.getTile().getPositionOwner(Position.LEFT) == null || temp.getTile().getPositionOwner(Position.LEFT).isEmpty()
 					|| temp.getTile().getPositionOwner(Position.LEFT).equals(name))) {
 				temp.getTile().updateSegmentOwners(Position.LEFT, name);
@@ -788,8 +851,8 @@ public class GameController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				for(int c=0; c<GameData.COLS; ++c) {
-					for(int r=0; r<GameData.ROWS; ++r) {
+				for(int r=0; r<GameData.ROWS; ++r) {
+					for(int c=0; c<GameData.COLS; ++c) {
 						TileContainer container = gameData.getTile(r, c);
 						if(container.getTile().getSegment(Position.CENTER) == Segment.CLOISTER && container.getFollowerPosition() != null) {
 							int count = 0;
@@ -972,6 +1035,20 @@ public class GameController implements Initializable {
 	}
 	
 	/**
+	 * Sets the grid pane's new height.
+	 */
+	public synchronized void updateGridHeight() {
+		gridPane.setPrefHeight(GameData.TILE_SIZE * GameData.ROWS + (GameData.GAP_SIZE * (GameData.ROWS + 1)) + GameData.OFFSET);
+	}
+	
+	/**
+	 * Sets the grid pane's new width.
+	 */
+	public synchronized void updateGridWidth() {
+		gridPane.setPrefWidth(GameData.TILE_SIZE * GameData.COLS + (GameData.GAP_SIZE * (GameData.COLS + 1)) + GameData.OFFSET);
+	}
+	
+	/**
 	 * Returns true if the specified player name is the client's player name.
 	 * @param player the player name
 	 * @return a boolean
@@ -979,7 +1056,7 @@ public class GameController implements Initializable {
 	public synchronized boolean isPlayerTurn(final String player) {
 		return client.getGame().getMode() == Mode.ASYNC || player.equalsIgnoreCase(client.getGame().getPlayerName());
 	}
-	
+
 	/**
 	 * Returns the score data.
 	 * @return the score data
