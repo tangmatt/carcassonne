@@ -13,6 +13,11 @@ public abstract class AbstractTile extends StackPane {
             + "-fx-border-width: 2;"
 			+ "-fx-border-insets: -1;"
             + "-fx-border-style: solid;";
+	public static final String latestStyle = "-fx-border-color: #708090;"
+            + "-fx-border-width: 2;"
+			+ "-fx-border-insets: -1;"
+            + "-fx-border-style: solid;"
+			+ "-fx-opacity: 0.7";
 	
 	public AbstractTile(final GameTile tile) {
 		addTile(tile);
@@ -137,6 +142,14 @@ public abstract class AbstractTile extends StackPane {
 	/**
 	 * Sets the TileContainer to be selected by graphical indication.
 	 * @param state a boolean
+	 * @param lastTile a TileContainer
 	 */
 	public abstract void setSelected(boolean state);
+	
+	/**
+	 * Sets the style to the last placed style indicator.
+	 */
+	public void setLastPlacedTileStyle() {
+		setStyle(latestStyle);
+	}
 }

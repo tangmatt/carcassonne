@@ -33,8 +33,8 @@ public class JoinGameController extends InputController implements Initializable
 			return;
 		try {
 			Address address = new Address(servAddrField.getText(), Integer.parseInt(servPortField.getText()));
-			new GameClient(usernameField.getText(), address).start(new javafx.stage.Stage());
 			stage.close();
+			new GameClient(usernameField.getText(), address).start(new javafx.stage.Stage());
 		} catch (Exception e) {
 			showMessage(LocalMessages.getString("CouldNotConnect"));
 		}

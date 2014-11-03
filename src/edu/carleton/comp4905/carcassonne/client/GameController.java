@@ -54,6 +54,7 @@ public class GameController implements Initializable {
 	private MouseEvent mousePressEvent;
 	private LobbyDialog lobbyDialog;
 	private GameClient client;
+	private TileContainer lastTile;
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -68,6 +69,7 @@ public class GameController implements Initializable {
 		popOver = createPopOver();
 		gameData.addFollowerViews(followerViews);
 		
+		removePreviewTiles();
 		createLobby();
 	}
 	
@@ -79,7 +81,6 @@ public class GameController implements Initializable {
 		updateGridHeight();
 		updateGridWidth();
 		createGameBoard();
-		removePreviewTiles();
 	}
 	
 	/**
@@ -103,6 +104,7 @@ public class GameController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
+				lastTile = container;
 				putTile(container, row, column);
 				if(!container.isEmpty()) {
 					if(gameData.getColumnIndex(container) == GameData.COLS-1) {
@@ -484,7 +486,8 @@ public class GameController implements Initializable {
 					preview.setSelected(false);
 				for(int r=0; r<GameData.ROWS; ++r) {
 					for(int c=0; c<GameData.COLS; ++c) {
-						gameData.getTile(r, c).setSelected(false);
+						if(lastTile != gameData.getTile(r, c))
+							gameData.getTile(r, c).setSelected(false);
 						gameData.getTile(r, c).removeMouseListener();
 					}
 				}
@@ -565,7 +568,8 @@ public class GameController implements Initializable {
 					for(int c=0; c<GameData.COLS; ++c) {
 						TileContainer container = gameData.getTile(r, c);
 						container.setEffect(null);
-						container.setSelected(false);
+						if(lastTile != container)
+							container.setSelected(false);
 						container.removeMouseListener();
 
 						if(container.getHoverHandle() != null) {
@@ -1039,6 +1043,7 @@ public class GameController implements Initializable {
 	 */
 	public synchronized void updateGridHeight() {
 		gridPane.setPrefHeight(GameData.TILE_SIZE * GameData.ROWS + (GameData.GAP_SIZE * (GameData.ROWS + 1)) + GameData.OFFSET);
+		scrollPane.setPrefHeight(gridPane.getPrefHeight());
 	}
 	
 	/**
@@ -1046,6 +1051,7 @@ public class GameController implements Initializable {
 	 */
 	public synchronized void updateGridWidth() {
 		gridPane.setPrefWidth(GameData.TILE_SIZE * GameData.COLS + (GameData.GAP_SIZE * (GameData.COLS + 1)) + GameData.OFFSET);
+		scrollPane.setPrefWidth(gridPane.getPrefWidth());
 	}
 	
 	/**
