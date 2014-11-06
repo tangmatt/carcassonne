@@ -13,7 +13,7 @@ public abstract class AbstractTile extends StackPane {
             + "-fx-border-width: 2;"
 			+ "-fx-border-insets: -1;"
             + "-fx-border-style: solid;";
-	public static final String latestStyle = "-fx-border-color: #3CB371;"
+	public static final String latestStyle = "-fx-border-color: #FFA500;"
             + "-fx-border-width: 2;"
 			+ "-fx-border-insets: -1;"
             + "-fx-border-style: solid;";

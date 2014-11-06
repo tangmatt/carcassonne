@@ -12,6 +12,7 @@ import java.util.Set;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.PopOver.ArrowLocation;
 
+import edu.carleton.comp4905.carcassonne.common.CommonUtil;
 import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventType;
@@ -25,7 +26,6 @@ import edu.carleton.comp4905.carcassonne.common.TileManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.GaussianBlur;
@@ -42,8 +42,7 @@ public class GameController implements Initializable {
 	@FXML private ScrollPane scrollPane;
 	@FXML private GridPane gridPane;
 	@FXML private HBox previewPane;
-	@FXML private Button endTurnButton;
-	@FXML private Label deckLabel;
+	@FXML private Label deckLabel, scoreLabel, pointsLabel;
 	@FXML private ImageView player1, player2, player3, player4, player5;
 	@FXML private ImageView meeple1, meeple2, meeple3, meeple4, meeple5, meeple6, meeple7; // meeple a.k.a follower
 	private ImageView[] playerViews;
@@ -77,7 +76,7 @@ public class GameController implements Initializable {
 	 * Initializes the game data and board.
 	 */
 	public synchronized void initGame() {
-		getGameData().init();
+		gameData.init();
 		updateGridHeight();
 		updateGridWidth();
 		createGameBoard();
@@ -911,8 +910,32 @@ public class GameController implements Initializable {
 		updateFollowerPanel();
 		addStartingTile(row, column);
 		
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				scoreLabel.setText(LocalMessages.getString("ScoreTitle"));
+				pointsLabel.setText(CommonUtil.convertIntegerToString(0));
+			}
+		});
+		
 		if(isPlayerTurn(target))
 			sendTurnRequest();
+	}
+	
+	/**
+	 * Updates the player's score
+	 * @param name the player name
+	 * @param score the score
+	 */
+	public synchronized void updatePlayerScore(final String name, final int score) {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				if(name.equals(client.getGame().getPlayerName()))
+					pointsLabel.setText(CommonUtil.convertIntegerToString(score));
+				scoreData.setPlayerScore(name, score);
+			}
+		});
 	}
 	
 	/**

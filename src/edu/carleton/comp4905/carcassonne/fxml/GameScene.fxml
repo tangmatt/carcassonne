@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.geometry.*?>
@@ -56,6 +58,28 @@
               </padding>
             </HBox>
           </right>
+               <center>
+                  <HBox alignment="CENTER" BorderPane.alignment="CENTER">
+                     <children>
+                        <Label fx:id="scoreLabel" textAlignment="CENTER" textFill="WHITE">
+                           <font>
+                              <Font name="Ubuntu" size="18.0" />
+                           </font>
+                           <effect>
+                              <DropShadow height="15.0" offsetX="1.0" offsetY="1.0" radius="7.0" width="15.0" />
+                           </effect>
+                        </Label>
+                        <Label fx:id="pointsLabel" textAlignment="CENTER" textFill="WHITE">
+                           <effect>
+                              <DropShadow height="15.0" offsetX="1.0" offsetY="1.0" radius="7.0" width="15.0" />
+                           </effect>
+                           <font>
+                              <Font name="Ubuntu" size="18.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+               </center>
         </BorderPane>
         <HBox id="tilePreview" fx:id="previewPane" alignment="CENTER" fillHeight="false" prefHeight="-1.0" prefWidth="200.0" spacing="5.0" style="-fx-background-color: #5D5D5D;-fx-border-color: transparent transparent #3B3B3B transparent;">
           <padding>

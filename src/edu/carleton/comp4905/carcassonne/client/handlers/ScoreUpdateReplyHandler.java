@@ -21,7 +21,7 @@ public class ScoreUpdateReplyHandler implements EventHandler {
 		String[] names = (String[])event.getProperty("names");
 		Mode mode = (Mode)event.getProperty("mode");
 		
-		gameController.getScoreData().setPlayerScore(target, score);
+		gameController.updatePlayerScore(target, score);
 		gameController.updatePlayerPanel(names, statuses, mode);
 	}
 }
