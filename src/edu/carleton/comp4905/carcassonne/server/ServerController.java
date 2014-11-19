@@ -24,6 +24,7 @@ import edu.carleton.comp4905.carcassonne.common.Player;
 import edu.carleton.comp4905.carcassonne.common.Player.Status;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -78,13 +79,13 @@ public class ServerController implements Initializable {
 						messageDesc.setText(selectedMessage.getMessage());
 				});
 				
-				// auto scroll to bottom of log viewer ** commented out because it prints out some warnings **
-				/*logView.getItems().addListener(new ListChangeListener<Object>() {
+				// auto scroll to bottom of log viewer
+				logView.getItems().addListener(new ListChangeListener<Object>() {
 					@Override
 					public void onChanged(ListChangeListener.Change<? extends Object> change) {
 						logView.scrollTo(logView.getItems().size()-1);
 					}
-				});*/
+				});
 				
 				playerView.setPlaceholder(new Text(LocalMessages.getString("NoPlayersMessage")));
 				logView.setPlaceholder(new Text(LocalMessages.getString("NoLogMessage")));

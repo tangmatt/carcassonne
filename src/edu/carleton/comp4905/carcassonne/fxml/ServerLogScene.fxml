@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.*?>
 
-<AnchorPane id="AnchorPane" fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="350.0" prefWidth="680.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="edu.carleton.comp4905.carcassonne.server.ServerController">
+<AnchorPane id="AnchorPane" fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="350.0" prefWidth="680.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.carleton.comp4905.carcassonne.server.ServerController">
   <children>
     <SplitPane dividerPositions="0.7528735632183908" focusTraversable="true" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <items>
@@ -14,18 +14,18 @@
           <items>
             <TableView id="playerTable" fx:id="playerView" focusTraversable="false" maxWidth="300.0" minWidth="90.0" prefHeight="200.0" prefWidth="200.0">
               <columns>
-                <TableColumn editable="false" prefWidth="75.0" text="Player" fx:id="playerColumn" />
-                <TableColumn editable="false" prefWidth="75.0" text="Address" fx:id="addrColumn" />
-                <TableColumn editable="false" prefWidth="75.0" resizable="true" text="Port" fx:id="portColumn" />
-                <TableColumn editable="false" prefWidth="75.0" resizable="true" text="Status" fx:id="statusColumn" />
+                <TableColumn fx:id="playerColumn" editable="false" prefWidth="75.0" text="Player" />
+                <TableColumn fx:id="addrColumn" editable="false" prefWidth="75.0" text="Address" />
+                <TableColumn fx:id="portColumn" editable="false" prefWidth="75.0" resizable="true" text="Port" />
+                <TableColumn fx:id="statusColumn" editable="false" prefWidth="75.0" resizable="true" text="Status" />
               </columns>
             </TableView>
-            <TableView fx:id="logView" focusTraversable="false" prefHeight="200.0" prefWidth="200.0">
+            <TableView fx:id="logView" focusTraversable="false" prefHeight="279.0" prefWidth="372.0">
               <columns>
-                <TableColumn editable="false" maxWidth="5000.0" minWidth="10.0" prefWidth="75.0" text="Date" fx:id="dateColumn" />
-                <TableColumn editable="false" maxWidth="5000.0" minWidth="10.0" prefWidth="75.0" text="Time" fx:id="timeColumn" />
-                <TableColumn editable="false" prefWidth="75.0" resizable="true" text="Type" fx:id="typeColumn" />
-                <TableColumn editable="false" maxWidth="5000.0" minWidth="10.0" prefWidth="195.0" sortable="false" text="Message" fx:id="messageColumn" />
+                <TableColumn fx:id="dateColumn" editable="false" prefWidth="75.0" text="Date" />
+                <TableColumn fx:id="timeColumn" editable="false" maxWidth="5000.0" prefWidth="75.0" text="Time" />
+                <TableColumn fx:id="typeColumn" editable="false" minWidth="5.0" resizable="true" text="Type" />
+                <TableColumn fx:id="messageColumn" editable="false" minWidth="-Infinity" prefWidth="142.0" text="Message" />
               </columns>
             </TableView>
           </items>

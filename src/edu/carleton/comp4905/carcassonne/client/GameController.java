@@ -59,7 +59,7 @@ public class GameController implements Initializable {
 	private TileContainer lastTile;
 	private Timer timer;
 	
-	public static final int KEEP_ALIVE_MSECS = 15000;
+	public static final int KEEP_ALIVE_MSECS = 60000;
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
