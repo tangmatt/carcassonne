@@ -8,13 +8,13 @@ import edu.carleton.comp4905.carcassonne.common.MessageType;
 import edu.carleton.comp4905.carcassonne.server.Server;
 import edu.carleton.comp4905.carcassonne.server.ServerController;
 
-public class UnknownHandler implements EventHandler {
+public class KeepAliveHandler implements EventHandler {
 	@Override
 	public void handleEvent(final Event event) {
 		Connection connection = (Connection)event.getProperty("connection");
 		Server server = (Server)connection.getService();
 		ServerController controller = server.getController();
 		
-		controller.addMessageEntry(MessageType.WARNING, LocalMessages.getString("UnknownEventDetected"));
+		controller.addMessageEntry(MessageType.INFO, LocalMessages.getString("KeepAliveReceived") + event.getPlayerName());
 	}
 }

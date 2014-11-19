@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
 import edu.carleton.comp4905.carcassonne.common.Acceptor;
 import edu.carleton.comp4905.carcassonne.common.Address;
 import edu.carleton.comp4905.carcassonne.common.Connection;
@@ -109,7 +110,7 @@ public class Server extends Service implements Runnable {
 				try {
 					Connection connection = acceptor.accept();
 					pool.execute(connection);
-				} catch (IOException e) {
+				} catch (Exception e) {
 					running = false;
 				}
 			}
@@ -159,6 +160,14 @@ public class Server extends Service implements Runnable {
 	}
 	
 	/**
+	 * Returns the previous player's name.
+	 * @return the player name
+	 */
+	public String getPreviousPlayer() {
+		return currPlayer = queue.getLast();
+	}
+	
+	/**
 	 * Returns true if the given player name is the current player. (used for SYNC mode; ASYNC mode not applicable)
 	 * @param player the player
 	 * @return a boolean
@@ -198,14 +207,13 @@ public class Server extends Service implements Runnable {
 	
 	@Override
 	public void shutdown() {
-		running = false;
 		for(Connection connection : connections.values())
 			connection.close();
 		try {
 			if(listener != null)
 				listener.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		controller.addMessageEntry(MessageType.INFO, "Server is now offline");
 		pool.shutdownNow();

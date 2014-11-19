@@ -1,5 +1,6 @@
 package edu.carleton.comp4905.carcassonne.client;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -210,7 +211,11 @@ public class LobbyController implements Initializable {
 		if(!event.isPrimaryButtonDown())
 			return;
 		Event startEvent = new Event(EventType.START_REQUEST, client.getGame().getPlayerName());
-		client.getGame().getConnection().sendEvent(startEvent);
+		try {
+			client.getGame().getConnection().sendEvent(startEvent);
+		} catch (IOException e) {
+			
+		}
 	}
 	
 	/**

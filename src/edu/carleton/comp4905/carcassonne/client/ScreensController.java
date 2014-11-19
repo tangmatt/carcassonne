@@ -44,6 +44,8 @@ public class ScreensController extends StackPane {
 			Object controller = fxmlLoader.getController();
 			if(controller instanceof JoinGameController)
 				((JoinGameController)controller).initData(stage);
+			else if(controller instanceof HostGameController)
+				((HostGameController)controller).initData(stage);
 			ControlledScreen screenContainer = ((ControlledScreen)fxmlLoader.getController());
 			screenContainer.setScreenParent(this);
 			addScreen(name, loadScreen);

@@ -17,6 +17,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 
 public class HostGameController extends InputController implements Initializable, ControlledScreen {
 	@FXML private BorderPane borderPane;
@@ -25,6 +26,7 @@ public class HostGameController extends InputController implements Initializable
 	@FXML private RadioButton syncButton, asyncButton;
 	@FXML private Button joinButton, hostButton, submitButton;
 	private ScreensController screensController;
+	private Stage stage;
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -48,6 +50,7 @@ public class HostGameController extends InputController implements Initializable
 		if(!isPortFieldValid())
 			return;
 		try {
+			stage.close();
 			new ServerClient(Integer.parseInt(servPortField.getText()),
 					Mode.valueOf(((RadioButton)toggleGroup.getSelectedToggle()).getText()))
 			.start(new javafx.stage.Stage());
@@ -63,6 +66,14 @@ public class HostGameController extends InputController implements Initializable
 	 */
 	private synchronized void handleJoinGame(final ActionEvent event) {
 		screensController.setScreen(Carcassonne.JOIN_SCREEN);
+	}
+	
+	/**
+	 * Initializes data for this controller.
+	 * @param stage a Stage
+	 */
+	public void initData(final Stage stage) {
+		this.stage = stage;
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package edu.carleton.comp4905.carcassonne.common;
 
 public enum EventType {
 	UNKNOWN,
+	KEEP_ALIVE,
 	JOIN_REQUEST,
 	JOIN_REPLY,
 	QUIT_REQUEST,
@@ -19,5 +20,5 @@ public enum EventType {
 	START_TURN_REQUEST,
 	START_TURN_REPLY,
 	END_TURN_REQUEST,
-	END_TURN_REPLY,
+	END_TURN_REPLY
 }

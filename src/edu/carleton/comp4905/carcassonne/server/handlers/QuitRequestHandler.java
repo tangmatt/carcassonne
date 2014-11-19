@@ -28,7 +28,7 @@ public class QuitRequestHandler implements EventHandler {
 		server.removePlayer(event.getPlayerName());
 		if(!controller.updatePlayer(event.getPlayerName(), address, portAsString, Status.DISCONNECTED))
 			return;
-		controller.addMessageEntry(MessageType.INFO, "Player (" + event.getPlayerName() + ") has quit");
+		controller.addMessageEntry(MessageType.INFO, "Player '" + event.getPlayerName() + "' has quit");
 		
 		if(connections.isEmpty())
 			controller.handleGameFinish();
@@ -44,6 +44,7 @@ public class QuitRequestHandler implements EventHandler {
 			message = player.getName() + " is the winner!";
 		} else if(!server.isGameInProgress()) {
 			controller.removePlayer(event.getPlayerName(), address, portAsString, Status.DISCONNECTED);
+			server.removePlayer(event.getPlayerName());
 		}
 
 		// send reply back to connected clients
@@ -56,7 +57,7 @@ public class QuitRequestHandler implements EventHandler {
 		reply.addProperty("gameInProgress", server.isGameInProgress());
 		reply.addProperty("messageTitle", title);
 		reply.addProperty("message", message);
-		connection.broadcastEvent(reply, connections);
+		controller.broadcastEvent(reply, connection, connections);
 		
 		controller.removeConnection(connections, address, port);
 	}

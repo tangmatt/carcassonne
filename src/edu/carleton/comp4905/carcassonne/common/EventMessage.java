@@ -349,6 +349,16 @@ public final class EventMessage {
      */
     com.google.protobuf.ByteString
         getMessageTitleBytes();
+
+    // optional bool quitting = 30;
+    /**
+     * <code>optional bool quitting = 30;</code>
+     */
+    boolean hasQuitting();
+    /**
+     * <code>optional bool quitting = 30;</code>
+     */
+    boolean getQuitting();
   }
   /**
    * Protobuf type {@code edu.carleton.comp4905.carcassonne.common.Event}
@@ -564,6 +574,11 @@ public final class EventMessage {
             case 234: {
               bitField0_ |= 0x04000000;
               messageTitle_ = input.readBytes();
+              break;
+            }
+            case 240: {
+              bitField0_ |= 0x08000000;
+              quitting_ = input.readBool();
               break;
             }
           }
@@ -1356,6 +1371,24 @@ public final class EventMessage {
       }
     }
 
+    // optional bool quitting = 30;
+    public static final int QUITTING_FIELD_NUMBER = 30;
+    private boolean quitting_;
+    /**
+     * <code>optional bool quitting = 30;</code>
+     */
+    @Override
+	public boolean hasQuitting() {
+      return ((bitField0_ & 0x08000000) == 0x08000000);
+    }
+    /**
+     * <code>optional bool quitting = 30;</code>
+     */
+    @Override
+	public boolean getQuitting() {
+      return quitting_;
+    }
+
     private void initFields() {
       eventType_ = 0;
       playerName_ = "";
@@ -1386,6 +1419,7 @@ public final class EventMessage {
       rows_ = 0;
       columns_ = 0;
       messageTitle_ = "";
+      quitting_ = false;
     }
     private byte memoizedIsInitialized = -1;
     @Override
@@ -1495,6 +1529,9 @@ public final class EventMessage {
       }
       if (((bitField0_ & 0x04000000) == 0x04000000)) {
         output.writeBytes(29, getMessageTitleBytes());
+      }
+      if (((bitField0_ & 0x08000000) == 0x08000000)) {
+        output.writeBool(30, quitting_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -1631,6 +1668,10 @@ public final class EventMessage {
       if (((bitField0_ & 0x04000000) == 0x04000000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(29, getMessageTitleBytes());
+      }
+      if (((bitField0_ & 0x08000000) == 0x08000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(30, quitting_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1810,6 +1851,8 @@ public final class EventMessage {
         bitField0_ = (bitField0_ & ~0x08000000);
         messageTitle_ = "";
         bitField0_ = (bitField0_ & ~0x10000000);
+        quitting_ = false;
+        bitField0_ = (bitField0_ & ~0x20000000);
         return this;
       }
 
@@ -1962,6 +2005,10 @@ public final class EventMessage {
           to_bitField0_ |= 0x04000000;
         }
         result.messageTitle_ = messageTitle_;
+        if (((from_bitField0_ & 0x20000000) == 0x20000000)) {
+          to_bitField0_ |= 0x08000000;
+        }
+        result.quitting_ = quitting_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -2093,6 +2140,9 @@ public final class EventMessage {
           bitField0_ |= 0x10000000;
           messageTitle_ = other.messageTitle_;
           onChanged();
+        }
+        if (other.hasQuitting()) {
+          setQuitting(other.getQuitting());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -3539,6 +3589,41 @@ public final class EventMessage {
         return this;
       }
 
+      // optional bool quitting = 30;
+      private boolean quitting_ ;
+      /**
+       * <code>optional bool quitting = 30;</code>
+       */
+      @Override
+	public boolean hasQuitting() {
+        return ((bitField0_ & 0x20000000) == 0x20000000);
+      }
+      /**
+       * <code>optional bool quitting = 30;</code>
+       */
+      @Override
+	public boolean getQuitting() {
+        return quitting_;
+      }
+      /**
+       * <code>optional bool quitting = 30;</code>
+       */
+      public Builder setQuitting(boolean value) {
+        bitField0_ |= 0x20000000;
+        quitting_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool quitting = 30;</code>
+       */
+      public Builder clearQuitting() {
+        bitField0_ = (bitField0_ & ~0x20000000);
+        quitting_ = false;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:edu.carleton.comp4905.carcassonne.common.Event)
     }
 
@@ -3565,7 +3650,7 @@ public final class EventMessage {
   static {
     java.lang.String[] descriptorData = {
       "\n\013event.proto\022(edu.carleton.comp4905.car" +
-      "cassonne.common\"\203\004\n\005Event\022\021\n\teventType\030\001" +
+      "cassonne.common\"\225\004\n\005Event\022\021\n\teventType\030\001" +
       " \002(\005\022\022\n\nplayerName\030\002 \002(\t\022\022\n\nconnection\030\003" +
       " \001(\014\022\017\n\007address\030\004 \001(\t\022\014\n\004port\030\005 \001(\005\022\024\n\014n" +
       "umOfPlayers\030\006 \001(\005\022\017\n\007success\030\007 \001(\010\022\017\n\007me" +
@@ -3578,7 +3663,8 @@ public final class EventMessage {
       "rs\030\026 \001(\005\022\023\n\013targetIndex\030\027 \001(\005\022\014\n\004mode\030\030 " +
       "\001(\005\022\020\n\010checksum\030\031 \001(\t\022\021\n\ttilesLeft\030\032 \001(\005" +
       "\022\014\n\004rows\030\033 \001(\005\022\017\n\007columns\030\034 \001(\005\022\024\n\014messa" +
-      "geTitle\030\035 \001(\tB\016B\014EventMessage"
+      "geTitle\030\035 \001(\t\022\020\n\010quitting\030\036 \001(\010B\016B\014Event" +
+      "Message"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -3591,7 +3677,7 @@ public final class EventMessage {
           internal_static_edu_carleton_comp4905_carcassonne_common_Event_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_edu_carleton_comp4905_carcassonne_common_Event_descriptor,
-              new java.lang.String[] { "EventType", "PlayerName", "Connection", "Address", "Port", "NumOfPlayers", "Success", "Message", "Statuses", "Names", "Finished", "GameInProgress", "Tile", "Row", "Column", "Rotation", "Meeple", "Position", "Shield", "Target", "Points", "Followers", "TargetIndex", "Mode", "Checksum", "TilesLeft", "Rows", "Columns", "MessageTitle", });
+              new java.lang.String[] { "EventType", "PlayerName", "Connection", "Address", "Port", "NumOfPlayers", "Success", "Message", "Statuses", "Names", "Finished", "GameInProgress", "Tile", "Row", "Column", "Rotation", "Meeple", "Position", "Shield", "Target", "Points", "Followers", "TargetIndex", "Mode", "Checksum", "TilesLeft", "Rows", "Columns", "MessageTitle", "Quitting", });
           return null;
         }
       };

@@ -33,6 +33,6 @@ public class ScoreUpdateRequestHandler implements EventHandler {
 		reply.addProperty("target", target);
 		reply.addProperty("mode", server.getMode());
 		reply.addProperty("points", controller.getPlayerScore(target));
-		connection.broadcastEvent(reply, connections);
+		controller.broadcastEvent(reply, connection, connections);
 	}
 }

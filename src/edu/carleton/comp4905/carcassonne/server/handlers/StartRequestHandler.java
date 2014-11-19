@@ -43,6 +43,6 @@ public class StartRequestHandler implements EventHandler {
 		reply.addProperty("row", row);
 		reply.addProperty("column", column);
 		reply.addProperty("points", points);
-		connection.broadcastEvent(reply, connections);
+		controller.broadcastEvent(reply, connection, connections);
 	}
 }

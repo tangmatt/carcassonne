@@ -38,6 +38,6 @@ public class SendTileRequestHandler implements EventHandler {
 		reply.addProperty("meeple", meeple);
 		reply.addProperty("position", position);
 		reply.addProperty("shield", shield);
-		connection.broadcastEvent(reply, connections);
+		controller.broadcastEvent(reply, connection, connections);
 	}
 }

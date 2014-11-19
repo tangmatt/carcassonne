@@ -1,5 +1,6 @@
 package edu.carleton.comp4905.carcassonne.client;
 
+import java.io.IOException;
 import java.net.URL;
 import java.text.ChoiceFormat;
 import java.text.Format;
@@ -8,6 +9,8 @@ import java.text.NumberFormat;
 import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.PopOver.ArrowLocation;
@@ -54,6 +57,9 @@ public class GameController implements Initializable {
 	private LobbyDialog lobbyDialog;
 	private GameClient client;
 	private TileContainer lastTile;
+	private Timer timer;
+	
+	public static final int KEEP_ALIVE_MSECS = 15000;
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -70,6 +76,7 @@ public class GameController implements Initializable {
 		
 		removePreviewTiles();
 		createLobby();
+		startKeepAliveTimer();
 	}
 	
 	/**
@@ -80,6 +87,27 @@ public class GameController implements Initializable {
 		updateGridHeight();
 		updateGridWidth();
 		createGameBoard();
+	}
+	
+	/**
+	 * Initializes the keep alive timer.
+	 */
+	public synchronized void startKeepAliveTimer() {
+		timer = new Timer();
+		timer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				Event event = new Event(EventType.KEEP_ALIVE, client.getGame().getPlayerName());
+				sendEvent(event, LocalMessages.getString("GameForceStop"));
+			}
+		}, KEEP_ALIVE_MSECS, KEEP_ALIVE_MSECS);
+	}
+	
+	/**
+	 * Pause keep alive timer.
+	 */
+	public synchronized void stopKeepAliveTimer() {
+		timer.cancel();
 	}
 	
 	/**
@@ -360,12 +388,62 @@ public class GameController implements Initializable {
 	}
 	
 	/**
+	 * Sends an event to the server.
+	 * @param event an event
+	 */
+	public void sendEvent(final Event event) {
+		try {
+			Connection connection = client.getGame().getConnection();
+			connection.sendEvent(event);
+		} catch (IOException e) {
+			stopKeepAliveTimer();
+			PlatformManager.run(new Runnable() {
+				@Override
+				public void run() {
+					blurGame(true);
+					new MessageDialog(getGridPane().getScene().getWindow(),
+							client,
+							LocalMessages.getString("ServerNoRespond"),
+							LocalMessages.getString("UnableToSendRequest"),
+							true)
+					.show();
+				}
+			});
+		}
+	}
+	
+	/**
+	 * Sends an event to the server.
+	 * @param event an event
+	 * @param message an error message
+	 */
+	public void sendEvent(final Event event, final String message) {
+		try {
+			Connection connection = client.getGame().getConnection();
+			connection.sendEvent(event);
+		} catch (IOException e) {
+			stopKeepAliveTimer();
+			PlatformManager.run(new Runnable() {
+				@Override
+				public void run() {
+					blurGame(true);
+					new MessageDialog(getGridPane().getScene().getWindow(),
+							client,
+							LocalMessages.getString("ServerNoRespond"),
+							message,
+							true)
+					.show();
+				}
+			});
+		}
+	}
+	
+	/**
 	 * Sends the turn request to the server.
 	 */
 	public void sendTurnRequest() {
-		Connection connection = client.getGame().getConnection();
 		Event event = new Event(EventType.START_TURN_REQUEST, client.getGame().getPlayerName());
-		connection.sendEvent(event);
+		sendEvent(event);
 	}
 	
 	/**
@@ -374,29 +452,28 @@ public class GameController implements Initializable {
 	 * @param message the message
 	 */
 	public void sendEndGameRequest(final String title, final String message) {
-		Connection connection = client.getGame().getConnection();
 		Event event = new Event(EventType.END_GAME_REQUEST, client.getGame().getPlayerName());
 		event.addProperty("messageTitle", title);
 		event.addProperty("message", message);
-		connection.sendEvent(event);
+		sendEvent(event);
 	}
 	
 	/**
 	 * Sends the end turn request to the server.
+	 * @param isQuitting is the player quitting afterwards
 	 */
-	public void sendEndTurnRequest() {
-		Connection connection = client.getGame().getConnection();
+	public void sendEndTurnRequest(final boolean isQuitting) {
 		Event event = new Event(EventType.END_TURN_REQUEST, client.getGame().getPlayerName());
-		connection.sendEvent(event);
+		event.addProperty("quitting", isQuitting);
+		sendEvent(event);
 	}
 	
 	/**
 	 * Sends the quit request to the server.
 	 */
 	public void sendQuitRequest() {
-		Connection connection = client.getGame().getConnection();
 		Event event = new Event(EventType.QUIT_REQUEST, client.getGame().getPlayerName());
-		connection.sendEvent(event);
+		sendEvent(event);
 	}
 	
 	/**
@@ -405,11 +482,10 @@ public class GameController implements Initializable {
 	 * @param points the points earned
 	 */
 	public void sendScoreUpdateRequest(final String name, final int points) {
-		Connection connection = client.getGame().getConnection();
 		Event event = new Event(EventType.SCORE_UPDATE_REQUEST, client.getGame().getPlayerName());
 		event.addProperty("target", name);
 		event.addProperty("points", points);
-		connection.sendEvent(event);
+		sendEvent(event);
 	}
 	
 	/**
@@ -418,11 +494,10 @@ public class GameController implements Initializable {
 	 * @param followers the follower amount
 	 */
 	public void sendFollowerUpdateRequest(final String name, final int followers) {
-		Connection connection = client.getGame().getConnection();
 		Event event = new Event(EventType.FOLLOWER_UPDATE_REQUEST, client.getGame().getPlayerName());
 		event.addProperty("target", name);
 		event.addProperty("followers", followers);
-		connection.sendEvent(event);
+		sendEvent(event);
 	}
 	
 	/**
@@ -452,14 +527,14 @@ public class GameController implements Initializable {
 				stopInteraction(true);
 			}
 		});
-		sendEndTurnRequest();
+		sendEndTurnRequest(false);
 	}
 	
 	/**
 	 * Handles tile selection.
 	 */
 	public synchronized void handleTileSelect(final GameTile selectedTile, final TileContainer container, 
-			final Connection connection, final int row, final int column) {
+			final int row, final int column) {
 		// send tile placement event to server
 		Event gameEvent = new Event(EventType.SEND_TILE_REQUEST, client.getGame().getPlayerName());
 		gameEvent.addProperty("tile", selectedTile.getName());
@@ -469,7 +544,7 @@ public class GameController implements Initializable {
 		gameEvent.addProperty("meeple", gameData.getIndex());
 		gameEvent.addProperty("position", container.getFollowerPosition());
 		gameEvent.addProperty("shield", container.getTile().hasShield());
-		connection.sendEvent(gameEvent);
+		sendEvent(gameEvent);
 		container.setHoverTile(false);
 		endTurn();
 	}
@@ -595,7 +670,7 @@ public class GameController implements Initializable {
 					else
 						javafx.event.Event.fireEvent(gameData.getPreviews()[0], mousePressEvent);
 				} catch(Exception e) {
-					// do nothing
+					//e.printStackTrace();
 				}
 			}
 		});
@@ -636,24 +711,6 @@ public class GameController implements Initializable {
 			public void run() {
 				blurGame(true);
 				lobbyDialog.show();
-			}
-		});
-	}
-	
-	/**
-	 * Shows the current player's turn on the player panel.
-	 * @param index the player index
-	 * @param numOfPlayers the number of players
-	 */
-	public synchronized void showCurrentPlayerTurn(final int index, final int numOfPlayers) {
-		PlatformManager.run(new Runnable() {
-			@Override
-			public void run() {
-				for(int i=0; i<playerViews.length; ++i) {
-					if(i >= numOfPlayers)
-						break;
-					playerViews[i].setImage(ResourceManager.getImageFromResources((i == index) ? "current.png" : "joined.png"));
-				}
 			}
 		});
 	}
@@ -707,14 +764,15 @@ public class GameController implements Initializable {
 					Image image = null;
 					if(statuses[i] == Player.Status.CONNECTED)
 						image = ResourceManager.getImageFromResources("joined.png");
-					else if(statuses[i] == Player.Status.DISCONNECTED)
-						image = ResourceManager.getImageFromResources("disconnected.png");
 					else if(statuses[i] == Player.Status.PLAYING) {
 						if(mode == Mode.SYNC)
 							image = ResourceManager.getImageFromResources("current.png");
 						else
 							image = ResourceManager.getImageFromResources("joined.png");
 					}
+					else if(statuses[i] == Player.Status.DISCONNECTED)
+						image = ResourceManager.getImageFromResources("disconnected.png");
+					
 					playerViews[i].setImage(image);
 					playerViews[i].addEventHandler(MouseEvent.MOUSE_ENTERED, new PlayerViewHandler(playerViews[i], popOver, nameLabel, scoreLabel));
 				}
@@ -888,11 +946,10 @@ public class GameController implements Initializable {
 	 * @param points the score points
 	 */
 	public synchronized void updatePlayerData(final String name, final int points) {
-		Connection connection = client.getGame().getConnection();
 		Event event = new Event(EventType.SCORE_UPDATE_REQUEST, client.getGame().getPlayerName());
 		event.addProperty("target", name);
 		event.addProperty("points", points);
-		connection.sendEvent(event);
+		sendEvent(event);
 	}
 	
 	/**
@@ -973,18 +1030,21 @@ public class GameController implements Initializable {
 	 * @param tile the tile name
 	 * @param targetName the target name
 	 * @param targetIndex the target index
-	 * @param numOfPlayers the number of players
+	 * @param statuses the player statuses
 	 * @param tilesLeft the number of tiles in deck
+	 * @param names the player names
+	 * @param mode the game mode
 	 */
 	public synchronized void handleStartTurn(final String playerName, final String tile, final String targetName,
-			final int targetIndex, final int numOfPlayers, final int tilesLeft) {
+			final int targetIndex, final Player.Status[] statuses, final int tilesLeft, final String[] names,
+			final Mode mode) {
 		if(tile == null) // return if there is no tile
 			return;
 		
 		updateDeckInfo(tilesLeft);
 		
 		if(client.getGame().getMode() == Mode.SYNC) {
-			showCurrentPlayerTurn(targetIndex, numOfPlayers);
+			updatePlayerPanel(names, statuses, mode);
 			if(client.getGame().getPlayerName().equalsIgnoreCase(targetName))
 				startTurn(tile);
 		} else if(client.getGame().getMode() == Mode.ASYNC) {
@@ -1003,23 +1063,24 @@ public class GameController implements Initializable {
 	 * @param title the title
 	 * @param message the message
 	 * @param isPlayerTurn flag to see if it is player's turn
+	 * @param isQuitting is the player quitting after
 	 */
 	public synchronized void handleEndTurn(final boolean success, final String playerName, final String targetName,
-			final String title, final String message, final boolean isPlayerTurn) {
+			final String title, final String message, final boolean isPlayerTurn, final boolean isQuitting) {
 		if(client.getGame().getPlayerName().equalsIgnoreCase(playerName))
 			removePreviewTiles();
 		if(!success) {
 			sendEndGameRequest(title, message);
 			return;
 		}
+		if(success && isQuitting && client.getGame().getPlayerName().equalsIgnoreCase(playerName))
+			sendQuitRequest();
 		if(client.getGame().getMode() == Mode.SYNC) {
-			if(success && client.getGame().getPlayerName().equalsIgnoreCase(targetName)) {
+			if(success && targetName != null && client.getGame().getPlayerName().equalsIgnoreCase(targetName))
 				sendTurnRequest();
-			}
 		} else if(client.getGame().getMode() == Mode.ASYNC) {
-			if(success && client.getGame().getPlayerName().equalsIgnoreCase(playerName)) {
+			if(success && client.getGame().getPlayerName().equalsIgnoreCase(playerName))
 				sendTurnRequest();
-			}
 		}
 	}
 	
@@ -1028,17 +1089,16 @@ public class GameController implements Initializable {
 	 */
 	public synchronized void handleQuitEvent(final boolean gameInProgress, final boolean finished, final String title,
 			final String message, final String playerName, final String[] names, final Player.Status[] statuses,
-			final int numOfPlayers, final Mode mode) {
+			final int numOfPlayers) {
 		if(gameInProgress) {
-			updatePlayerPanel(names, statuses, mode);
+			updatePlayerPanel(names, statuses, client.getGame().getMode());
 			if(finished && message != null) {
 				if(playerName.equals(client.getGame().getPlayerName())) {
 					client.getStage().getOnCloseRequest().handle(null);
-				} else {
+				} 
+				if(numOfPlayers == 1){
 					sendEndGameRequest(title, message);
 				}
-			} else if(client.getGame().getMode() == Mode.SYNC && client.getGame().getPlayerName().equalsIgnoreCase(playerName)) {
-				sendEndTurnRequest();
 			}
 		}
 		else {
@@ -1132,6 +1192,14 @@ public class GameController implements Initializable {
 	 */
 	public synchronized LobbyController getLobbyController() {
 		return lobbyDialog.getController();
+	}
+	
+	/**
+	 * Returns the Timer object.
+	 * @return a Timer
+	 */
+	public synchronized Timer getTimer() {
+		return timer;
 	}
 	
 	/**

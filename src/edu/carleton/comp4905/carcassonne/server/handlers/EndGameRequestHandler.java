@@ -25,7 +25,7 @@ public class EndGameRequestHandler implements EventHandler {
 		Event reply = new Event(EventType.END_GAME_REPLY, event.getPlayerName());
 		reply.addProperty("messageTitle", title);
 		reply.addProperty("message", message);
-		connection.sendEvent(reply);
+		controller.sendEvent(reply, connection);
 		
 		controller.closeServerApplication();
 	}

@@ -19,22 +19,34 @@ public class EndTurnRequestHandler implements EventHandler {
 		Server server = (Server)connection.getService();
 		ServerController controller = server.getController();
 		ConcurrentMap<Address, Connection> connections = server.getConnections();
-		
+
 		String title = null, message = null;
+		boolean isQuitting = (boolean)event.getProperty("quitting");
+		String prevPlayer = new String(server.getCurrentPlayer());
 		
 		if(server.getMode() == Mode.SYNC) {
-			if(!server.getCurrentPlayer().equalsIgnoreCase(event.getPlayerName()))
+			if(isQuitting)
+				server.removePlayer(event.getPlayerName());
+			if(!prevPlayer.equalsIgnoreCase(event.getPlayerName())) {
+				Event reply = new Event(EventType.END_TURN_REPLY, event.getPlayerName());
+				reply.addProperty("success", !(controller.allPlayersHaveNoTile() && controller.getDeck().isEmpty()));
+				reply.addProperty("messageTitle", title);
+				reply.addProperty("message", message);
+				reply.addProperty("finished", server.getCurrentPlayer().equalsIgnoreCase(event.getPlayerName()));
+				reply.addProperty("quitting", isQuitting);
+				controller.broadcastEvent(reply, connection, connections);
 				return;
+			}
 			server.setNextPlayer();
 		}
-		
+
 		controller.updatePlayerHand(event.getPlayerName(), false);
 		boolean success = !(controller.allPlayersHaveNoTile() && controller.getDeck().isEmpty());
 		if(!success) {
 			title = LocalMessages.getString("EmptyDeckTitle");
 			message = controller.getWinnerMessage();
 		}
-		
+
 		// send reply back to connected client
 		Event reply = new Event(EventType.END_TURN_REPLY, event.getPlayerName());
 		reply.addProperty("success", success);
@@ -42,6 +54,7 @@ public class EndTurnRequestHandler implements EventHandler {
 		reply.addProperty("messageTitle", title);
 		reply.addProperty("message", message);
 		reply.addProperty("finished", server.getCurrentPlayer().equalsIgnoreCase(event.getPlayerName()));
-		connection.broadcastEvent(reply, connections);
+		reply.addProperty("quitting", isQuitting);
+		controller.broadcastEvent(reply, connection, connections);
 	}
 }

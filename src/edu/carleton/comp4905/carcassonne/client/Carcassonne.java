@@ -3,11 +3,9 @@ package edu.carleton.comp4905.carcassonne.client;
 import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.ResourceManager;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 public class Carcassonne extends Application {
 	public static final String JOIN_SCREEN = "ServerConnectScene";
@@ -34,14 +32,6 @@ public class Carcassonne extends Application {
 		Scene scene = new Scene(root, 298-10, 281-10);
 		primaryStage.setScene(scene); // subtracted by 10 because setResizable adds 10 pixels apparently (on Windows)..
 		primaryStage.show();
-		
-		// event handler for closing the window
-		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-			@Override
-			public void handle(WindowEvent event) {
-				primaryStage.close();
-			}
-		});
 	}
 	
 	public static void main(String args[]) {

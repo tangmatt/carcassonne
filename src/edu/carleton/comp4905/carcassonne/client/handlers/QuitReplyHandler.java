@@ -5,7 +5,6 @@ import edu.carleton.comp4905.carcassonne.client.GameController;
 import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventHandler;
-import edu.carleton.comp4905.carcassonne.common.Mode;
 import edu.carleton.comp4905.carcassonne.common.Player;
 
 public class QuitReplyHandler implements EventHandler {
@@ -21,9 +20,8 @@ public class QuitReplyHandler implements EventHandler {
 		String title = (String)event.getProperty("messageTitle");
 		String message = (String)event.getProperty("message");
 		boolean gameInProgress = (boolean)event.getProperty("gameInProgress");
-		Mode mode = (Mode)event.getProperty("mode");
 		
 		gameController.handleQuitEvent(gameInProgress, finished, title,
-				message, event.getPlayerName(), names, statuses, numOfPlayers, mode);
+				message, event.getPlayerName(), names, statuses, numOfPlayers);
 	}
 }

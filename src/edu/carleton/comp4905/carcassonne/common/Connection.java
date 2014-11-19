@@ -1,5 +1,6 @@
 package edu.carleton.comp4905.carcassonne.common;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentMap;
@@ -34,11 +35,10 @@ public abstract class Connection implements Runnable, Serializable {
 					event.addProperty("connection", connection);
 					event.addProperty("address", peer.getInetAddress().getHostAddress());
 					event.addProperty("port", peer.getPort());
-					System.out.println(event.getEventType());
 					if(event != null)
 						service.getReactor().dispatch(event);
 				} catch (Exception e) {
-					//running = false;
+					running = false;
 				}
 			}
 		}
@@ -72,24 +72,26 @@ public abstract class Connection implements Runnable, Serializable {
 	 * Closes the socket and other relations.
 	 */
 	public void close() {
-		//try {
-			//running = false;
-			//peer.close();
+		try {
+			running = false;
+			peer.close();
 			service.getPool().shutdownNow();
-		/*} catch (IOException e) {
+		} catch (Exception e) {
 			// do nothing
-		}*/
+		}
 	}
 	
 	/**
 	 * Sends an event.
 	 * @param event an Event
+	 * @throws IOException 
 	 */
-	public abstract void sendEvent(Event event);
+	public abstract void sendEvent(Event event) throws IOException;
 	
 	/**
 	 * Broadcasts an event to all connected services.
 	 * @param event an Event
+	 * @throws IOException 
 	 */
-	public abstract void broadcastEvent(Event event, ConcurrentMap<Address, Connection> connections);
+	public abstract void broadcastEvent(Event event, ConcurrentMap<Address, Connection> connections) throws IOException;
 }

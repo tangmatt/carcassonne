@@ -21,6 +21,7 @@ public class StartTurnRequestHandler implements EventHandler {
 		ConcurrentMap<Address, Connection> connections = server.getConnections();
 		
 		Player.Status[] statuses = controller.getStatuses(connections);
+		String[] names = controller.getPlayerNames();
 		String tile = null;
 		
 		if(!controller.getDeck().isEmpty()) {
@@ -39,7 +40,9 @@ public class StartTurnRequestHandler implements EventHandler {
 		reply.addProperty("target", server.getCurrentPlayer());
 		reply.addProperty("targetIndex", server.getTurn(controller.getPlayerNames()));
 		reply.addProperty("statuses", statuses);
+		reply.addProperty("names", names);
 		reply.addProperty("tilesLeft", controller.getDeck().size());
-		connection.broadcastEvent(reply, connections);
+		reply.addProperty("mode", server.getMode());
+		controller.broadcastEvent(reply, connection, connections);
 	}
 }

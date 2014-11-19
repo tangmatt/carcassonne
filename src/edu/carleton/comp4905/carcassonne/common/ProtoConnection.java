@@ -30,7 +30,7 @@ public class ProtoConnection extends Connection {
 	}
 	
 	@Override
-	public synchronized void broadcastEvent(final Event event, final ConcurrentMap<Address, Connection> connections) {
+	public synchronized void broadcastEvent(final Event event, final ConcurrentMap<Address, Connection> connections) throws IOException {
 		for(Address address : connections.keySet()) {
 			Connection connection = connections.get(address);
 			connection.sendEvent(event);
@@ -187,32 +187,8 @@ public class ProtoConnection extends Connection {
 					Event event = getEvent(eventMessage);
 					buffer.put(event);
 				} catch (Exception e) {
-					running = false;
+					//running = false;
 				}
-			}
-		}
-	}
-	
-	private class Consumer implements Runnable {
-		private final ProtoConnection connection;
-
-		public Consumer(final ProtoConnection connection) {
-			this.connection = connection;
-		}
-		
-		@Override
-		public void run() {
-			try {
-				while(running) {
-					Event event = buffer.take();
-					event.addProperty("connection", connection);
-					event.addProperty("address", peer.getInetAddress().getHostAddress());
-					event.addProperty("port", peer.getPort());
-					if(event != null)
-						service.getReactor().dispatch(event);
-				}
-			} catch (Exception e) {
-				running = false;
 			}
 		}
 	}

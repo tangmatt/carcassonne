@@ -33,28 +33,28 @@ public class JoinRequestHandler implements EventHandler {
 			reply.addProperty("numOfPlayers", connections.size());
 			reply.addProperty("success", false);
 			reply.addProperty("message", LocalMessages.getString("GameAlreadyStarted"));
-			connection.sendEvent(reply);
+			controller.sendEvent(reply, connection);
 			return;
 		} else if(controller.playerExists(event.getPlayerName())) {
 			Event reply = new Event(EventType.JOIN_REPLY, event.getPlayerName());
 			reply.addProperty("numOfPlayers", connections.size());
 			reply.addProperty("success", false);
 			reply.addProperty("message", LocalMessages.getString("PlayerAlreadyExists"));
-			connection.sendEvent(reply);
+			controller.sendEvent(reply, connection);
 			return;
 		} else if(connections.size() >= 5) {
 			Event reply = new Event(EventType.JOIN_REPLY, event.getPlayerName());
 			reply.addProperty("numOfPlayers", connections.size());
 			reply.addProperty("success", false);
 			reply.addProperty("message", LocalMessages.getString("PlayerLimitReached"));
-			connection.sendEvent(reply);
+			controller.sendEvent(reply, connection);
 			return;
 		} else if(!checksum.equals(tileManager.checksum())) {
 			Event reply = new Event(EventType.JOIN_REPLY, event.getPlayerName());
 			reply.addProperty("numOfPlayers", connections.size());
 			reply.addProperty("success", false);
 			reply.addProperty("message", LocalMessages.getString("ModifiedTileConfig"));
-			connection.sendEvent(reply);
+			controller.sendEvent(reply, connection);
 			return;
 		}
 		
@@ -67,6 +67,6 @@ public class JoinRequestHandler implements EventHandler {
 		Event reply = new Event(EventType.JOIN_REPLY, event.getPlayerName());
 		reply.addProperty("numOfPlayers", connections.size());
 		reply.addProperty("success", true);
-		connection.broadcastEvent(reply, connections);
+		controller.broadcastEvent(reply, connection, connections);
 	}
 }

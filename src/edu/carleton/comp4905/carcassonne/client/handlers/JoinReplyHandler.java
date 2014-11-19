@@ -25,7 +25,6 @@ public class JoinReplyHandler implements EventHandler {
 			lobbyController.updatePlayerIcons(numOfPlayers);
 			lobbyController.handleStartAvailability(numOfPlayers);
 			gameController.showLobbyDialog();
-			//gameController.updatePlayerData(event.getPlayerName(), 0);
 		} else {
 			gameController.blurGame(true);
 			PlatformManager.run(new Runnable() {

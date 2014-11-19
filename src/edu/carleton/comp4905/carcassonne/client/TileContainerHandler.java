@@ -1,6 +1,5 @@
 package edu.carleton.comp4905.carcassonne.client;
 
-import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Position;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
@@ -19,7 +18,6 @@ public class TileContainerHandler implements EventHandler<MouseEvent> {
 	@Override
 	public void handle(final MouseEvent event) {
 		TileContainer container = (TileContainer) event.getSource();
-		Connection connection = controller.getGameClient().getGame().getConnection();
 		GameTile selectedTile = controller.getGameData().getCopyOfSelectedPreviewTile();
 		Position position = container.getFollowerPosition();
 		
@@ -34,6 +32,6 @@ public class TileContainerHandler implements EventHandler<MouseEvent> {
 				return;
 		}
 		
-		controller.handleTileSelect(selectedTile, container, connection, row, column);
+		controller.handleTileSelect(selectedTile, container, row, column);
 	}
 }

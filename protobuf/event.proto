@@ -32,4 +32,5 @@ message Event {
 	optional int32 rows = 27;
 	optional int32 columns = 28;
 	optional string messageTitle = 29;
+	optional bool quitting = 30;
 }

@@ -1,5 +1,6 @@
 package edu.carleton.comp4905.carcassonne.server;
 
+import java.io.IOException;
 import java.net.URL;
 import java.text.ChoiceFormat;
 import java.text.Format;
@@ -10,9 +11,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.ConcurrentMap;
 
 import edu.carleton.comp4905.carcassonne.common.Address;
 import edu.carleton.comp4905.carcassonne.common.Connection;
+import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.Message;
 import edu.carleton.comp4905.carcassonne.common.MessageType;
@@ -373,6 +376,33 @@ public class ServerController implements Initializable {
 			}
 		}
 		return -1;
+	}
+	
+	/**
+	 * Sends event to client.
+	 * @param event an event
+	 * @param connection the connection
+	 */
+	public void sendEvent(final Event event, final Connection connection) {
+		try {
+			connection.sendEvent(event);
+		} catch (IOException e) {
+			addMessageEntry(MessageType.ERROR, LocalMessages.getString("UnableToSendReply"));
+		}
+	}
+	
+	/**
+	 * Sends event to all clients.
+	 * @param event an event
+	 * @param connection the connection
+	 * @param connections the connections
+	 */
+	public void broadcastEvent(final Event event, final Connection connection, final ConcurrentMap<Address, Connection> connections) {
+		try {
+			connection.broadcastEvent(event, connections);
+		} catch (IOException e) {
+			addMessageEntry(MessageType.ERROR, LocalMessages.getString("UnableToSendReply"));
+		}
 	}
 	
 	/**
