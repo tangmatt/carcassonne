@@ -24,8 +24,8 @@
               <columns>
                 <TableColumn fx:id="dateColumn" editable="false" prefWidth="75.0" text="Date" />
                 <TableColumn fx:id="timeColumn" editable="false" maxWidth="5000.0" prefWidth="75.0" text="Time" />
-                <TableColumn fx:id="typeColumn" editable="false" minWidth="5.0" resizable="true" text="Type" />
-                <TableColumn fx:id="messageColumn" editable="false" minWidth="-Infinity" prefWidth="142.0" text="Message" />
+                <TableColumn fx:id="typeColumn" editable="false" minWidth="5.0" prefWidth="47.0" resizable="true" text="Type" />
+                <TableColumn fx:id="messageColumn" editable="false" minWidth="-Infinity" prefWidth="175.0" text="Message" />
               </columns>
             </TableView>
           </items>

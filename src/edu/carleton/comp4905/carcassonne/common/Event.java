@@ -48,4 +48,12 @@ public class Event implements Serializable {
 	public Object getProperty(final String propertyName) {
 		return properties.get(propertyName);
 	}
+	
+	/**
+	 * Returns a string representation of the event.
+	 * @return an String
+	 */
+	public String toString() {
+		return "Event '" + eventType.name() + "' sent by " + playerName;
+	}
 }

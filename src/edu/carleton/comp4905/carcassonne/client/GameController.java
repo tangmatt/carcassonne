@@ -57,9 +57,10 @@ public class GameController implements Initializable {
 	private LobbyDialog lobbyDialog;
 	private GameClient client;
 	private TileContainer lastTile;
-	private Timer timer;
+	private Timer keepAliveTimer;
+	private boolean isAlive;
 	
-	public static final int KEEP_ALIVE_MSECS = 60000;
+	public static final int KEEP_ALIVE_MSECS = 120 * 1000;
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -68,6 +69,7 @@ public class GameController implements Initializable {
 		gameData = new GameData();
 		scoreData = new ScoreData();
 		tileManager = TileManager.getInstance();
+		isAlive = true;
 		
 		playerViews = new ImageView[] { player1, player2, player3, player4, player5 };
 		ImageView[] followerViews = new ImageView[] { meeple1, meeple2, meeple3, meeple4, meeple5, meeple6, meeple7 };
@@ -93,8 +95,8 @@ public class GameController implements Initializable {
 	 * Initializes the keep alive timer.
 	 */
 	public synchronized void startKeepAliveTimer() {
-		timer = new Timer();
-		timer.scheduleAtFixedRate(new TimerTask() {
+		keepAliveTimer = new Timer();
+		keepAliveTimer.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
 				Event event = new Event(EventType.KEEP_ALIVE, client.getGame().getPlayerName());
@@ -107,7 +109,7 @@ public class GameController implements Initializable {
 	 * Pause keep alive timer.
 	 */
 	public synchronized void stopKeepAliveTimer() {
-		timer.cancel();
+		keepAliveTimer.cancel();
 	}
 	
 	/**
@@ -397,18 +399,21 @@ public class GameController implements Initializable {
 			connection.sendEvent(event);
 		} catch (IOException e) {
 			stopKeepAliveTimer();
-			PlatformManager.run(new Runnable() {
-				@Override
-				public void run() {
-					blurGame(true);
-					new MessageDialog(getGridPane().getScene().getWindow(),
-							client,
-							LocalMessages.getString("ServerNoRespond"),
-							LocalMessages.getString("UnableToSendRequest"),
-							true)
-					.show();
-				}
-			});
+			if(isAlive) {
+				PlatformManager.run(new Runnable() {
+					@Override
+					public void run() {
+						isAlive = false;
+						blurGame(true);
+						new MessageDialog(getGridPane().getScene().getWindow(),
+								client,
+								LocalMessages.getString("ServerNoRespond"),
+								LocalMessages.getString("UnableToSendRequest"),
+								true)
+						.show();
+					}
+				});
+			}
 		}
 	}
 	
@@ -423,18 +428,21 @@ public class GameController implements Initializable {
 			connection.sendEvent(event);
 		} catch (IOException e) {
 			stopKeepAliveTimer();
-			PlatformManager.run(new Runnable() {
-				@Override
-				public void run() {
-					blurGame(true);
-					new MessageDialog(getGridPane().getScene().getWindow(),
-							client,
-							LocalMessages.getString("ServerNoRespond"),
-							message,
-							true)
-					.show();
-				}
-			});
+			if(isAlive) {
+				PlatformManager.run(new Runnable() {
+					@Override
+					public void run() {
+						isAlive = false;
+						blurGame(true);
+						new MessageDialog(getGridPane().getScene().getWindow(),
+								client,
+								LocalMessages.getString("ServerNoRespond"),
+								message,
+								true)
+						.show();
+					}
+				});
+			}
 		}
 	}
 	
@@ -1199,7 +1207,7 @@ public class GameController implements Initializable {
 	 * @return a Timer
 	 */
 	public synchronized Timer getTimer() {
-		return timer;
+		return keepAliveTimer;
 	}
 	
 	/**
