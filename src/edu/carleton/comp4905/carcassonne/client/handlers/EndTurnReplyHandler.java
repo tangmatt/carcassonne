@@ -19,9 +19,9 @@ public class EndTurnReplyHandler implements EventHandler {
 		String target = (String)event.getProperty("target");
 		String title = (String)event.getProperty("messageTitle");
 		String message = (String)event.getProperty("message");
-		boolean isPlayerTurn = (boolean)event.getProperty("finished");
+		boolean finished = (boolean)event.getProperty("finished");
 		boolean isQuitting = (boolean)event.getProperty("quitting");
 
-		gameController.handleEndTurn(success, player, target, title, message, isPlayerTurn, isQuitting);
+		gameController.handleEndTurn(success, player, target, title, message, finished, isQuitting);
 	}
 }

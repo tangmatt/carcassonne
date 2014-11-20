@@ -53,7 +53,7 @@ public class EndTurnRequestHandler implements EventHandler {
 		reply.addProperty("target", server.getCurrentPlayer());
 		reply.addProperty("messageTitle", title);
 		reply.addProperty("message", message);
-		reply.addProperty("finished", server.getCurrentPlayer().equalsIgnoreCase(event.getPlayerName()));
+		reply.addProperty("finished", isQuitting && connections.size() == 2);
 		reply.addProperty("quitting", isQuitting);
 		controller.broadcastEvent(reply, connection, connections);
 	}

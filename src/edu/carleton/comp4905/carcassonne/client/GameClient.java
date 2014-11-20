@@ -46,11 +46,11 @@ public class GameClient extends Application {
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent event) {
-				// TODO WILL NEED TO TAKE INTO ACCOUNT IF NOT THEIR TURN
 				if(game.getConnection() != null)
 					controller.sendEndTurnRequest(true);
+				primaryStage.hide();
 				// give enough time for the request to send to server
-				try { Thread.sleep(10); } catch (InterruptedException e) {}
+				try { Thread.sleep(100); } catch (InterruptedException e) {}
 				game.shutdown();
 				primaryStage.close();
 			}

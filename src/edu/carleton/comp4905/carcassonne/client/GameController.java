@@ -1070,11 +1070,11 @@ public class GameController implements Initializable {
 	 * @param targetName the target name
 	 * @param title the title
 	 * @param message the message
-	 * @param isPlayerTurn flag to see if it is player's turn
+	 * @param finished is the game finished (last person remaining)
 	 * @param isQuitting is the player quitting after
 	 */
 	public synchronized void handleEndTurn(final boolean success, final String playerName, final String targetName,
-			final String title, final String message, final boolean isPlayerTurn, final boolean isQuitting) {
+			final String title, final String message, final boolean finished, final boolean isQuitting) {
 		if(client.getGame().getPlayerName().equalsIgnoreCase(playerName))
 			removePreviewTiles();
 		if(!success) {
@@ -1084,10 +1084,10 @@ public class GameController implements Initializable {
 		if(success && isQuitting && client.getGame().getPlayerName().equalsIgnoreCase(playerName))
 			sendQuitRequest();
 		if(client.getGame().getMode() == Mode.SYNC) {
-			if(success && targetName != null && client.getGame().getPlayerName().equalsIgnoreCase(targetName))
+			if(success && targetName != null && !finished && client.getGame().getPlayerName().equalsIgnoreCase(targetName))
 				sendTurnRequest();
 		} else if(client.getGame().getMode() == Mode.ASYNC) {
-			if(success && client.getGame().getPlayerName().equalsIgnoreCase(playerName))
+			if(success && !finished && client.getGame().getPlayerName().equalsIgnoreCase(playerName))
 				sendTurnRequest();
 		}
 	}

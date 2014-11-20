@@ -104,6 +104,8 @@ public class ProtoConnection extends Connection {
 			event.addProperty("messageTitle", eventMessage.getMessageTitle());
 		if(eventMessage.hasFollowers())
 			event.addProperty("followers", eventMessage.getFollowers());
+		if(eventMessage.hasQuitting())
+			event.addProperty("quitting", eventMessage.getQuitting());
 		
 		return event;
 	}
@@ -172,6 +174,8 @@ public class ProtoConnection extends Connection {
 			builder.setMessageTitle((String)event.getProperty("messageTitle"));
 		if(event.getProperty("followers") != null)
 			builder.setFollowers((int)event.getProperty("followers"));
+		if(event.getProperty("quitting") != null)
+			builder.setQuitting((boolean)event.getProperty("quitting"));
 		
 		return builder.build();
 	}
