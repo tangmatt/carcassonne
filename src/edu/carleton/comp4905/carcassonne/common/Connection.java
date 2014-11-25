@@ -35,6 +35,7 @@ public abstract class Connection implements Runnable, Serializable {
 					event.addProperty("connection", connection);
 					event.addProperty("address", peer.getInetAddress().getHostAddress());
 					event.addProperty("port", peer.getPort());
+					System.out.println(event);
 					if(event != null)
 						service.getReactor().dispatch(event);
 				} catch (Exception e) {

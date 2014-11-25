@@ -126,6 +126,7 @@ public class Server extends Service implements Runnable {
 				}
 			});
 		}
+		this.shutdown();
 	}
 	
 	/**

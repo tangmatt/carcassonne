@@ -80,12 +80,12 @@ public class ServerController implements Initializable {
 				});
 				
 				// auto scroll to bottom of log viewer
-				logView.getItems().addListener(new ListChangeListener<Object>() {
+				/*logView.getItems().addListener(new ListChangeListener<Object>() {
 					@Override
 					public void onChanged(ListChangeListener.Change<? extends Object> change) {
 						logView.scrollTo(logView.getItems().size()-1);
 					}
-				});
+				});*/
 				
 				playerView.setPlaceholder(new Text(LocalMessages.getString("NoPlayersMessage")));
 				logView.setPlaceholder(new Text(LocalMessages.getString("NoLogMessage")));

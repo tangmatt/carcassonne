@@ -60,7 +60,7 @@ public class GameController implements Initializable {
 	private Timer keepAliveTimer;
 	private boolean isAlive;
 	
-	public static final int KEEP_ALIVE_MSECS = 120 * 1000;
+	public static final int KEEP_ALIVE_MSECS = 30 * 1000;
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -109,7 +109,8 @@ public class GameController implements Initializable {
 	 * Pause keep alive timer.
 	 */
 	public synchronized void stopKeepAliveTimer() {
-		keepAliveTimer.cancel();
+		if(keepAliveTimer != null)
+			keepAliveTimer.cancel();
 	}
 	
 	/**
@@ -1084,8 +1085,10 @@ public class GameController implements Initializable {
 		if(success && isQuitting && client.getGame().getPlayerName().equalsIgnoreCase(playerName))
 			sendQuitRequest();
 		if(client.getGame().getMode() == Mode.SYNC) {
-			if(success && targetName != null && !finished && client.getGame().getPlayerName().equalsIgnoreCase(targetName))
+			if(success && targetName != null && !finished && client.getGame().getPlayerName().equalsIgnoreCase(targetName)) {
+				try { Thread.sleep(100); } catch (InterruptedException e) {}
 				sendTurnRequest();
+			}
 		} else if(client.getGame().getMode() == Mode.ASYNC) {
 			if(success && !finished && client.getGame().getPlayerName().equalsIgnoreCase(playerName))
 				sendTurnRequest();

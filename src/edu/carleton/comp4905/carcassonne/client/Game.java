@@ -96,8 +96,10 @@ public class Game extends Service implements Runnable {
 	public void shutdown() {
 		if(connection != null)
 			connection.close();
-		controller.getTimer().cancel();
-		controller.getTimer().purge();
+		if(controller.getTimer() != null) {
+			controller.getTimer().cancel();
+			controller.getTimer().purge();
+		}
 		pool.shutdownNow();
 	}
 }

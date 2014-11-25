@@ -27,9 +27,11 @@ public class DefaultConnection extends Connection {
 
 	@Override
 	public synchronized void broadcastEvent(final Event event, final ConcurrentMap<Address, Connection> connections) throws IOException {
+		System.out.println("Broadcasting " + event.getEventType() + " to " + connections.size() + " players:");
 		for(Address address : connections.keySet()) {
 			Connection connection = connections.get(address);
 			connection.sendEvent(event);
+			System.out.println("\t" + event.getEventType() + " to " + connection.getPeer().getPort());
 		}
 	}
 
