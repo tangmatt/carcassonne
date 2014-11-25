@@ -72,7 +72,7 @@ public class ServerController implements Initializable {
 				typeColumn.setCellValueFactory(new PropertyValueFactory<Message, MessageType>("type"));
 				messageColumn.setCellValueFactory(new PropertyValueFactory<Message, String>("message"));
 				
-				// Row selection listener; displays log message in text area
+				// row selection listener; displays log message in text area
 				logView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
 					Message selectedMessage = newValue;
 					if(selectedMessage != null)
@@ -80,12 +80,12 @@ public class ServerController implements Initializable {
 				});
 				
 				// auto scroll to bottom of log viewer
-				/*logView.getItems().addListener(new ListChangeListener<Object>() {
+				logView.getItems().addListener(new ListChangeListener<Object>() {
 					@Override
 					public void onChanged(ListChangeListener.Change<? extends Object> change) {
 						logView.scrollTo(logView.getItems().size()-1);
 					}
-				});*/
+				});
 				
 				playerView.setPlaceholder(new Text(LocalMessages.getString("NoPlayersMessage")));
 				logView.setPlaceholder(new Text(LocalMessages.getString("NoLogMessage")));
