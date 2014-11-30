@@ -21,17 +21,17 @@ public class DefaultConnection extends Connection {
 	}
 
 	@Override
-	public synchronized void sendEvent(final Event event) throws IOException {
+	public void sendEvent(final Event event) throws IOException {
 		new ObjectOutputStream(peer.getOutputStream()).writeObject(event);
 	}
 
 	@Override
-	public synchronized void broadcastEvent(final Event event, final ConcurrentMap<Address, Connection> connections) throws IOException {
+	public void broadcastEvent(final Event event, final ConcurrentMap<Address, Connection> connections) throws IOException {
 		Logger.log("Broadcasting " + event.getEventType() + " to " + connections.size() + " players:");
 		for(Address address : connections.keySet()) {
 			Connection connection = connections.get(address);
-			connection.sendEvent(event);
 			Logger.log("\t" + event.getEventType() + " to " + connection.getPeer().getPort());
+			connection.sendEvent(event);
 		}
 	}
 
@@ -44,6 +44,7 @@ public class DefaultConnection extends Connection {
 					buffer.put(event);
 				} catch (Exception e) {
 					//running = false;
+					Logger.log(e.getMessage());
 				}
 			}
 		}

@@ -20,6 +20,7 @@ import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventType;
 import edu.carleton.comp4905.carcassonne.common.LocalMessages;
+import edu.carleton.comp4905.carcassonne.common.Logger;
 import edu.carleton.comp4905.carcassonne.common.Mode;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
 import edu.carleton.comp4905.carcassonne.common.Player;
@@ -99,6 +100,7 @@ public class GameController implements Initializable {
 		keepAliveTimer.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
+				try { Thread.sleep(100); } catch (InterruptedException e) { }
 				Event event = new Event(EventType.KEEP_ALIVE, client.getGame().getPlayerName());
 				sendEvent(event, LocalMessages.getString("GameForceStop"));
 			}
@@ -399,6 +401,7 @@ public class GameController implements Initializable {
 			Connection connection = client.getGame().getConnection();
 			connection.sendEvent(event);
 		} catch (IOException e) {
+			Logger.log("Could not send "+ event);
 			stopKeepAliveTimer();
 			if(isAlive) {
 				PlatformManager.run(new Runnable() {
@@ -428,6 +431,7 @@ public class GameController implements Initializable {
 			Connection connection = client.getGame().getConnection();
 			connection.sendEvent(event);
 		} catch (IOException e) {
+			Logger.log("Could not send "+ event);
 			stopKeepAliveTimer();
 			if(isAlive) {
 				PlatformManager.run(new Runnable() {

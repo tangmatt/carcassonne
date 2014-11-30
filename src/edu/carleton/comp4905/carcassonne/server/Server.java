@@ -13,6 +13,7 @@ import edu.carleton.comp4905.carcassonne.common.Address;
 import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.DefaultAcceptor;
 import edu.carleton.comp4905.carcassonne.common.LocalMessages;
+import edu.carleton.comp4905.carcassonne.common.Logger;
 import edu.carleton.comp4905.carcassonne.common.MessageType;
 import edu.carleton.comp4905.carcassonne.common.Mode;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
@@ -112,6 +113,7 @@ public class Server extends Service implements Runnable {
 					pool.execute(connection);
 				} catch (Exception e) {
 					running = false;
+					Logger.log(e.getMessage());
 				}
 			}
 		} catch (IOException e) {
