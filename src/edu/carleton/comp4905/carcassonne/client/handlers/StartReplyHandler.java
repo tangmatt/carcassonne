@@ -3,7 +3,6 @@ package edu.carleton.comp4905.carcassonne.client.handlers;
 import edu.carleton.comp4905.carcassonne.client.Game;
 import edu.carleton.comp4905.carcassonne.client.GameController;
 import edu.carleton.comp4905.carcassonne.client.GameData;
-import edu.carleton.comp4905.carcassonne.client.LobbyController;
 import edu.carleton.comp4905.carcassonne.common.Connection;
 import edu.carleton.comp4905.carcassonne.common.Event;
 import edu.carleton.comp4905.carcassonne.common.EventHandler;
@@ -16,7 +15,6 @@ public class StartReplyHandler implements EventHandler {
 		Connection connection = (Connection)event.getProperty("connection");
 		Game game = (Game)connection.getService();
 		GameController gameController = game.getGameController();
-		LobbyController lobbyController = gameController.getLobbyController();
 		
 		String target = (String)event.getProperty("target");
 		String[] names = (String[])event.getProperty("names");
@@ -36,7 +34,7 @@ public class StartReplyHandler implements EventHandler {
 			}
 		}
 		
-		lobbyController.close();
+		gameController.closeLobby();
 		game.setMode(mode);
 		gameController.getScoreData().setPlayerScore(game.getPlayerName(), 0);
 		gameController.handleStartGame(names, statuses, target, row, column, mode);

@@ -92,7 +92,7 @@
    <center>
       <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" pannable="true" prefHeight="530.0" prefWidth="596.0" scaleShape="false" vbarPolicy="NEVER" BorderPane.alignment="TOP_CENTER">
         <content>
-          <GridPane fx:id="gridPane" alignment="TOP_CENTER" cacheShape="false" centerShape="false" hgap="3.0" maxHeight="-1.0" maxWidth="-1.0" scaleShape="false" snapToPixel="false" style="" vgap="3.0">
+          <GridPane fx:id="gridPane" alignment="TOP_CENTER" cacheShape="false" centerShape="false" hgap="2.0" maxHeight="-1.0" scaleShape="false" snapToPixel="false" style="" vgap="2.0">
             <columnConstraints>
               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />

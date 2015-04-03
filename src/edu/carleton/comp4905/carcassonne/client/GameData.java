@@ -15,8 +15,7 @@ public class GameData {
 	public static final int TOTAL_FOLLOWERS = 7;
 	public static final int TOTAL_PLAYERS = 5;
 	public static final int TILE_SIZE = 64;
-	public static final int GAP_SIZE = 2;
-	public static final int OFFSET = 30;
+	public static final int GAP_SIZE = 5;
 	
 	private TileContainer[][] tiles;
 	private final TilePreview[] previews;
@@ -43,6 +42,14 @@ public class GameData {
 	 */
 	public void init() {
 		tiles = new TileContainer[ROWS][COLS];
+	}
+	
+	/**
+	 * Returns whether the board has any tiles (even empty).
+	 * @return a boolean
+	 */
+	public boolean isBoardNull() {
+		return tiles == null;
 	}
 	
 	/**
@@ -197,10 +204,10 @@ public class GameData {
 	 * @param container the tile container
 	 * @return the row
 	 */
-	public synchronized int getRowIndex(final TileContainer container) {
+	public int getRowIndex(final TileContainer container) {
 		for(int r=0; r<GameData.ROWS; ++r) {
 			for(int c=0; c<GameData.COLS; ++c) {
-				if(getTile(r, c).equals(container)) {
+				if(getTile(r, c) != null && getTile(r, c).equals(container)) {
 					return r;
 				}
 			}
@@ -213,10 +220,10 @@ public class GameData {
 	 * @param container the tile container
 	 * @return the column
 	 */
-	public synchronized int getColumnIndex(final TileContainer container) {
+	public int getColumnIndex(final TileContainer container) {
 		for(int r=0; r<GameData.ROWS; ++r) {
 			for(int c=0; c<GameData.COLS; ++c) {
-				if(getTile(r, c).equals(container)) {
+				if(getTile(r, c) != null && getTile(r, c).equals(container)) {
 					return c;
 				}
 			}

@@ -29,7 +29,7 @@ public class Carcassonne extends Application {
 		
 		Group root = new Group();
 		root.getChildren().addAll(mainContainer);
-		Scene scene = new Scene(root, 298-10, 281-10);
+		Scene scene = new Scene(root, 298-10, 440-10);
 		primaryStage.setScene(scene); // subtracted by 10 because setResizable adds 10 pixels apparently (on Windows)..
 		primaryStage.show();
 	}

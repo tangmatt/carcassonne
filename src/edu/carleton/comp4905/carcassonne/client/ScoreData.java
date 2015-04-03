@@ -6,6 +6,12 @@ import java.util.Map;
 public class ScoreData {
 	private Map<String, Integer> players;
 	public final static int CLOISTER_POINTS = 9;
+	public final static int ROAD_POINTS = 1;
+	public final static int FIELD_POINTS = 1;
+	public final static int CITY_POINTS = 2;
+	public final static int CITY_POINTS_EXCEPTION = 1;
+	public final static int SHIELD_POINTS = 2;
+	public final static int UNDEFINED = 0;
 	
 	public ScoreData() {
 		players = new HashMap<String, Integer>();

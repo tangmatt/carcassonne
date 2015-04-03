@@ -18,6 +18,8 @@ public class TileContainer extends AbstractTile {
 	public TileContainer(final GameTile tile) {
 		super(tile);
 		this.isHoverTile = false;
+		setMaxSize(GameData.TILE_SIZE+2, GameData.TILE_SIZE+2);
+		setMinSize(GameData.TILE_SIZE+2, GameData.TILE_SIZE+2);
 	}
 	
 	/**
@@ -64,19 +66,19 @@ public class TileContainer extends AbstractTile {
 			follower.setTranslateY(getBottomPositionY(tile, follower));
 		else if(position == Position.LEFT)
 			follower.setTranslateX(getLeftPositionX(tile, follower));
-		else if(position == Position.TOP_RIGHT) {
+		else if(position == Position.TOP_RIGHT_RIGHT || position == Position.TOP_RIGHT_TOP) {
 			follower.setTranslateY(getTopPositionY(tile, follower));
 			follower.setTranslateX(getRightPositionX(tile, follower));
 		}
-		else if(position == Position.BOTTOM_RIGHT) {
+		else if(position == Position.BOTTOM_RIGHT_RIGHT || position == Position.BOTTOM_RIGHT_BOTTOM) {
 			follower.setTranslateY(getBottomPositionY(tile, follower));
 			follower.setTranslateX(getRightPositionX(tile, follower));
 		}
-		else if(position == Position.TOP_LEFT) {
+		else if(position == Position.TOP_LEFT_LEFT || position == Position.TOP_LEFT_TOP) {
 			follower.setTranslateY(getTopPositionY(tile, follower));
 			follower.setTranslateX(getLeftPositionX(tile, follower));
 		}
-		else if(position == Position.BOTTOM_LEFT) {
+		else if(position == Position.BOTTOM_LEFT_LEFT || position == Position.BOTTOM_LEFT_BOTTOM) {
 			follower.setTranslateY(getBottomPositionY(tile, follower));
 			follower.setTranslateX(getLeftPositionX(tile, follower));
 		}
@@ -181,6 +183,23 @@ public class TileContainer extends AbstractTile {
 	}
 	
 	/**
+	 * Returns the id at specified position.
+	 * @param position the position
+	 * @return the id of the connected segment
+	 */
+	public int getPositionId(final Position position) {
+		return tile.getPositionId(position);
+	}
+	
+	/**
+	 * Returns the position data
+	 * @param position the position
+	 */
+	public PositionData getPositionData(final Position position) {
+		return tile.getPositionData(position);
+	}
+	
+	/**
 	 * Returns the mouse hover event handler.
 	 * @return the EventHandler
 	 */
@@ -230,6 +249,15 @@ public class TileContainer extends AbstractTile {
 			setCursor(Cursor.DEFAULT);
 			setStyle(defaultStyle);
 		}
+	}
+	
+	/**
+	 * Returns the segment from specified id.
+	 * @param id
+	 * @return a Segment
+	 */
+	public Segment getSegmentById(final int id) {
+		return tile.getSegmentById(id);
 	}
 	
 	@Override

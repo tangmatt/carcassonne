@@ -61,6 +61,14 @@ public class Game extends Service implements Runnable {
 	}
 	
 	/**
+	 * Returns true if the game has started.
+	 * @return a boolean
+	 */
+	public synchronized boolean hasGameStarted() {
+		return controller.hasGameStarted();
+	}
+	
+	/**
 	 * Returns the client's player name.
 	 * @return a String
 	 */

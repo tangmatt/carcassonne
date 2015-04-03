@@ -49,19 +49,51 @@ public class TileManager {
 				Map<Position, Segment> segments = getSegments(section);
 				GameTile gameTile = new GameTile();
 				gameTile.setTile(key, segments);
-				gameTile.setShield(section.get("SHIELD") != null && section.get("SHIELD").equalsIgnoreCase("TRUE"));
+				if(section.get("SHIELD") != null) {
+					gameTile.setShield(Position.valueOf(section.get("SHIELD")));
+				}
+				if(section.get("DIVIDERS") != null) {
+					String dividers = section.get("DIVIDERS").replace(" ", "");
+					if(dividers.contains(",")) {
+						String[] splitted = dividers.split(",");
+						for(int i=0; i<splitted.length; ++i) {
+							Position pos = Position.valueOf(splitted[i]);
+							gameTile.addDividedArea(pos);
+						}
+					} else {
+						Position pos = Position.valueOf(dividers);
+						gameTile.addDividedArea(pos);
+					}
+				}
 				if(section.get("FOLLOWERS") != null) {
 					String followers = section.get("FOLLOWERS").replace(" ", "");
 					if(followers.contains(",")) {
 						String[] splitted = followers.split(",");
 						for(int i=0; i<splitted.length; ++i) {
 							Position pos = Position.valueOf(splitted[i]);
-							gameTile.setPosition(pos, "");
+							if(pos == Position.TOP_LEFT) {
+								gameTile.setPosition(Position.TOP_LEFT_LEFT, "");
+								gameTile.setPosition(Position.TOP_LEFT_TOP, "");
+							}
+							else if(pos == Position.TOP_RIGHT) {
+								gameTile.setPosition(Position.TOP_RIGHT_RIGHT, "");
+								gameTile.setPosition(Position.TOP_RIGHT_TOP, "");
+							}
+							else if(pos == Position.BOTTOM_LEFT) {
+								gameTile.setPosition(Position.BOTTOM_LEFT_LEFT, "");
+								gameTile.setPosition(Position.BOTTOM_LEFT_BOTTOM, "");
+							}
+							else if(pos == Position.BOTTOM_RIGHT) {
+								gameTile.setPosition(Position.BOTTOM_RIGHT_RIGHT, "");
+								gameTile.setPosition(Position.BOTTOM_RIGHT_BOTTOM, "");
+							}
+							else
+								gameTile.setPosition(pos, "");
 						}
 					} else {
 						Position pos = Position.valueOf(followers);
 						gameTile.setPosition(pos, "");
-					}				
+					}
 				}
 				tiles.put(key, gameTile);
 				counters.put(key, Integer.parseInt(section.get("COUNT")));
@@ -86,10 +118,14 @@ public class TileManager {
 		segments.put(Position.BOTTOM, Segment.valueOf(section.get(Position.BOTTOM.toString())));
 		segments.put(Position.LEFT, Segment.valueOf(section.get(Position.LEFT.toString())));
 		segments.put(Position.CENTER, Segment.valueOf(section.get(Position.CENTER.toString())));
-		segments.put(Position.TOP_LEFT, Segment.valueOf(section.get(Position.TOP_LEFT.toString())));
-		segments.put(Position.TOP_RIGHT, Segment.valueOf(section.get(Position.TOP_RIGHT.toString())));
-		segments.put(Position.BOTTOM_LEFT, Segment.valueOf(section.get(Position.BOTTOM_LEFT.toString())));
-		segments.put(Position.BOTTOM_RIGHT, Segment.valueOf(section.get(Position.BOTTOM_RIGHT.toString())));
+		segments.put(Position.TOP_LEFT_LEFT, Segment.valueOf(section.get(Position.TOP_LEFT_LEFT.toString())));
+		segments.put(Position.TOP_LEFT_TOP, Segment.valueOf(section.get(Position.TOP_LEFT_TOP.toString())));
+		segments.put(Position.TOP_RIGHT_RIGHT, Segment.valueOf(section.get(Position.TOP_RIGHT_RIGHT.toString())));
+		segments.put(Position.TOP_RIGHT_TOP, Segment.valueOf(section.get(Position.TOP_RIGHT_TOP.toString())));
+		segments.put(Position.BOTTOM_LEFT_LEFT, Segment.valueOf(section.get(Position.BOTTOM_LEFT_LEFT.toString())));
+		segments.put(Position.BOTTOM_LEFT_BOTTOM, Segment.valueOf(section.get(Position.BOTTOM_LEFT_BOTTOM.toString())));
+		segments.put(Position.BOTTOM_RIGHT_RIGHT, Segment.valueOf(section.get(Position.BOTTOM_RIGHT_RIGHT.toString())));
+		segments.put(Position.BOTTOM_RIGHT_BOTTOM, Segment.valueOf(section.get(Position.BOTTOM_RIGHT_BOTTOM.toString())));
 		return segments;
 	}
 	

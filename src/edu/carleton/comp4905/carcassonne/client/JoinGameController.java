@@ -2,28 +2,34 @@ package edu.carleton.comp4905.carcassonne.client;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import edu.carleton.comp4905.carcassonne.common.Address;
 import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
+import edu.carleton.comp4905.carcassonne.common.ResourceManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 public class JoinGameController extends InputController implements Initializable, ControlledScreen {
 	@FXML private Label title, sceneDesc, usernameLabel, servAddrLabel, servPortLabel; 
 	@FXML private Button joinButton, hostButton, submitButton;
+	@FXML private ImageView imageLogo;
 	private ScreensController screensController;
 	private Stage stage;
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
-		// do nothing
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				imageLogo.setImage(ResourceManager.getImageFromResources("carcassonne_logo.png"));
+			}
+		});
 	}
 	
 	@FXML

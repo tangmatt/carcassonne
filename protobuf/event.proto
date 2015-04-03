@@ -21,7 +21,7 @@ message Event {
 	optional int32 rotation = 16;
 	optional int32 meeple = 17;
 	optional int32 position = 18;
-	optional bool shield = 19;
+	optional int32 shield = 19;
 	optional string target = 20;
 	optional int32 points = 21;
 	optional int32 followers = 22;
@@ -33,4 +33,5 @@ message Event {
 	optional int32 columns = 28;
 	optional string messageTitle = 29;
 	optional bool quitting = 30;
+	optional int32 serializer = 31;
 }

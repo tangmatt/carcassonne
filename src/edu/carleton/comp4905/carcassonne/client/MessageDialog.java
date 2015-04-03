@@ -15,7 +15,7 @@ public class MessageDialog extends Dialog {
 			@Override
 			public void handle(WindowEvent event) {
 				if(closing) {
-					((GameClient)client).getController().blurGame(false);
+					((GameClient)client).getController().blurGame(true);
 					((GameClient)client).getStage().getOnCloseRequest().handle(null);
 				}
 				close();

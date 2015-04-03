@@ -39,6 +39,7 @@ public abstract class Connection implements Runnable, Serializable {
 					if(event != null)
 						service.getReactor().dispatch(event);
 				} catch (Exception e) {
+					//e.printStackTrace(); // for error messages, if any
 					running = false;
 				}
 			}

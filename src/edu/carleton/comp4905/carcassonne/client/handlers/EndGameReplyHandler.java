@@ -18,6 +18,7 @@ public class EndGameReplyHandler implements EventHandler {
 		String messageTitle = (String)event.getProperty("messageTitle");
 		String message = (String)event.getProperty("message");
 		
+		gameController.stopKeepAliveTimer();
 		gameController.blurGame(true);
 		PlatformManager.run(new Runnable() {
 			@Override

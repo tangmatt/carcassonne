@@ -4,12 +4,11 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ResourceBundle;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import edu.carleton.comp4905.carcassonne.common.LocalMessages;
 import edu.carleton.comp4905.carcassonne.common.Mode;
 import edu.carleton.comp4905.carcassonne.common.PlatformManager;
+import edu.carleton.comp4905.carcassonne.common.ResourceManager;
 import edu.carleton.comp4905.carcassonne.server.ServerClient;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
@@ -28,13 +28,20 @@ public class HostGameController extends InputController implements Initializable
 	@FXML private ToggleGroup toggleGroup;
 	@FXML private RadioButton syncButton, asyncButton;
 	@FXML private Button joinButton, hostButton, submitButton;
+	@FXML private ImageView imageLogo;
 	private ScreensController screensController;
 	private Stage stage;
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
-		syncButton.setTooltip(new Tooltip(LocalMessages.getString("SyncTip")));
-		asyncButton.setTooltip(new Tooltip(LocalMessages.getString("AsyncTip")));
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				imageLogo.setImage(ResourceManager.getImageFromResources("carcassonne_logo.png"));
+				syncButton.setTooltip(new Tooltip(LocalMessages.getString("SyncTip")));
+				asyncButton.setTooltip(new Tooltip(LocalMessages.getString("AsyncTip")));
+			}
+		});
 		
 		try {
 			InetAddress inetAddress = InetAddress.getLocalHost();

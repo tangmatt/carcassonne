@@ -83,7 +83,7 @@ public class ProtoConnection extends Connection {
 		if(eventMessage.hasPosition())
 			event.addProperty("position", Position.values()[eventMessage.getPosition()]);
 		if(eventMessage.hasShield())
-			event.addProperty("shield", eventMessage.getShield());
+			event.addProperty("shield", Position.values()[eventMessage.getShield()]);
 		if(eventMessage.hasTarget())
 			event.addProperty("target", eventMessage.getTarget());
 		if(eventMessage.hasPoints())
@@ -106,6 +106,8 @@ public class ProtoConnection extends Connection {
 			event.addProperty("followers", eventMessage.getFollowers());
 		if(eventMessage.hasQuitting())
 			event.addProperty("quitting", eventMessage.getQuitting());
+		if(eventMessage.hasSerializer())
+			event.addProperty("serializer", Serializer.values()[eventMessage.getSerializer()]);
 		
 		return event;
 	}
@@ -153,7 +155,7 @@ public class ProtoConnection extends Connection {
 		if(event.getProperty("position") != null)
 			builder.setPosition(((Position)event.getProperty("position")).ordinal());
 		if(event.getProperty("shield") != null)
-			builder.setShield((boolean)event.getProperty("shield"));
+			builder.setShield(((Position)event.getProperty("shield")).ordinal());
 		if(event.getProperty("target") != null)
 			builder.setTarget((String)event.getProperty("target"));
 		if(event.getProperty("points") != null)
@@ -176,6 +178,8 @@ public class ProtoConnection extends Connection {
 			builder.setFollowers((int)event.getProperty("followers"));
 		if(event.getProperty("quitting") != null)
 			builder.setQuitting((boolean)event.getProperty("quitting"));
+		if(event.getProperty("serializer") != null)
+			builder.setSerializer(((Serializer)event.getProperty("serializer")).ordinal());
 		
 		return builder.build();
 	}
@@ -191,7 +195,7 @@ public class ProtoConnection extends Connection {
 					Event event = getEvent(eventMessage);
 					buffer.put(event);
 				} catch (Exception e) {
-					//running = false;
+					// do nothing
 				}
 			}
 		}

@@ -225,15 +225,15 @@ public final class EventMessage {
      */
     int getPosition();
 
-    // optional bool shield = 19;
+    // optional int32 shield = 19;
     /**
-     * <code>optional bool shield = 19;</code>
+     * <code>optional int32 shield = 19;</code>
      */
     boolean hasShield();
     /**
-     * <code>optional bool shield = 19;</code>
+     * <code>optional int32 shield = 19;</code>
      */
-    boolean getShield();
+    int getShield();
 
     // optional string target = 20;
     /**
@@ -359,6 +359,16 @@ public final class EventMessage {
      * <code>optional bool quitting = 30;</code>
      */
     boolean getQuitting();
+
+    // optional int32 serializer = 31;
+    /**
+     * <code>optional int32 serializer = 31;</code>
+     */
+    boolean hasSerializer();
+    /**
+     * <code>optional int32 serializer = 31;</code>
+     */
+    int getSerializer();
   }
   /**
    * Protobuf type {@code edu.carleton.comp4905.carcassonne.common.Event}
@@ -523,7 +533,7 @@ public final class EventMessage {
             }
             case 152: {
               bitField0_ |= 0x00010000;
-              shield_ = input.readBool();
+              shield_ = input.readInt32();
               break;
             }
             case 162: {
@@ -579,6 +589,11 @@ public final class EventMessage {
             case 240: {
               bitField0_ |= 0x08000000;
               quitting_ = input.readBool();
+              break;
+            }
+            case 248: {
+              bitField0_ |= 0x10000000;
+              serializer_ = input.readInt32();
               break;
             }
           }
@@ -1089,21 +1104,21 @@ public final class EventMessage {
       return position_;
     }
 
-    // optional bool shield = 19;
+    // optional int32 shield = 19;
     public static final int SHIELD_FIELD_NUMBER = 19;
-    private boolean shield_;
+    private int shield_;
     /**
-     * <code>optional bool shield = 19;</code>
+     * <code>optional int32 shield = 19;</code>
      */
     @Override
 	public boolean hasShield() {
       return ((bitField0_ & 0x00010000) == 0x00010000);
     }
     /**
-     * <code>optional bool shield = 19;</code>
+     * <code>optional int32 shield = 19;</code>
      */
     @Override
-	public boolean getShield() {
+	public int getShield() {
       return shield_;
     }
 
@@ -1389,6 +1404,24 @@ public final class EventMessage {
       return quitting_;
     }
 
+    // optional int32 serializer = 31;
+    public static final int SERIALIZER_FIELD_NUMBER = 31;
+    private int serializer_;
+    /**
+     * <code>optional int32 serializer = 31;</code>
+     */
+    @Override
+	public boolean hasSerializer() {
+      return ((bitField0_ & 0x10000000) == 0x10000000);
+    }
+    /**
+     * <code>optional int32 serializer = 31;</code>
+     */
+    @Override
+	public int getSerializer() {
+      return serializer_;
+    }
+
     private void initFields() {
       eventType_ = 0;
       playerName_ = "";
@@ -1408,7 +1441,7 @@ public final class EventMessage {
       rotation_ = 0;
       meeple_ = 0;
       position_ = 0;
-      shield_ = false;
+      shield_ = 0;
       target_ = "";
       points_ = 0;
       followers_ = 0;
@@ -1420,6 +1453,7 @@ public final class EventMessage {
       columns_ = 0;
       messageTitle_ = "";
       quitting_ = false;
+      serializer_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     @Override
@@ -1498,7 +1532,7 @@ public final class EventMessage {
         output.writeInt32(18, position_);
       }
       if (((bitField0_ & 0x00010000) == 0x00010000)) {
-        output.writeBool(19, shield_);
+        output.writeInt32(19, shield_);
       }
       if (((bitField0_ & 0x00020000) == 0x00020000)) {
         output.writeBytes(20, getTargetBytes());
@@ -1532,6 +1566,9 @@ public final class EventMessage {
       }
       if (((bitField0_ & 0x08000000) == 0x08000000)) {
         output.writeBool(30, quitting_);
+      }
+      if (((bitField0_ & 0x10000000) == 0x10000000)) {
+        output.writeInt32(31, serializer_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -1627,7 +1664,7 @@ public final class EventMessage {
       }
       if (((bitField0_ & 0x00010000) == 0x00010000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(19, shield_);
+          .computeInt32Size(19, shield_);
       }
       if (((bitField0_ & 0x00020000) == 0x00020000)) {
         size += com.google.protobuf.CodedOutputStream
@@ -1672,6 +1709,10 @@ public final class EventMessage {
       if (((bitField0_ & 0x08000000) == 0x08000000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(30, quitting_);
+      }
+      if (((bitField0_ & 0x10000000) == 0x10000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(31, serializer_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1829,7 +1870,7 @@ public final class EventMessage {
         bitField0_ = (bitField0_ & ~0x00010000);
         position_ = 0;
         bitField0_ = (bitField0_ & ~0x00020000);
-        shield_ = false;
+        shield_ = 0;
         bitField0_ = (bitField0_ & ~0x00040000);
         target_ = "";
         bitField0_ = (bitField0_ & ~0x00080000);
@@ -1853,6 +1894,8 @@ public final class EventMessage {
         bitField0_ = (bitField0_ & ~0x10000000);
         quitting_ = false;
         bitField0_ = (bitField0_ & ~0x20000000);
+        serializer_ = 0;
+        bitField0_ = (bitField0_ & ~0x40000000);
         return this;
       }
 
@@ -2009,6 +2052,10 @@ public final class EventMessage {
           to_bitField0_ |= 0x08000000;
         }
         result.quitting_ = quitting_;
+        if (((from_bitField0_ & 0x40000000) == 0x40000000)) {
+          to_bitField0_ |= 0x10000000;
+        }
+        result.serializer_ = serializer_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -2143,6 +2190,9 @@ public final class EventMessage {
         }
         if (other.hasQuitting()) {
           setQuitting(other.getQuitting());
+        }
+        if (other.hasSerializer()) {
+          setSerializer(other.getSerializer());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -3078,37 +3128,37 @@ public final class EventMessage {
         return this;
       }
 
-      // optional bool shield = 19;
-      private boolean shield_ ;
+      // optional int32 shield = 19;
+      private int shield_ ;
       /**
-       * <code>optional bool shield = 19;</code>
+       * <code>optional int32 shield = 19;</code>
        */
       @Override
 	public boolean hasShield() {
         return ((bitField0_ & 0x00040000) == 0x00040000);
       }
       /**
-       * <code>optional bool shield = 19;</code>
+       * <code>optional int32 shield = 19;</code>
        */
       @Override
-	public boolean getShield() {
+	public int getShield() {
         return shield_;
       }
       /**
-       * <code>optional bool shield = 19;</code>
+       * <code>optional int32 shield = 19;</code>
        */
-      public Builder setShield(boolean value) {
+      public Builder setShield(int value) {
         bitField0_ |= 0x00040000;
         shield_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional bool shield = 19;</code>
+       * <code>optional int32 shield = 19;</code>
        */
       public Builder clearShield() {
         bitField0_ = (bitField0_ & ~0x00040000);
-        shield_ = false;
+        shield_ = 0;
         onChanged();
         return this;
       }
@@ -3624,6 +3674,41 @@ public final class EventMessage {
         return this;
       }
 
+      // optional int32 serializer = 31;
+      private int serializer_ ;
+      /**
+       * <code>optional int32 serializer = 31;</code>
+       */
+      @Override
+	public boolean hasSerializer() {
+        return ((bitField0_ & 0x40000000) == 0x40000000);
+      }
+      /**
+       * <code>optional int32 serializer = 31;</code>
+       */
+      @Override
+	public int getSerializer() {
+        return serializer_;
+      }
+      /**
+       * <code>optional int32 serializer = 31;</code>
+       */
+      public Builder setSerializer(int value) {
+        bitField0_ |= 0x40000000;
+        serializer_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 serializer = 31;</code>
+       */
+      public Builder clearSerializer() {
+        bitField0_ = (bitField0_ & ~0x40000000);
+        serializer_ = 0;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:edu.carleton.comp4905.carcassonne.common.Event)
     }
 
@@ -3650,7 +3735,7 @@ public final class EventMessage {
   static {
     java.lang.String[] descriptorData = {
       "\n\013event.proto\022(edu.carleton.comp4905.car" +
-      "cassonne.common\"\225\004\n\005Event\022\021\n\teventType\030\001" +
+      "cassonne.common\"\251\004\n\005Event\022\021\n\teventType\030\001" +
       " \002(\005\022\022\n\nplayerName\030\002 \002(\t\022\022\n\nconnection\030\003" +
       " \001(\014\022\017\n\007address\030\004 \001(\t\022\014\n\004port\030\005 \001(\005\022\024\n\014n" +
       "umOfPlayers\030\006 \001(\005\022\017\n\007success\030\007 \001(\010\022\017\n\007me" +
@@ -3658,13 +3743,13 @@ public final class EventMessage {
       " \003(\t\022\020\n\010finished\030\013 \001(\010\022\026\n\016gameInProgress" +
       "\030\014 \001(\010\022\014\n\004tile\030\r \001(\t\022\013\n\003row\030\016 \001(\005\022\016\n\006col" +
       "umn\030\017 \001(\005\022\020\n\010rotation\030\020 \001(\005\022\016\n\006meeple\030\021 " +
-      "\001(\005\022\020\n\010position\030\022 \001(\005\022\016\n\006shield\030\023 \001(\010\022\016\n",
+      "\001(\005\022\020\n\010position\030\022 \001(\005\022\016\n\006shield\030\023 \001(\005\022\016\n",
       "\006target\030\024 \001(\t\022\016\n\006points\030\025 \001(\005\022\021\n\tfollowe" +
       "rs\030\026 \001(\005\022\023\n\013targetIndex\030\027 \001(\005\022\014\n\004mode\030\030 " +
       "\001(\005\022\020\n\010checksum\030\031 \001(\t\022\021\n\ttilesLeft\030\032 \001(\005" +
       "\022\014\n\004rows\030\033 \001(\005\022\017\n\007columns\030\034 \001(\005\022\024\n\014messa" +
-      "geTitle\030\035 \001(\t\022\020\n\010quitting\030\036 \001(\010B\016B\014Event" +
-      "Message"
+      "geTitle\030\035 \001(\t\022\020\n\010quitting\030\036 \001(\010\022\022\n\nseria" +
+      "lizer\030\037 \001(\005B\016B\014EventMessage"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -3677,7 +3762,7 @@ public final class EventMessage {
           internal_static_edu_carleton_comp4905_carcassonne_common_Event_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_edu_carleton_comp4905_carcassonne_common_Event_descriptor,
-              new java.lang.String[] { "EventType", "PlayerName", "Connection", "Address", "Port", "NumOfPlayers", "Success", "Message", "Statuses", "Names", "Finished", "GameInProgress", "Tile", "Row", "Column", "Rotation", "Meeple", "Position", "Shield", "Target", "Points", "Followers", "TargetIndex", "Mode", "Checksum", "TilesLeft", "Rows", "Columns", "MessageTitle", "Quitting", });
+              new java.lang.String[] { "EventType", "PlayerName", "Connection", "Address", "Port", "NumOfPlayers", "Success", "Message", "Statuses", "Names", "Finished", "GameInProgress", "Tile", "Row", "Column", "Rotation", "Meeple", "Position", "Shield", "Target", "Points", "Followers", "TargetIndex", "Mode", "Checksum", "TilesLeft", "Rows", "Columns", "MessageTitle", "Quitting", "Serializer", });
           return null;
         }
       };

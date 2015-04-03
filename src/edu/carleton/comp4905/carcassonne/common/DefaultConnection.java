@@ -43,8 +43,7 @@ public class DefaultConnection extends Connection {
 					Event event = (Event) new ObjectInputStream(peer.getInputStream()).readObject();
 					buffer.put(event);
 				} catch (Exception e) {
-					//running = false;
-					Logger.log(e.getMessage());
+					// do nothing
 				}
 			}
 		}

@@ -1,7 +1,28 @@
-Applications will not terminate on close (a thread may still be running, but I could not figure out which one).
-For now, simply terminate them all after running. Using an IDE to compile and run would be the simplest choice rather than using the .jar file.
-A temporary fix for the issue was made but it affected the network communication so requests did not make it through.
-I had to sacrifice the termination of applications in order to let the game run properly.
+How to run the application?
+ - Java 8 is required (check Build Path to ensure it is correctly pointing to it)
+ - Run Carcassonne.java (the manager that will allow player to start server or join a game)
 
 How to change the serialization method?
-- Go to app.properties and under SERIALIZER, type the preferred method (JAVA_SERIALIZE or GOOGLE_PROTOBUF)
+ - Go to app.properties and under SERIALIZER, type the preferred method (JAVA_SERIALIZE or GOOGLE_PROTOBUF)
+
+How to add more event handlers?
+ - Add a new line in client.properties/server.properties using existing format
+
+How to add more tiles?
+ - Add a new section in the tiles.ini file using existing format
+
+How to export to a JAR file in Eclipse?
+ - Right-click on Carcassonne project and select Export...
+ - Select Runnable JAR file from Java folder and press Next
+ - Make sure "Package required libraries into generated JAR" is selected
+ - Press Finish
+ - (also copy the config folder to the same directory as the Carcassonne JAR file, else the actual game scene will not appear)
+
+Noticing any problems such as network-related issues or game just not functioning properly?
+ - Create another server with a port that has not been binded/used
+
+Notes:
+ - [CRITICAL] When passing in a new variable over the network, be sure to incorporate it in the protobuf .PROTO file AND in ProtoConnection
+ - The user interface is in .FXML files
+ - Images are located in the resources package
+ - Used http://www.fwtwr.com/fwtwr/carcassonne/rules.asp as a quick reference for rules

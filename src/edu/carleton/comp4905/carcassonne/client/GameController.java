@@ -6,7 +6,12 @@ import java.text.ChoiceFormat;
 import java.text.Format;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Timer;
@@ -15,18 +20,8 @@ import java.util.TimerTask;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.PopOver.ArrowLocation;
 
-import edu.carleton.comp4905.carcassonne.common.CommonUtil;
-import edu.carleton.comp4905.carcassonne.common.Connection;
-import edu.carleton.comp4905.carcassonne.common.Event;
-import edu.carleton.comp4905.carcassonne.common.EventType;
-import edu.carleton.comp4905.carcassonne.common.LocalMessages;
-import edu.carleton.comp4905.carcassonne.common.Logger;
-import edu.carleton.comp4905.carcassonne.common.Mode;
-import edu.carleton.comp4905.carcassonne.common.PlatformManager;
-import edu.carleton.comp4905.carcassonne.common.Player;
-import edu.carleton.comp4905.carcassonne.common.Position;
-import edu.carleton.comp4905.carcassonne.common.ResourceManager;
-import edu.carleton.comp4905.carcassonne.common.TileManager;
+import edu.carleton.comp4905.carcassonne.common.*;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -48,7 +43,7 @@ public class GameController implements Initializable {
 	@FXML private HBox previewPane;
 	@FXML private Label deckLabel, scoreLabel, pointsLabel;
 	@FXML private ImageView player1, player2, player3, player4, player5;
-	@FXML private ImageView meeple1, meeple2, meeple3, meeple4, meeple5, meeple6, meeple7; // meeple a.k.a follower
+	@FXML private ImageView meeple1, meeple2, meeple3, meeple4, meeple5, meeple6, meeple7;
 	private ImageView[] playerViews;
 	private PopOver popOver;
 	private TileManager tileManager;
@@ -60,8 +55,9 @@ public class GameController implements Initializable {
 	private TileContainer lastTile;
 	private Timer keepAliveTimer;
 	private boolean isAlive;
+	private Map<Integer, Set<TileContainer>> ownedSegments;
 	
-	public static final int KEEP_ALIVE_MSECS = 30 * 1000;
+	public static final int KEEP_ALIVE_MSECS = 45 * 1000;
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -71,6 +67,7 @@ public class GameController implements Initializable {
 		scoreData = new ScoreData();
 		tileManager = TileManager.getInstance();
 		isAlive = true;
+		ownedSegments = new HashMap<Integer, Set<TileContainer>>();
 		
 		playerViews = new ImageView[] { player1, player2, player3, player4, player5 };
 		ImageView[] followerViews = new ImageView[] { meeple1, meeple2, meeple3, meeple4, meeple5, meeple6, meeple7 };
@@ -137,6 +134,17 @@ public class GameController implements Initializable {
 			@Override
 			public void run() {
 				lastTile = container;
+				
+				container.setOnMouseClicked(new EventHandler<MouseEvent>() {
+					@Override
+					public void handle(MouseEvent event) {
+						Logger.log(container.getTile().getName());
+						for (Position key : container.getTile().getPositions().keySet()) {
+							Logger.log(key + " (" + container.getSegment(key) + ")" + " = " + container.getPositionData(key));
+						}
+					}
+				});
+				
 				putTile(container, row, column);
 				if(!container.isEmpty()) {
 					if(gameData.getColumnIndex(container) == GameData.COLS-1) {
@@ -556,7 +564,7 @@ public class GameController implements Initializable {
 		gameEvent.addProperty("column", column);
 		gameEvent.addProperty("meeple", gameData.getIndex());
 		gameEvent.addProperty("position", container.getFollowerPosition());
-		gameEvent.addProperty("shield", container.getTile().hasShield());
+		gameEvent.addProperty("shield", container.getTile().getShield());
 		sendEvent(gameEvent);
 		container.setHoverTile(false);
 		endTurn();
@@ -683,7 +691,7 @@ public class GameController implements Initializable {
 					else
 						javafx.event.Event.fireEvent(gameData.getPreviews()[0], mousePressEvent);
 				} catch(Exception e) {
-					//e.printStackTrace();
+					// do nothing
 				}
 			}
 		});
@@ -750,7 +758,8 @@ public class GameController implements Initializable {
 	 * @param column the column
 	 */
 	public synchronized void addStartingTile(final int row, final int column) {
-		addTile(new TileContainer(tileManager.getStarterTile()), row, column);
+		TileContainer container = new TileContainer(tileManager.getStarterTile());
+		addTile(container, row, column);
 	}
 	
 	/**
@@ -814,15 +823,175 @@ public class GameController implements Initializable {
 	 * Retrieves all of the followers and recalculates the connected segment data.
 	 */
 	public synchronized void updateFollowers() {
-		PlatformManager.run(new Runnable() {
-			@Override
-			public void run() {
-				for(TileContainer container : gameData.getTilesWithFollowers().keySet()) {
-					String playerName = gameData.getTilesWithFollowers().get(container);
-					updateConnectedSegments(container, container.getFollowerPosition(), playerName);
-				}
-			}
-		});
+		for(TileContainer container : gameData.getTilesWithFollowers().keySet()) {
+			String playerName = gameData.getTilesWithFollowers().get(container);
+			updateConnectedSegments(container, container.getFollowerPosition(), playerName);
+		}
+	}
+	
+	/**
+	 * Updates all tiles such as segment owners.
+	 * @param container a TileContainer
+	 * @param r a row
+	 * @param c a column
+	 */
+	public synchronized void updateTiles(final int r, final int c) {
+		TileContainer topTile = gameData.getTile(r-1, c);
+		TileContainer bottomTile = gameData.getTile(r+1, c);
+		TileContainer leftTile = gameData.getTile(r, c-1);
+		TileContainer rightTile = gameData.getTile(r, c+1);
+		TileContainer currentTile = gameData.getTile(r, c);
+		Set<TileContainer> traversed = new HashSet<TileContainer>();
+		
+		if(!traversed.contains(currentTile)) {
+			traversed.add(currentTile);
+			updateConnectedSegments(currentTile);
+			updateTiles(r, c, traversed);
+		}
+		
+		if(!traversed.contains(topTile)) {
+			traversed.add(topTile);
+			updateConnectedSegments(topTile);
+			updateTiles(r-1, c, traversed);
+		}
+		
+		if(!traversed.contains(bottomTile)) {
+			traversed.add(bottomTile);
+			updateConnectedSegments(bottomTile);
+			updateTiles(r+1, c, traversed);
+		}
+		
+		if(!traversed.contains(leftTile)) {
+			traversed.add(leftTile);
+			updateConnectedSegments(leftTile);
+			updateTiles(r, c-1, traversed);
+		}
+		
+		if(!traversed.contains(rightTile)) {
+			traversed.add(rightTile);
+			updateConnectedSegments(rightTile);
+			updateTiles(r, c+1, traversed);
+		}
+	}
+	
+	/**
+	 * Updates all tiles such as segment owners.
+	 * @param container a TileContainer
+	 */
+	public synchronized void updateTiles(final int r, final int c, final Set<TileContainer> traversed) {
+		TileContainer topTile = gameData.getTile(r-1, c);
+		TileContainer bottomTile = gameData.getTile(r+1, c);
+		TileContainer leftTile = gameData.getTile(r, c-1);
+		TileContainer rightTile = gameData.getTile(r, c+1);
+		
+		if(!traversed.contains(topTile)) {
+			traversed.add(topTile);
+			updateConnectedSegments(topTile);
+			updateTiles(r-1, c, traversed);
+		}
+		
+		if(!traversed.contains(bottomTile)) {
+			traversed.add(bottomTile);
+			updateConnectedSegments(bottomTile);
+			updateTiles(r+1, c, traversed);
+		}
+		
+		if(!traversed.contains(leftTile)) {
+			traversed.add(leftTile);
+			updateConnectedSegments(leftTile);
+			updateTiles(r, c-1, traversed);
+		}
+		
+		if(!traversed.contains(rightTile)) {
+			traversed.add(rightTile);
+			updateConnectedSegments(rightTile);
+			updateTiles(r, c+1, traversed);
+		}
+	}
+	
+	/**
+	 * Updates all tiles such as segment owners.
+	 * @param container a TileContainer
+	 */
+	public synchronized void updateConnectedSegments(final TileContainer container) {
+		int r = gameData.getRowIndex(container), c = gameData.getColumnIndex(container);
+		if(container == null || container.getTile().getName().equals("empty.png") || container.isEmpty())
+			return;
+		TileContainer leftTile = gameData.getTile(r, c-1);
+		TileContainer rightTile = gameData.getTile(r, c+1);
+		TileContainer topTile = gameData.getTile(r-1, c);
+		TileContainer bottomTile = gameData.getTile(r+1, c);
+		if(topTile != null && container.getTopSegment() == topTile.getBottomSegment() && !CommonUtil.isNullOrEmpty(topTile.getPositionOwner(Position.BOTTOM))) {
+			container.getTile().updateSegmentOwners(Position.TOP, topTile.getPositionOwner(Position.BOTTOM), topTile.getPositionId(Position.BOTTOM));
+			updateOwnedSegments(topTile.getPositionId(Position.BOTTOM), topTile);
+			updateOwnedSegments(container.getPositionId(Position.BOTTOM), container);
+		}
+		
+		if(topTile != null && container.getSegment(Position.TOP_RIGHT_TOP) == topTile.getSegment(Position.BOTTOM_RIGHT_BOTTOM) && !CommonUtil.isNullOrEmpty(topTile.getPositionOwner(Position.BOTTOM_RIGHT_BOTTOM))) {
+			container.getTile().updateSegmentOwners(Position.TOP_RIGHT_TOP, topTile.getPositionOwner(Position.BOTTOM_RIGHT_BOTTOM), topTile.getPositionId(Position.BOTTOM_RIGHT_BOTTOM));
+			updateOwnedSegments(topTile.getPositionId(Position.BOTTOM_RIGHT_BOTTOM), topTile);
+			updateOwnedSegments(container.getPositionId(Position.BOTTOM_RIGHT_BOTTOM), container);
+		}
+		
+		if(topTile != null && container.getSegment(Position.TOP_LEFT_TOP) == topTile.getSegment(Position.BOTTOM_LEFT_BOTTOM) && !CommonUtil.isNullOrEmpty(topTile.getPositionOwner(Position.BOTTOM_LEFT_BOTTOM))) {
+			container.getTile().updateSegmentOwners(Position.TOP_LEFT_TOP, topTile.getPositionOwner(Position.BOTTOM_LEFT_BOTTOM), topTile.getPositionId(Position.BOTTOM_LEFT_BOTTOM));
+			updateOwnedSegments(topTile.getPositionId(Position.BOTTOM_LEFT_BOTTOM), topTile);
+			updateOwnedSegments(container.getPositionId(Position.BOTTOM_LEFT_BOTTOM), container);
+		}
+		
+		if(bottomTile != null && container.getBottomSegment() == bottomTile.getTopSegment() && !CommonUtil.isNullOrEmpty(bottomTile.getPositionOwner(Position.TOP))) {
+			container.getTile().updateSegmentOwners(Position.BOTTOM, bottomTile.getPositionOwner(Position.TOP), bottomTile.getPositionId(Position.TOP));
+			updateOwnedSegments(bottomTile.getPositionId(Position.TOP), bottomTile);
+			updateOwnedSegments(container.getPositionId(Position.TOP), container);
+		}
+		
+		if(bottomTile != null && container.getSegment(Position.BOTTOM_RIGHT_BOTTOM) == bottomTile.getSegment(Position.TOP_RIGHT_TOP) && !CommonUtil.isNullOrEmpty(bottomTile.getPositionOwner(Position.TOP_RIGHT_TOP))) {
+			container.getTile().updateSegmentOwners(Position.BOTTOM_RIGHT_BOTTOM, bottomTile.getPositionOwner(Position.TOP_RIGHT_TOP), bottomTile.getPositionId(Position.TOP_RIGHT_TOP));
+			updateOwnedSegments(bottomTile.getPositionId(Position.TOP_RIGHT_TOP), bottomTile);
+			updateOwnedSegments(container.getPositionId(Position.TOP_RIGHT_TOP), container);
+		}
+		
+		if(bottomTile != null && container.getSegment(Position.BOTTOM_LEFT_BOTTOM) == bottomTile.getSegment(Position.TOP_LEFT_TOP) && !CommonUtil.isNullOrEmpty(bottomTile.getPositionOwner(Position.TOP_LEFT_TOP))) {
+			container.getTile().updateSegmentOwners(Position.BOTTOM_LEFT_BOTTOM, bottomTile.getPositionOwner(Position.TOP_LEFT_TOP), bottomTile.getPositionId(Position.TOP_LEFT_TOP));
+			updateOwnedSegments(bottomTile.getPositionId(Position.TOP_LEFT_TOP), bottomTile);
+			updateOwnedSegments(container.getPositionId(Position.TOP_LEFT_TOP), container);
+		}
+
+		if(leftTile != null && container.getLeftSegment() == leftTile.getRightSegment() && !CommonUtil.isNullOrEmpty(leftTile.getPositionOwner(Position.RIGHT))) {
+			container.getTile().updateSegmentOwners(Position.LEFT, leftTile.getPositionOwner(Position.RIGHT), leftTile.getPositionId(Position.RIGHT));
+			updateOwnedSegments(leftTile.getPositionId(Position.RIGHT), leftTile);
+			updateOwnedSegments(container.getPositionId(Position.RIGHT), container);
+		}
+		
+		if(leftTile != null && container.getSegment(Position.TOP_LEFT_LEFT) == leftTile.getSegment(Position.TOP_RIGHT_RIGHT) && !CommonUtil.isNullOrEmpty(leftTile.getPositionOwner(Position.TOP_RIGHT_RIGHT))) {
+			container.getTile().updateSegmentOwners(Position.TOP_LEFT_LEFT, leftTile.getPositionOwner(Position.TOP_RIGHT_RIGHT), leftTile.getPositionId(Position.TOP_RIGHT_RIGHT));
+			updateOwnedSegments(leftTile.getPositionId(Position.TOP_RIGHT_RIGHT), leftTile);
+			updateOwnedSegments(container.getPositionId(Position.TOP_RIGHT_RIGHT), container);
+		}
+
+		if(leftTile != null && container.getSegment(Position.BOTTOM_LEFT_LEFT) == leftTile.getSegment(Position.BOTTOM_RIGHT_RIGHT) && !CommonUtil.isNullOrEmpty(leftTile.getPositionOwner(Position.BOTTOM_RIGHT_RIGHT))) {
+			container.getTile().updateSegmentOwners(Position.BOTTOM_LEFT_LEFT, leftTile.getPositionOwner(Position.BOTTOM_RIGHT_RIGHT), leftTile.getPositionId(Position.BOTTOM_RIGHT_RIGHT));
+			updateOwnedSegments(leftTile.getPositionId(Position.BOTTOM_RIGHT_RIGHT), leftTile);
+			updateOwnedSegments(container.getPositionId(Position.BOTTOM_RIGHT_RIGHT), container);
+		}
+		
+		if(rightTile != null && container.getRightSegment() == rightTile.getLeftSegment() && !CommonUtil.isNullOrEmpty(rightTile.getPositionOwner(Position.LEFT))) {
+			container.getTile().updateSegmentOwners(Position.RIGHT, rightTile.getPositionOwner(Position.LEFT), rightTile.getPositionId(Position.LEFT));
+			updateOwnedSegments(rightTile.getPositionId(Position.LEFT), rightTile);
+			updateOwnedSegments(container.getPositionId(Position.LEFT), container);
+		}
+		
+		if(rightTile != null && container.getSegment(Position.TOP_RIGHT_RIGHT) == rightTile.getSegment(Position.TOP_RIGHT_RIGHT) && !CommonUtil.isNullOrEmpty(rightTile.getPositionOwner(Position.TOP_RIGHT_RIGHT))) {
+			container.getTile().updateSegmentOwners(Position.TOP_RIGHT_RIGHT, rightTile.getPositionOwner(Position.TOP_RIGHT_RIGHT), rightTile.getPositionId(Position.TOP_RIGHT_RIGHT));
+			updateOwnedSegments(rightTile.getPositionId(Position.TOP_RIGHT_RIGHT), rightTile);
+			updateOwnedSegments(container.getPositionId(Position.TOP_RIGHT_RIGHT), container);
+		}
+		
+		if(rightTile != null && container.getSegment(Position.BOTTOM_RIGHT_RIGHT) == rightTile.getSegment(Position.BOTTOM_LEFT_LEFT) && !CommonUtil.isNullOrEmpty(rightTile.getPositionOwner(Position.BOTTOM_LEFT_LEFT))) {
+			container.getTile().updateSegmentOwners(Position.BOTTOM_RIGHT_RIGHT, rightTile.getPositionOwner(Position.BOTTOM_LEFT_LEFT), rightTile.getPositionId(Position.BOTTOM_LEFT_LEFT));
+			updateOwnedSegments(rightTile.getPositionId(Position.BOTTOM_LEFT_LEFT), rightTile);
+			updateOwnedSegments(container.getPositionId(Position.BOTTOM_LEFT_LEFT), container);
+		}
 	}
 	
 	/**
@@ -832,15 +1001,12 @@ public class GameController implements Initializable {
 	 * @param name the name
 	 */
 	public synchronized void updateConnectedSegments(final TileContainer container, final Position position, final String name) {
-		PlatformManager.run(new Runnable() {
-			@Override
-			public void run() {
-				Set<TileContainer> traversed = new HashSet<TileContainer>();
-				container.getTile().updateSegmentOwners(position, name);
-				traversed.add(container);
-				updateConnectedSegments(container, container.getSegment(position), position, name, traversed);
-			}
-		});
+		Set<TileContainer> traversed = new HashSet<TileContainer>();
+		int id = container.getPositionId(position);
+		container.getTile().updateSegmentOwners(position, name, id);
+		traversed.add(container);
+		updateOwnedSegments(container.getPositionId(position), container);
+		updateConnectedSegments(container, container.getSegment(position), position, name, traversed, id);
 	}
 	
 	/**
@@ -850,62 +1016,80 @@ public class GameController implements Initializable {
 	 * @param position the position
 	 * @param name the name
 	 * @param traversed the list of traversed tiles
+	 * @param id the identifier
 	 */
 	private void updateConnectedSegments(final TileContainer container, final Segment segment,
-			final Position position, final String name, final Set<TileContainer> traversed) {
+			final Position position, final String name, final Set<TileContainer> traversed, final int id) {
 		final int r = gameData.getRowIndex(container), c = gameData.getColumnIndex(container);
 
 		if(r-1 >= 0) {
 			TileContainer temp = gameData.getTile(r-1, c);
-			if(temp != null && segment == temp.getBottomSegment() && !traversed.contains(temp)
+			if(temp != null && segment == temp.getBottomSegment() && !traversed.contains(temp) && id == temp.getPositionId(Position.BOTTOM)
 					&& (temp.getTile().getPositionOwner(Position.BOTTOM) == null || temp.getTile().getPositionOwner(Position.BOTTOM).isEmpty()
 					|| temp.getTile().getPositionOwner(Position.BOTTOM).equals(name))) {
-				temp.getTile().updateSegmentOwners(Position.BOTTOM, name);
+				temp.getTile().updateSegmentOwners(Position.BOTTOM, name, id);
 				traversed.add(temp);
-				//container.showFollower(Position.TOP, 3);
-				updateConnectedSegments(temp, temp.getBottomSegment(), Position.BOTTOM, name, traversed);
+				updateOwnedSegments(temp.getPositionId(Position.BOTTOM), temp);
+				updateOwnedSegments(container.getPositionId(Position.BOTTOM), container);
+				updateConnectedSegments(temp, temp.getBottomSegment(), Position.BOTTOM, name, traversed, id);
 			}
 		}
 		if(r+1 < GameData.ROWS) {
 			TileContainer temp = gameData.getTile(r+1, c);
-			if(temp != null && segment == temp.getTopSegment() && !traversed.contains(temp)
+			if(temp != null && segment == temp.getTopSegment() && !traversed.contains(temp) && id == temp.getPositionId(Position.TOP)
 					&& (temp.getTile().getPositionOwner(Position.TOP) == null || temp.getTile().getPositionOwner(Position.TOP).isEmpty()
 					|| temp.getTile().getPositionOwner(Position.TOP).equals(name))) {
-				temp.getTile().updateSegmentOwners(Position.TOP, name);
+				temp.getTile().updateSegmentOwners(Position.TOP, name, id);
 				traversed.add(temp);
-				//container.showFollower(Position.BOTTOM, 3);
-				updateConnectedSegments(temp, temp.getTopSegment(), Position.TOP, name, traversed);
+				updateOwnedSegments(temp.getPositionId(Position.TOP), temp);
+				updateOwnedSegments(container.getPositionId(Position.TOP), container);
+				updateConnectedSegments(temp, temp.getTopSegment(), Position.TOP, name, traversed, id);
 			}
 		}
 		if(c-1 >= 0) {
 			TileContainer temp = gameData.getTile(r, c-1);
-			if(temp != null && segment == temp.getRightSegment() && !traversed.contains(temp)
+			if(temp != null && segment == temp.getRightSegment() && !traversed.contains(temp) && id == temp.getPositionId(Position.RIGHT)
 					&& (temp.getTile().getPositionOwner(Position.RIGHT) == null || temp.getTile().getPositionOwner(Position.RIGHT).isEmpty()
 					|| temp.getTile().getPositionOwner(Position.RIGHT).equals(name))) {
-				temp.getTile().updateSegmentOwners(Position.RIGHT, name);
+				temp.getTile().updateSegmentOwners(Position.RIGHT, name, id);
 				traversed.add(temp);
-				//container.showFollower(Position.LEFT, 3);
-				updateConnectedSegments(temp, temp.getRightSegment(), Position.RIGHT, name, traversed);
+				updateOwnedSegments(temp.getPositionId(Position.RIGHT), temp);
+				updateOwnedSegments(container.getPositionId(Position.RIGHT), container);
+				updateConnectedSegments(temp, temp.getRightSegment(), Position.RIGHT, name, traversed, id);
 			}
 		}
 		if(c+1 < GameData.COLS) {
 			TileContainer temp = gameData.getTile(r, c+1);
-			if(temp != null && segment == temp.getLeftSegment() && !traversed.contains(temp)
+			if(temp != null && segment == temp.getLeftSegment() && !traversed.contains(temp) && id == temp.getPositionId(Position.LEFT)
 					&& (temp.getTile().getPositionOwner(Position.LEFT) == null || temp.getTile().getPositionOwner(Position.LEFT).isEmpty()
 					|| temp.getTile().getPositionOwner(Position.LEFT).equals(name))) {
-				temp.getTile().updateSegmentOwners(Position.LEFT, name);
+				temp.getTile().updateSegmentOwners(Position.LEFT, name, id);
 				traversed.add(temp);
-				//container.showFollower(Position.RIGHT, 3);
-				updateConnectedSegments(temp, temp.getLeftSegment(), Position.LEFT, name, traversed);
+				updateOwnedSegments(temp.getPositionId(Position.LEFT), temp);
+				updateOwnedSegments(container.getPositionId(Position.LEFT), container);
+				updateConnectedSegments(temp, temp.getLeftSegment(), Position.LEFT, name, traversed, id);
 			}
 		}
 	}
 	
 	/**
-	 * Handles the final scoring of the game.
+	 * Adds the owned segments mapped to an id.
+	 * @param id the identifier
+	 * @param tile the game tile
 	 */
-	public synchronized void handleFinalScoring() {
-		
+	public synchronized void updateOwnedSegments(final int id, final TileContainer tile) {
+		Set<TileContainer> ownedTiles = ownedSegments.get(id);
+		if(id == PositionData.INVALID_ID)
+			return;
+		if(ownedTiles == null) {
+			Set<TileContainer> newTiles = new HashSet<TileContainer>();
+			newTiles.add(tile);
+			ownedSegments.put(id, newTiles);
+		}
+		else {
+			ownedTiles.add(tile);
+			ownedSegments.put(id, ownedTiles);
+		}
 	}
 	
 	/**
@@ -914,7 +1098,14 @@ public class GameController implements Initializable {
 	 */
 	public synchronized void handleCompleteSegments(final String player) {
 		handleCompleteCloister(player);
-		//handleCompleteRoad(player);
+	}
+	
+	/**
+	 * Checks for completed cloisters then handles accordingly.
+	 * @param player the player name
+	 */
+	public synchronized void handleScoring(final String player) {
+		handleSegmentScoring(player);
 	}
 	
 	/**
@@ -928,7 +1119,7 @@ public class GameController implements Initializable {
 				for(int r=0; r<GameData.ROWS; ++r) {
 					for(int c=0; c<GameData.COLS; ++c) {
 						TileContainer container = gameData.getTile(r, c);
-						if(container.getTile().getSegment(Position.CENTER) == Segment.CLOISTER && container.getFollowerPosition() != null) {
+						if(container.getTile().getSegment(Position.CENTER) == Segment.CLOISTER && container.getChildren().contains(container.follower)) {
 							int count = 0;
 							if(r-1 >= 0 && !gameData.getTile(r-1, c).isHoverTile() && !gameData.getTile(r-1, c).isEmpty())
 								count++;
@@ -944,13 +1135,80 @@ public class GameController implements Initializable {
 									sendScoreUpdateRequest(container.getTile().getPositionOwner(Position.CENTER), ScoreData.CLOISTER_POINTS);
 									sendFollowerUpdateRequest(container.getTile().getPositionOwner(Position.CENTER), 1);
 								}
-								container.getTile().removeSegment(Position.CENTER);
 							}
 						}
 					}
 				}
 			}
 		});
+	}
+	
+	/**
+	 * Checks for completed segments then handles accordingly.
+	 * @param player the player name
+	 */
+	public synchronized void handleSegmentScoring(final String player) {
+		List<Integer> ids = new ArrayList<Integer>();
+		for(Entry<Integer, Set<TileContainer>> entry : ownedSegments.entrySet()) {
+			boolean isComplete = true;
+			int numOfShields = 0;
+			Set<TileContainer> tiles = entry.getValue();
+			TileContainer temp = null;
+			int id = entry.getKey();
+			for(TileContainer tile : tiles) {
+				int r = gameData.getRowIndex(tile), c = gameData.getColumnIndex(tile);
+				temp = tile;
+				if(tile.getPositionId(Position.TOP) == id && (gameData.getTile(r-1, c) == null || gameData.getTile(r-1, c).isEmpty())) {
+					isComplete = false;
+					break;
+				}
+				if(tile.getPositionId(Position.BOTTOM) == id && (gameData.getTile(r+1, c) == null || gameData.getTile(r+1, c).isEmpty())) {
+					isComplete = false;
+					break;			
+				}
+				if(tile.getPositionId(Position.LEFT) == id && (gameData.getTile(r, c-1) == null || gameData.getTile(r, c-1).isEmpty())) {
+					isComplete = false;
+					break;
+				}
+				if(tile.getPositionId(Position.RIGHT) == id && (gameData.getTile(r, c+1) == null || gameData.getTile(r, c+1).isEmpty())) {
+					isComplete = false;
+					break;
+				}
+				if(tile.getPositionId(tile.getTile().getShield()) == id) {
+					++numOfShields;
+				}
+			}
+
+			String name = temp.getTile().getOwnerOfId(id);
+			if(isComplete && id != PositionData.INVALID_ID) {
+				int score = ScoreData.UNDEFINED;
+				if(temp.getSegmentById(id) == Segment.ROAD) {
+					score = ScoreData.ROAD_POINTS;
+				} else if(temp.getSegmentById(id) == Segment.CITY) {
+					score = ScoreData.CITY_POINTS;
+					if(tiles.size() == 2) {
+						score = ScoreData.CITY_POINTS_EXCEPTION;
+					}
+				} else {
+					continue;
+				}
+				
+				if(client.getGame().getPlayerName().equalsIgnoreCase(player)) {
+					sendScoreUpdateRequest(name, (score * tiles.size()) + (ScoreData.SHIELD_POINTS * numOfShields));
+				}
+					
+				for(TileContainer tile : tiles) {
+					if(tile.getPositionId(tile.getFollowerPosition()) == id)
+						tile.getChildren().remove(tile.follower);
+					tile.getTile().removePositionsById(id);
+				}
+				ids.add(id);
+			}
+		}
+		
+		for(int id : ids) {
+			ownedSegments.remove(id);
+		}
 	}
 	
 	/**
@@ -1001,7 +1259,8 @@ public class GameController implements Initializable {
 		PlatformManager.run(new Runnable() {
 			@Override
 			public void run() {
-				if(name.equals(client.getGame().getPlayerName()))
+				String playerName = client.getGame().getPlayerName();
+				if(playerName != null && name.equals(playerName))
 					pointsLabel.setText(CommonUtil.convertIntegerToString(score));
 				scoreData.setPlayerScore(name, score);
 			}
@@ -1117,8 +1376,8 @@ public class GameController implements Initializable {
 			}
 		}
 		else {
-			getLobbyController().updatePlayerIcons(numOfPlayers);
-			getLobbyController().handleStartAvailability(numOfPlayers);
+			lobbyDialog.getController().updatePlayerIcons(numOfPlayers);
+			lobbyDialog.getController().handleStartAvailability(numOfPlayers);
 		}
 	}
 	
@@ -1140,16 +1399,16 @@ public class GameController implements Initializable {
 	 * Sets the grid pane's new height.
 	 */
 	public synchronized void updateGridHeight() {
-		gridPane.setPrefHeight(GameData.TILE_SIZE * GameData.ROWS + (GameData.GAP_SIZE * (GameData.ROWS + 1)) + GameData.OFFSET);
-		scrollPane.setPrefHeight(gridPane.getPrefHeight());
+		gridPane.setMinHeight(GameData.TILE_SIZE * GameData.ROWS + (GameData.GAP_SIZE * (GameData.ROWS + 1)));
+		gridPane.setMaxHeight(GameData.TILE_SIZE * GameData.ROWS + (GameData.GAP_SIZE * (GameData.ROWS + 1)));
 	}
 	
 	/**
 	 * Sets the grid pane's new width.
 	 */
 	public synchronized void updateGridWidth() {
-		gridPane.setPrefWidth(GameData.TILE_SIZE * GameData.COLS + (GameData.GAP_SIZE * (GameData.COLS + 1)) + GameData.OFFSET);
-		scrollPane.setPrefWidth(gridPane.getPrefWidth());
+		gridPane.setMinWidth(GameData.TILE_SIZE * GameData.COLS + (GameData.GAP_SIZE * (GameData.COLS + 1)));
+		gridPane.setMaxWidth(GameData.TILE_SIZE * GameData.COLS + (GameData.GAP_SIZE * (GameData.COLS + 1)));
 	}
 	
 	/**
@@ -1159,6 +1418,36 @@ public class GameController implements Initializable {
 	 */
 	public synchronized boolean isPlayerTurn(final String player) {
 		return client.getGame().getMode() == Mode.ASYNC || player.equalsIgnoreCase(client.getGame().getPlayerName());
+	}
+	
+	public synchronized void updateLobbyUI(final int numOfPlayers) {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				lobbyDialog.getController().updatePlayerIcons(numOfPlayers);
+				lobbyDialog.getController().handleStartAvailability(numOfPlayers);
+			}
+		});
+	}
+	
+	/**
+	 * Closes the lobby dialog.
+	 */
+	public synchronized void closeLobby() {
+		PlatformManager.run(new Runnable() {
+			@Override
+			public void run() {
+				lobbyDialog.getController().close();
+			}
+		});
+	}
+	
+	/**
+	 * Returns true if the game has started.
+	 * @return a boolean
+	 */
+	public synchronized boolean hasGameStarted() {
+		return !gameData.isBoardNull();
 	}
 
 	/**
@@ -1201,12 +1490,8 @@ public class GameController implements Initializable {
 		return gameData;
 	}
 	
-	/**
-	 * Returns the LobbyController object.
-	 * @return a LobbyController
-	 */
-	public synchronized LobbyController getLobbyController() {
-		return lobbyDialog.getController();
+	public synchronized Map<Integer, Set<TileContainer>> getOwnedSegments() {
+		return ownedSegments;
 	}
 	
 	/**

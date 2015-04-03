@@ -53,6 +53,7 @@ public class Event implements Serializable {
 	 * Returns a string representation of the event.
 	 * @return an String
 	 */
+	@Override
 	public String toString() {
 		return "Event '" + eventType.name() + "' sent by " + playerName;
 	}

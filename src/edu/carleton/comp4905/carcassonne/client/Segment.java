@@ -6,5 +6,6 @@ public enum Segment {
 	ROAD,
 	CLOISTER,
 	CROSSROAD,
-	EMPTY
+	EMPTY,
+	UNDEFINED
 }

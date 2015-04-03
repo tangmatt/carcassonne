@@ -26,7 +26,7 @@ public class SendTileRequestHandler implements EventHandler {
 		int column = (int)event.getProperty("column");
 		int meeple = (int)event.getProperty("meeple");
 		Position position = (Position)event.getProperty("position");
-		boolean shield = (boolean)event.getProperty("shield");
+		Position shield = (Position)event.getProperty("shield");
 		
 		controller.addMessageEntry(MessageType.INFO, "Player '" + event.getPlayerName() + "' has placed a tile at row=" + row + ", column=" + column + ", name="+tile + ", rotation=" + rotation + ", shield=" + shield);
 		

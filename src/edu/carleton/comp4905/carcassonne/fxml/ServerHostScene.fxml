@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.image.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.geometry.*?>
@@ -8,31 +9,30 @@
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane fx:id="borderPane" prefHeight="281.0" prefWidth="298.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="edu.carleton.comp4905.carcassonne.client.HostGameController">
+<BorderPane fx:id="borderPane" prefWidth="298.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.carleton.comp4905.carcassonne.client.HostGameController">
   <bottom>
     <GridPane hgap="5.0" prefHeight="250.0" prefWidth="287.0" style="-fx-background-color: linear-gradient(#FAFAFA, #F5F5F5);" vgap="5.0">
       <children>
-        <Label fx:id="title" alignment="CENTER" text="%GameTitle" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.hgrow="NEVER" GridPane.rowIndex="0" GridPane.rowSpan="1" GridPane.valignment="CENTER" GridPane.vgrow="NEVER">
+        <Label fx:id="sceneDesc" text="%HostFormDesc" textFill="$x1" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.hgrow="NEVER" GridPane.rowSpan="1" GridPane.valignment="CENTER" GridPane.vgrow="NEVER">
           <font>
-            <Font size="25.0" />
+            <Font name="System Bold" size="15.0" />
           </font>
           <textFill>
             <Color blue="0.427" green="0.424" red="0.424" fx:id="x1" />
           </textFill>
         </Label>
-        <Label fx:id="sceneDesc" text="%HostFormDesc" textFill="$x1" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.rowSpan="1" GridPane.valignment="CENTER" GridPane.vgrow="NEVER" />
-        <Label fx:id="usernameLabel" disable="false" text="%Mode" textFill="$x1" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-        <Label fx:id="servAddrLabel" text="%ServerAddr" textFill="$x1" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-        <Label fx:id="servPortLabel" text="%ServerPort" textFill="$x1" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-        <TextField id="servAddress" fx:id="servAddrField" editable="false" focusTraversable="true" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-        <TextField id="servPort" fx:id="servPortField" prefWidth="200.0" text="5000" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-        <VBox alignment="CENTER_RIGHT" fillWidth="true" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
+        <Label fx:id="usernameLabel" disable="false" text="%Mode" textFill="$x1" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+        <Label fx:id="servAddrLabel" text="%ServerAddr" textFill="$x1" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <Label fx:id="servPortLabel" text="%ServerPort" textFill="$x1" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <TextField id="servAddress" fx:id="servAddrField" editable="false" focusTraversable="true" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+        <TextField id="servPort" fx:id="servPortField" prefWidth="200.0" text="5000" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+        <VBox alignment="CENTER_RIGHT" fillWidth="true" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
           <children>
             <Button id="connectButton" fx:id="submitButton" defaultButton="true" focusTraversable="false" onAction="#handleSubmit" style="-fx-background-color: #4486F7;&#10;-fx-background-radius: 0;&#10;-fx-border-color: #3079ED;" text="%HostButton" textFill="WHITE" />
           </children>
         </VBox>
-        <Label fx:id="messagePrompt" opacity="1.0" text="" textFill="#ff3333" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="5" GridPane.rowSpan="1" />
-        <HBox alignment="CENTER_LEFT" fillHeight="true" prefHeight="100.0" prefWidth="200.0" spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+        <Label fx:id="messagePrompt" opacity="1.0" text="" textFill="#ff3333" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="4" GridPane.rowSpan="1" />
+        <HBox alignment="CENTER_LEFT" fillHeight="true" prefHeight="100.0" prefWidth="200.0" spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
           <children>
             <RadioButton fx:id="syncButton" mnemonicParsing="false" selected="true" text="%Sync" textFill="$x1">
               <toggleGroup>
@@ -59,16 +59,21 @@
         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
       </rowConstraints>
     </GridPane>
   </bottom>
-  <top>
-    <ToolBar style="-fx-border-color: transparent transparent #444444 transparent;&#10;-fx-background-color: #4D4D4D;">
-      <items>
-        <Button fx:id="joinButton" cancelButton="false" defaultButton="false" disable="false" focusTraversable="false" mnemonicParsing="false" onAction="#handleJoinGame" style="-fx-background-color: transparent;" text="%Join" textFill="WHITE" />
-        <Button fx:id="hostButton" defaultButton="false" disable="true" mnemonicParsing="false" style="-fx-background-color: transparent;" text="%Host" textFill="WHITE" visible="true" />
-      </items>
-    </ToolBar>
-  </top>
+   <top>
+      <VBox prefWidth="100.0" style="-fx-background-color: linear-gradient(#fff8dc 0%, #B3AE9A 100%);" BorderPane.alignment="CENTER">
+         <children>
+            <ImageView fx:id="imageLogo" fitHeight="159.0" fitWidth="297.0">
+            </ImageView>
+          <ToolBar style="-fx-border-color: #444444 transparent #444444 transparent;&#10;-fx-background-color: #4D4D4D;">
+            <items>
+              <Button fx:id="joinButton" cancelButton="false" defaultButton="false" disable="false" focusTraversable="false" mnemonicParsing="false" onAction="#handleJoinGame" style="-fx-background-color: transparent;" text="%Join" textFill="#b1b1b1" />
+              <Button fx:id="hostButton" defaultButton="false" focusTraversable="false" mnemonicParsing="false" style="-fx-background-color: transparent;" text="%Host" textFill="WHITE" visible="true" />
+            </items>
+          </ToolBar>
+         </children>
+      </VBox>
+   </top>
 </BorderPane>

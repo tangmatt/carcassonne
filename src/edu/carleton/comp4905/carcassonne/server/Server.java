@@ -210,13 +210,11 @@ public class Server extends Service implements Runnable {
 	
 	@Override
 	public void shutdown() {
-		for(Connection connection : connections.values())
-			connection.close();
 		try {
 			if(listener != null)
 				listener.close();
 		} catch (IOException e) {
-			//e.printStackTrace();
+			// do nothing
 		}
 		controller.addMessageEntry(MessageType.INFO, "Server is now offline");
 		pool.shutdownNow();

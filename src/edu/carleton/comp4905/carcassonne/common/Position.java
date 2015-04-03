@@ -1,16 +1,11 @@
 package edu.carleton.comp4905.carcassonne.common;
 
-/**
- * Note: It is crucial to have these positions in the correct order as they have now.
- * Any changes may affect the algorithm to connect the same adjacent segments.
- * 
- * Ordinals:
- * 0 1 2
- * 3 4 5
- * 6 7 8
- */
 public enum Position {
-	TOP_LEFT, TOP, TOP_RIGHT,
+	TOP_LEFT_LEFT, TOP_LEFT, TOP_LEFT_TOP,
+	TOP,
+	TOP_RIGHT_TOP, TOP_RIGHT, TOP_RIGHT_RIGHT,
 	LEFT, CENTER, RIGHT,
-	BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT
+	BOTTOM_LEFT_LEFT, BOTTOM_LEFT, BOTTOM_LEFT_BOTTOM,
+	BOTTOM,
+	BOTTOM_RIGHT_BOTTOM, BOTTOM_RIGHT, BOTTOM_RIGHT_RIGHT
 }
